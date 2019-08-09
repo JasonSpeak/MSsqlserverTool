@@ -8,7 +8,11 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Windows;
+using System.Windows.Input;
+using GalaSoft.MvvmLight.CommandWpf;
 using NLog;
+using NLog.Fluent;
 
 
 namespace MSsqlTool.ViewModel
@@ -42,42 +46,26 @@ namespace MSsqlTool.ViewModel
 
         private SqlConnection _connection;
 
-        private List<SqlMenuModel> _dataBaseForMenu;
+        private List<SqlMenuModel> _mainList;
 
+        public ICommand ItemCommand { get; private set; }
 
-        public List<SqlMenuModel> DataBaseForMenu
+        public List<SqlMenuModel> MainList
         {
-            get { return _dataBaseForMenu; }
-            set { _dataBaseForMenu = value; }
+            get { return _mainList; }
         }
 
         public MainViewModel()
         {
             InitializeData();
+            ItemCommand = new RelayCommand(ItemSelectedExecuted);
         }
-
-
-        //private List<string> DataBasesWithoutSysDataBase
-        //{
-        //    get
-        //    {
-        //        List<string> databases=new List<string>();
-        //        foreach (DataRow row in _dataBaseTable.Rows)
-        //        {
-        //            if (!Enum.IsDefined(typeof(SysDataBases), row["name"]))
-        //            {
-        //                databases.Add(row["name"].ToString());
-        //            }
-        //        }
-        //        return databases;
-        //    }
-        //}
 
         private void InitializeData()
         {
+            DataTable dataBaseTable = new DataTable();
             try
             {
-                DataTable dataBaseTable = new DataTable();
                 using (_connection = new SqlConnection(connectString))
                 {
                     _connection.Open();
@@ -92,7 +80,67 @@ namespace MSsqlTool.ViewModel
             {
                 logger.Error(e.Message);
             }
-
+            List<string> tempDataBaseList = new List<string>();
+            foreach (DataRow row in dataBaseTable.Rows)
+            {
+                if (!Enum.IsDefined(typeof(SysDataBases), row["name"]))
+                {
+                    tempDataBaseList.Add(row["name"].ToString());
+                }
+            }
+            _mainList = new List<SqlMenuModel>();
+            List<SqlMenuModel> DataBasesList = new List<SqlMenuModel>();
+            foreach (string name in tempDataBaseList)
+            {
+                List<SqlMenuModel> tablesList = GetTableList(name);
+                SqlMenuModel tempMenuModel = new SqlMenuModel(){Name = name,MenuTables = tablesList,level = 2};
+                DataBasesList.Add(tempMenuModel);
+            }
+            _mainList.Add(new SqlMenuModel(){Name = "Êý¾Ý¿â",MenuTables = DataBasesList,level = 1});
         }
+
+        private List<SqlMenuModel> GetTableList(string databaseName)
+        {
+            List<SqlMenuModel> tableList = new List<SqlMenuModel>();
+            SqlConnection getTableConnection = new SqlConnection();
+            DataTable TableNames = new DataTable();
+            string GetTableConnString =
+                String.Format(
+                    "data source=.\\SQLEXPRESS;initial catalog={0};integrated security=True;MultipleActiveResultSets=True;App=EntityFramework",
+                    databaseName);
+            try
+            {
+                using (getTableConnection = new SqlConnection(GetTableConnString))
+                {
+                    getTableConnection.Open();
+                    string selectTableString = "select name from sys.tables";
+                    SqlDataAdapter tablesNameAdapter = new SqlDataAdapter(selectTableString,getTableConnection);
+                    TableNames = new DataTable();
+                    tablesNameAdapter.Fill(TableNames);
+                    getTableConnection.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error(e.Message);
+            }
+
+            foreach (DataRow row in TableNames.Rows)
+            {
+                tableList.Add(new SqlMenuModel(row["name"].ToString()){level = 3});
+            }
+
+            foreach (var s in tableList)
+            {
+                logger.Trace(s.Name);
+            }
+            return tableList;
+        }
+
+        private void ItemSelectedExecuted()
+        {
+            MessageBox.Show("HI");
+        }
+        
     }
 }

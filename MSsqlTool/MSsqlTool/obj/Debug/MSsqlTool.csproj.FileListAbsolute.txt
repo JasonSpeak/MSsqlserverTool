@@ -20,7 +20,6 @@ E:\SmallTools\MSsqlTools\MSsqlTool\MSsqlTool\bin\Debug\GalaSoft.MvvmLight.Platfo
 E:\SmallTools\MSsqlTools\MSsqlTool\MSsqlTool\bin\Debug\NLog.xml
 E:\SmallTools\MSsqlTools\MSsqlTool\MSsqlTool\bin\Debug\zh-Hans\EntityFramework.resources.dll
 E:\SmallTools\MSsqlTools\MSsqlTool\MSsqlTool\bin\Debug\zh-Hans\EntityFramework.SqlServer.resources.dll
-E:\SmallTools\MSsqlTools\MSsqlTool\MSsqlTool\obj\Debug\MSsqlTool.csprojAssemblyReference.cache
 E:\SmallTools\MSsqlTools\MSsqlTool\MSsqlTool\obj\Debug\View\MainWindow.g.cs
 E:\SmallTools\MSsqlTools\MSsqlTool\MSsqlTool\obj\Debug\App.g.cs
 E:\SmallTools\MSsqlTools\MSsqlTool\MSsqlTool\obj\Debug\GeneratedInternalTypeHelper.g.cs
@@ -36,3 +35,11 @@ E:\SmallTools\MSsqlTools\MSsqlTool\MSsqlTool\obj\Debug\MSsqlTool.csproj.CopyComp
 E:\SmallTools\MSsqlTools\MSsqlTool\MSsqlTool\obj\Debug\MSsqlTool.exe
 E:\SmallTools\MSsqlTools\MSsqlTool\MSsqlTool\obj\Debug\MSsqlTool.pdb
 E:\SmallTools\MSsqlTools\MSsqlTool\MSsqlTool\bin\Debug\NLog.config
+E:\SmallTools\MSsqlTools\MSsqlTool\MSsqlTool\bin\Debug\MaterialDesignColors.dll
+E:\SmallTools\MSsqlTools\MSsqlTool\MSsqlTool\bin\Debug\MaterialDesignThemes.Wpf.dll
+E:\SmallTools\MSsqlTools\MSsqlTool\MSsqlTool\bin\Debug\MaterialDesignColors.pdb
+E:\SmallTools\MSsqlTools\MSsqlTool\MSsqlTool\bin\Debug\MaterialDesignThemes.Wpf.pdb
+E:\SmallTools\MSsqlTools\MSsqlTool\MSsqlTool\bin\Debug\MaterialDesignThemes.Wpf.xml
+E:\SmallTools\MSsqlTools\MSsqlTool\MSsqlTool\obj\Debug\Styles\ContextMenuStyle.baml
+E:\SmallTools\MSsqlTools\MSsqlTool\MSsqlTool\obj\Debug\Styles\DataBaseTreeStyle.baml
+E:\SmallTools\MSsqlTools\MSsqlTool\MSsqlTool\obj\Debug\MSsqlTool.csprojAssemblyReference.cache
