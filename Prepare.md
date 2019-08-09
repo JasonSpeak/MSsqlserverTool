@@ -45,3 +45,7 @@
     with  
     move 'database_name' to 'D:\Program Files\Microsoft SQL Server\MSSQL11.SQLEXPRESS\MSSQL\DATA\database_name.mdf',  
     move 'database_name_log' to 'D:\Program Files\Microsoft SQL   Server\MSSQL11.SQLEXPRESS\MSSQL\DATA\database_name_log.ldf'
+
+# 注意点
+> - 备份数据库可选择输出路径
+> - 恢复数据库可选择备份文件，根据备份文件名称决定恢复的数据库名称
