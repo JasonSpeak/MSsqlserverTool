@@ -9,44 +9,65 @@
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     Title="MSsqlTool"
     Width="1680"
+    MinWidth="840"
     Height="1050"
-    Background="{DynamicResource MaterialDesignLightBackground}"
+    MinHeight="525"
     DataContext="{Binding Source={StaticResource Locator}, Path=Main}"
-    FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
     Icon="/MSsqlTool;component/Icons/SQL.png"
-    TextElement.FontSize="14"
+    TextElement.FontSize="16"
     TextElement.FontWeight="Medium"
-    TextElement.Foreground="{DynamicResource MaterialDesignBody}"
     mc:Ignorable="d">
+    <Window.Resources>
+        <ContextMenu x:Key="DatabaseMenu">
+            <MenuItem
+                Command="{Binding Source={StaticResource Locator}, Path=Main.ExportCommand}"
+                CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}, Path=PlacementTarget.Header.Name}"
+                Header="导出" />
+        </ContextMenu>
+        <ContextMenu x:Key="OpenTables">
+            <MenuItem Command="{Binding Source={StaticResource Locator}, Path=Main.ItemCommand}" Header="打开" />
+        </ContextMenu>
+    </Window.Resources>
     <Grid ShowGridLines="True">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="3*" />
             <ColumnDefinition Width="17*" />
         </Grid.ColumnDefinitions>
         <Grid Grid.Column="0">
-            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                <TreeView ItemsSource="{Binding MainList}">
+            <ScrollViewer
+                HorizontalContentAlignment="Left"
+                HorizontalScrollBarVisibility="Auto"
+                VerticalScrollBarVisibility="Auto">
+                <TreeView HorizontalContentAlignment="Left" ItemsSource="{Binding MainDatabaseList}">
                     <TreeView.ItemTemplate>
                         <HierarchicalDataTemplate DataType="{x:Type dm:SqlMenuModel}" ItemsSource="{Binding MenuTables}">
-                            <TextBlock Tag="{Binding level}" Text="{Binding Name}" />
+                            <TextBlock Text="{Binding Name}" />
+                            <HierarchicalDataTemplate.ItemContainerStyle>
+                                <Style BasedOn="{StaticResource MaterialDesignTreeViewItem}" TargetType="TreeViewItem">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Level}" Value="database">
+                                            <Setter Property="ContextMenu" Value="{StaticResource DatabaseMenu}" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Level}" Value="table">
+                                            <Setter Property="ContextMenu" Value="{StaticResource OpenTables}" />
+                                        </DataTrigger>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="IsSelected" Value="True" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </HierarchicalDataTemplate.ItemContainerStyle>
                         </HierarchicalDataTemplate>
                     </TreeView.ItemTemplate>
-                    <TreeView.ItemContainerStyle>
-                        <Style TargetType="TreeViewItem">
-                            <Setter Property="IsExpanded" Value="True" />
-                        </Style>
-                    </TreeView.ItemContainerStyle>
                     <TreeView.ContextMenu>
                         <ContextMenu>
-                            
+                            <MenuItem Command="{Binding ImportCommand}" Header="导入" />
                         </ContextMenu>
                     </TreeView.ContextMenu>
                 </TreeView>
             </ScrollViewer>
         </Grid>
-        <Grid
-            Grid.Column="1"
-            ShowGridLines="True">
+        <Grid Grid.Column="1" ShowGridLines="True">
             <Grid.RowDefinitions>
                 <RowDefinition Height="35px" />
                 <RowDefinition Height="*" />

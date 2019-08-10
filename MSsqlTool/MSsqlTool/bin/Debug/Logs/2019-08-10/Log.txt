@@ -1,0 +1,133 @@
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_ExportCommand>b__11_0 => MainViewModel.ExportExecuted DataBase Name = 
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_ExportCommand>b__11_0 => MainViewModel.ExportExecuted DataBase Name = 
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_ExportCommand>b__11_0 => MainViewModel.ExportExecuted DataBase Name = 
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_ExportCommand>b__11_0 => MainViewModel.ExportExecuted DataBase Name = lonwin_test_sqw
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_ExportCommand>b__11_0 => MainViewModel.ExportExecuted DataBase Name = mvb
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_ExportCommand>b__11_0 => MainViewModel.ExportExecuted DataBase Name = mvvm
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_ExportCommand>b__11_0 => MainViewModel.ExportExecuted DataBase Name = mvp
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_ExportCommand>b__11_0 => MainViewModel.ExportExecuted DataBase Name = lonwin_test_sqw
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+MainViewModel..ctor => MainViewModel.InitializeData => MainViewModel.GetTableList test
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_ExportCommand>b__11_0 => MainViewModel.ExportExecuted DataBase Name = lonwin_test_sqw
+RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted => MainViewModel.PrepareForImport Unknown object type 'databaselonwin_test_sqw' used in a CREATE, DROP, or ALTER statement.
+RuntimeMethodInfo.UnsafeInvokeInternal => RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted Exclusive access could not be obtained because the database is in use.
+RESTORE DATABASE is terminating abnormally.
+RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted => MainViewModel.PrepareForImport Unknown object type 'databaselonwin_test_sqw' used in a CREATE, DROP, or ALTER statement.
+RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted => MainViewModel.PrepareForImport Unknown object type 'databaselonwin_test_sqw' used in a CREATE, DROP, or ALTER statement.
+RuntimeMethodInfo.UnsafeInvokeInternal => RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted Exclusive access could not be obtained because the database is in use.
+RESTORE DATABASE is terminating abnormally.
+RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted => MainViewModel.PrepareForImport Cannot drop database "lonwin_test_sqw" because it is currently in use.
+RuntimeMethodInfo.UnsafeInvokeInternal => RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted Exclusive access could not be obtained because the database is in use.
+RESTORE DATABASE is terminating abnormally.
+RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted => MainViewModel.PrepareForImport Cannot drop database "lonwin_test_sqw" because it is currently in use.
+RuntimeMethodInfo.UnsafeInvokeInternal => RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted Exclusive access could not be obtained because the database is in use.
+RESTORE DATABASE is terminating abnormally.
+RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted => MainViewModel.PrepareForImport Cannot drop database "lonwin_test_sqw" because it is currently in use.
+RuntimeMethodInfo.UnsafeInvokeInternal => RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted Exclusive access could not be obtained because the database is in use.
+RESTORE DATABASE is terminating abnormally.
+RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted => MainViewModel.PrepareForImport ExecuteNonQuery 要求已打开且可用的 Connection。连接的当前状态为已关闭。
+RuntimeMethodInfo.UnsafeInvokeInternal => RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted Exclusive access could not be obtained because the database is in use.
+RESTORE DATABASE is terminating abnormally.
+RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted => MainViewModel.PrepareForImport Cannot drop database "lonwin_test_sqw" because it is currently in use.
+RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted => MainViewModel.PrepareForImport Cannot drop database "lonwin_test_sqw" because it is currently in use.
+RuntimeMethodInfo.UnsafeInvokeInternal => RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted Exclusive access could not be obtained because the database is in use.
+RESTORE DATABASE is terminating abnormally.
+RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted => MainViewModel.PrepareForImport Cannot drop database "lonwin_test_sqw" because it is currently in use.
+RuntimeMethodInfo.UnsafeInvokeInternal => RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted Exclusive access could not be obtained because the database is in use.
+RESTORE DATABASE is terminating abnormally.
+RuntimeMethodInfo.UnsafeInvokeInternal => RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted Incorrect syntax near the keyword 'from'.
+RuntimeMethodInfo.UnsafeInvokeInternal => RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted Exclusive access could not be obtained because the database is in use.
+RESTORE DATABASE is terminating abnormally.
+RuntimeMethodInfo.UnsafeInvokeInternal => RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted Exclusive access could not be obtained because the database is in use.
+RESTORE DATABASE is terminating abnormally.
+RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted => MainViewModel.PrepareForImport Cannot drop database "lonwin_test_sqw" because it is currently in use.
+RuntimeMethodInfo.UnsafeInvokeInternal => RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted Exclusive access could not be obtained because the database is in use.
+RESTORE DATABASE is terminating abnormally.
+RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted => MainViewModel.PrepareForImport Cannot drop database "lonwin_test_sqw" because it is currently in use.
+RuntimeMethodInfo.UnsafeInvokeInternal => RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted Exclusive access could not be obtained because the database is in use.
+RESTORE DATABASE is terminating abnormally.
+RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted => MainViewModel.PrepareForImport Cannot drop database "lonwin_test_sqw" because it is currently in use.
+RuntimeMethodInfo.UnsafeInvokeInternal => RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted Exclusive access could not be obtained because the database is in use.
+RESTORE DATABASE is terminating abnormally.
+RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted => MainViewModel.PrepareForImport Cannot drop database "lonwin_test_sqw" because it is currently in use.
+RuntimeMethodInfo.UnsafeInvokeInternal => RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted Exclusive access could not be obtained because the database is in use.
+RESTORE DATABASE is terminating abnormally.
+RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted => MainViewModel.PrepareForImport Cannot drop database "mvb" because it is currently in use.
+RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted => MainViewModel.PrepareForImport Cannot drop database "mvb" because it is currently in use.
+RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted => MainViewModel.PrepareForImport Cannot drop the database 'mvb', because it does not exist or you do not have permission.
+RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted => MainViewModel.PrepareForImport Cannot drop database "mvb" because it is currently in use.
+RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted => MainViewModel.PrepareForImport Cannot drop database "mvb" because it is currently in use.

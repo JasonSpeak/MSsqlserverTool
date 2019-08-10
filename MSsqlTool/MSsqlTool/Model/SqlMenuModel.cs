@@ -3,14 +3,45 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GalaSoft.MvvmLight;
 
 namespace MSsqlTool.Model
 {
-    public class SqlMenuModel
+    public class SqlMenuModel:ObservableObject
     {
-        public string Name { get; set; }
-        public int level { get; set; }
-        public List<SqlMenuModel> MenuTables { get; set; }
+        private string _name;
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                _name = value;
+                RaisePropertyChanged(() => Name);
+            }
+        }
+
+        private string _level;
+        public string Level
+        {
+            get => _level;
+            set
+            {
+                _level = value;
+                RaisePropertyChanged(() => Level);
+            }
+        }
+
+        private List<SqlMenuModel> _menuTables;
+
+        public List<SqlMenuModel> MenuTables
+        {
+            get => _menuTables;
+            set
+            {
+                _menuTables = value;
+                RaisePropertyChanged(() => MenuTables);
+            }
+        }
 
         public SqlMenuModel()
         {

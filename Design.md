@@ -1,5 +1,6 @@
 # Model
 > - SqlMenuModel
 >   - string Name
->   - int level
+>   - string Level
 >   - List< SqlMenuModel > MenuTables
+
