@@ -2,20 +2,25 @@
     x:Class="MSsqlTool.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:commandBehaviors="clr-namespace:MSsqlTool.CommandBehaviors"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:dm="clr-namespace:MSsqlTool.Model"
     xmlns:local="clr-namespace:MSsqlTool"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:percentageConverter="clr-namespace:MSsqlTool.ViewModel"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:wpf="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf"
     Title="MSsqlTool"
     Width="1680"
-    MinWidth="840"
     Height="1050"
+    MinWidth="840"
     MinHeight="525"
     DataContext="{Binding Source={StaticResource Locator}, Path=Main}"
     Icon="/MSsqlTool;component/Icons/SQL.png"
     TextElement.FontSize="16"
     TextElement.FontWeight="Medium"
+    WindowState="Maximized"
     mc:Ignorable="d">
     <Window.Resources>
         <ContextMenu x:Key="DatabaseMenu">
@@ -25,8 +30,9 @@
                 Header="导出" />
         </ContextMenu>
         <ContextMenu x:Key="OpenTables">
-            <MenuItem Command="{Binding Source={StaticResource Locator}, Path=Main.ItemCommand}" Header="打开" />
+            <MenuItem Command="{Binding Source={StaticResource Locator}, Path=Main.OpenTableCommand}" Header="打开" />
         </ContextMenu>
+        <percentageConverter:PercentageConverter x:Key="PercentageConverter" />
     </Window.Resources>
     <Grid ShowGridLines="True">
         <Grid.ColumnDefinitions>
@@ -45,16 +51,19 @@
                             <HierarchicalDataTemplate.ItemContainerStyle>
                                 <Style BasedOn="{StaticResource MaterialDesignTreeViewItem}" TargetType="TreeViewItem">
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Level}" Value="database">
+                                        <DataTrigger Binding="{Binding Level}" Value="databases">
                                             <Setter Property="ContextMenu" Value="{StaticResource DatabaseMenu}" />
                                         </DataTrigger>
-                                        <DataTrigger Binding="{Binding Level}" Value="table">
+                                        <DataTrigger Binding="{Binding Level}" Value="tables">
                                             <Setter Property="ContextMenu" Value="{StaticResource OpenTables}" />
+                                            <Setter Property="commandBehaviors:MouseDoubleClick.Command" Value="{Binding Source={StaticResource Locator}, Path=Main.OpenTableCommand}" />
+                                            <Setter Property="commandBehaviors:MouseDoubleClick.CommandParameter" Value="{Binding Name}" />
                                         </DataTrigger>
                                         <Trigger Property="IsMouseOver" Value="True">
                                             <Setter Property="IsSelected" Value="True" />
                                         </Trigger>
                                     </Style.Triggers>
+                                    <Setter Property="IsExpanded" Value="True" />
                                 </Style>
                             </HierarchicalDataTemplate.ItemContainerStyle>
                         </HierarchicalDataTemplate>
@@ -62,16 +71,59 @@
                     <TreeView.ContextMenu>
                         <ContextMenu>
                             <MenuItem Command="{Binding ImportCommand}" Header="导入" />
+                            <MenuItem Command="{Binding RefreshCommand}" Header="刷新" />
                         </ContextMenu>
                     </TreeView.ContextMenu>
+                    <TreeView.ItemContainerStyle>
+                        <Style BasedOn="{StaticResource MaterialDesignTreeViewItem}" TargetType="TreeViewItem">
+                            <Setter Property="IsExpanded" Value="True" />
+                        </Style>
+                    </TreeView.ItemContainerStyle>
                 </TreeView>
             </ScrollViewer>
         </Grid>
         <Grid Grid.Column="1" ShowGridLines="True">
             <Grid.RowDefinitions>
-                <RowDefinition Height="35px" />
+                <RowDefinition Height="50px" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
+            <StackPanel
+                x:Name="TableStackPanel"
+                Grid.Row="0"
+                Orientation="Horizontal">
+                <ListView ItemsSource="{Binding OpenedTableList, Mode=TwoWay}">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel IsItemsHost="True" Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <materialDesign:Chip
+                                Width="{Binding Converter={StaticResource PercentageConverter}, ElementName=TableStackPanel, Path=ActualWidth, ConverterParameter=0.12}"
+                                Height="30px"
+                                Content="{Binding TableName}"
+                                IsDeletable="True" />
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource MaterialDesignListView}">
+                            <Style.Triggers>
+                                
+                            </Style.Triggers>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                </ListView>
+                <!--<Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>-->
+            </StackPanel>
             <Grid Grid.Row="1">
                 <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" />
             </Grid>

@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:d1p1="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:wpf="clr-namespace:MaterialDesignThemes;assembly=MaterialDesignThemes.Wpf"
     xmlns:vm="clr-namespace:MSsqlTool.ViewModel"
     d1p1:Ignorable="d"
     StartupUri="View/MainWindow.xaml">

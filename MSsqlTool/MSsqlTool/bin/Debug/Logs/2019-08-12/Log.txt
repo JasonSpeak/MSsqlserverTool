@@ -1,0 +1,58 @@
+MainViewModel.ImportExecuted => MainViewModel.PrepareForImport => MainViewModel.DropDataBase Cannot drop database "lonwin_test_sqw" because it is currently in use.
+Changed database context to 'master'.
+RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted => MainViewModel.ImportDataBase Exclusive access could not be obtained because the database is in use.
+RESTORE DATABASE is terminating abnormally.
+MainViewModel.ImportExecuted => MainViewModel.PrepareForImport => MainViewModel.DropDataBase ExecuteNonQuery 要求已打开且可用的 Connection。连接的当前状态为已关闭。
+MainViewModel.ImportExecuted => MainViewModel.PrepareForImport => MainViewModel.DropDataBase Cannot drop database "lonwin_test_sqw" because it is currently in use.
+Changed database context to 'master'.
+RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted => MainViewModel.ImportDataBase Exclusive access could not be obtained because the database is in use.
+RESTORE DATABASE is terminating abnormally.
+MainViewModel.ImportExecuted => MainViewModel.PrepareForImport => MainViewModel.DropDataBase Cannot drop database "lonwin_test_sqw" because it is currently in use.
+Changed database context to 'master'.
+RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted => MainViewModel.ImportDataBase ExecuteNonQuery 要求已打开且可用的 Connection。连接的当前状态为已关闭。
+RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted => MainViewModel.DropDataBase Cannot drop database "lonwin_test_sqw" because it is currently in use.
+Changed database context to 'master'.
+RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted => MainViewModel.DropDataBase Cannot drop database "mvc" because it is currently in use.
+Changed database context to 'master'.
+RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted => MainViewModel.DropDataBase Cannot drop database "mvc" because it is currently in use.
+Changed database context to 'master'.
+RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted => MainViewModel.DropDataBase Cannot drop database "mvc" because it is currently in use.
+Changed database context to 'master'.
+RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted => MainViewModel.DropDataBase Cannot drop database "mvc" because it is currently in use.
+Changed database context to 'master'.
+RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted => MainViewModel.DropDataBase Cannot drop database "mvc" because it is currently in use.
+Changed database context to 'tempdb'.
+RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted => MainViewModel.DropDataBase ExecuteNonQuery: Connection 属性尚未初始化。
+RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted => MainViewModel.DropDataBase Cannot drop database "mvc" because it is currently in use.
+Changed database context to 'master'.
+RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted => MainViewModel.ImportDataBase ExecuteNonQuery 要求已打开且可用的 Connection。连接的当前状态为已关闭。
+RuntimeMethodHandle.InvokeMethod => MainViewModel.ImportExecuted => MainViewModel.ImportDataBase ExecuteNonQuery 要求已打开且可用的 Connection。连接的当前状态为已关闭。
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_ExportCommand>b__12_0 => MainViewModel.ExportExecuted Cannot open backup device 'C:\Users\lonwin\Desktop\mvp.bak'. Operating system error 5(拒绝访问。).
+BACKUP DATABASE is terminating abnormally.
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_ExportCommand>b__12_0 => MainViewModel.ExportExecuted Cannot open backup device 'C:\Users\lonwin\Desktop\mvp.bak'. Operating system error 5(拒绝访问。).
+BACKUP DATABASE is terminating abnormally.
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_ExportCommand>b__12_0 => MainViewModel.ExportExecuted Cannot open backup device 'C:\Users\lonwin\Documents\mvp.bak'. Operating system error 5(拒绝访问。).
+BACKUP DATABASE is terminating abnormally.
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_ExportCommand>b__12_0 => MainViewModel.ExportExecuted Cannot open backup device 'C:\Users\lonwin\Desktop\lonwin_test_sqw.bak'. Operating system error 5(拒绝访问。).
+BACKUP DATABASE is terminating abnormally.
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_ExportCommand>b__12_0 => MainViewModel.ExportExecuted Cannot open backup device 'C:\Users\lonwin\Desktop\lonwin_test_sqw.bak'. Operating system error 5(拒绝访问。).
+BACKUP DATABASE is terminating abnormally.
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_OpenTableCommand>b__17_0 => MainViewModel.OpenTableExecuted test
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_OpenTableCommand>b__17_0 => MainViewModel.OpenTableExecuted test
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_OpenTableCommand>b__17_0 => MainViewModel.OpenTableExecuted test
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_OpenTableCommand>b__17_0 => MainViewModel.OpenTableExecuted test
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_OpenTableCommand>b__17_0 => MainViewModel.OpenTableExecuted test
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_OpenTableCommand>b__17_0 => MainViewModel.OpenTableExecuted test
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_OpenTableCommand>b__18_0 => MainViewModel.OpenTableExecuted test
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_OpenTableCommand>b__18_0 => MainViewModel.OpenTableExecuted test
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_OpenTableCommand>b__18_0 => MainViewModel.OpenTableExecuted tempUser
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_OpenTableCommand>b__18_0 => MainViewModel.OpenTableExecuted add the table married
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_OpenTableCommand>b__18_0 => MainViewModel.OpenTableExecuted tempUser
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_OpenTableCommand>b__18_0 => MainViewModel.OpenTableExecuted add the table email
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_OpenTableCommand>b__18_0 => MainViewModel.OpenTableExecuted add the table married
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_OpenTableCommand>b__18_0 => MainViewModel.OpenTableExecuted email
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_OpenTableCommand>b__18_0 => MainViewModel.OpenTableExecuted add the table tempUser
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_OpenTableCommand>b__18_0 => MainViewModel.OpenTableExecuted add the table test
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_OpenTableCommand>b__18_0 => MainViewModel.OpenTableExecuted test
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_OpenTableCommand>b__18_0 => MainViewModel.OpenTableExecuted test
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_OpenTableCommand>b__18_0 => MainViewModel.OpenTableExecuted mk

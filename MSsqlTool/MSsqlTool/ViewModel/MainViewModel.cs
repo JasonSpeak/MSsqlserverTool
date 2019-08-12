@@ -17,6 +17,7 @@ using GalaSoft.MvvmLight.CommandWpf;
 using System.Windows.Forms;
 using NLog;
 using NLog.Fluent;
+using DataRow = System.Data.DataRow;
 using MessageBox = System.Windows.MessageBox;
 
 
@@ -57,17 +58,13 @@ namespace MSsqlTool.ViewModel
 
         private RelayCommand _importCommand;
 
+        private RelayCommand<string> _openTableCommand;
+
+        private RelayCommand _refreshCommand;
+
         private List<SqlMenuModel> _mainDatabaseList;
 
-        public List<SqlMenuModel> MainDatabaseList
-        {
-            get { return _mainDatabaseList; }
-            set
-            {
-                _mainDatabaseList = value;
-                RaisePropertyChanged(() => MainDatabaseList);
-            }
-        }
+        private List<OpenedTablesModel> _openedTableList;
 
         public RelayCommand<string> ExportCommand
         {
@@ -77,7 +74,6 @@ namespace MSsqlTool.ViewModel
                 {
                     _exportCommand = new RelayCommand<string>((databaseName) => ExportExecuted(databaseName));
                 }
-
                 return _exportCommand;
             }
             set { _exportCommand = value; }
@@ -97,11 +93,58 @@ namespace MSsqlTool.ViewModel
             set { _importCommand = value; }
         }
 
-        public ICommand ItemCommand { get; private set; }
+        public RelayCommand<string> OpenTableCommand
+        {
+            get
+            {
+                if (_openTableCommand == null)
+                {
+                    _openTableCommand = new RelayCommand<string>((tableName)=>OpenTableExecuted(tableName));
+                }
+
+                return _openTableCommand;
+            }
+            set { _openTableCommand = value; }
+        }
+
+        public RelayCommand RefreshCommand
+        {
+            get
+            {
+                if (_refreshCommand == null)
+                {
+                    _refreshCommand = new RelayCommand(RefreshExecuted);
+                }
+
+                return _refreshCommand;
+            }
+            set { _refreshCommand = value; }
+        }
 
         public List<SqlMenuModel> DataBaselist
         {
             get { return _dataBaselist; }
+        }
+
+        public List<SqlMenuModel> MainDatabaseList
+        {
+            get { return _mainDatabaseList; }
+            set
+            {
+                _mainDatabaseList = value;
+                RaisePropertyChanged(() => MainDatabaseList);
+            }
+        }
+
+
+        public List<OpenedTablesModel> OpenedTableList
+        {
+            get { return _openedTableList; }
+            set
+            {
+                _openedTableList = value;
+                RaisePropertyChanged(()=>OpenedTableList);
+            }
         }
 
         public MainViewModel()
@@ -127,8 +170,8 @@ namespace MSsqlTool.ViewModel
             catch (Exception e)
             {
                 logger.Error(e.Message);
+                _connection.Close();
             }
-            _connection.Dispose();
             List<string> tempDataBaseList = new List<string>();
             foreach (DataRow row in dataBaseTable.Rows)
             {
@@ -141,7 +184,7 @@ namespace MSsqlTool.ViewModel
             foreach (string name in tempDataBaseList)
             {
                 List<SqlMenuModel> tablesList = GetTableList(name);
-                SqlMenuModel tempMenuModel = new SqlMenuModel(){Name = name,MenuTables = tablesList,Level = "database"};
+                SqlMenuModel tempMenuModel = new SqlMenuModel(){Name = name, MenuTables = tablesList, Level = "databases"};
                 _dataBaselist.Add(tempMenuModel);
             }
             MainDatabaseList = new List<SqlMenuModel>
@@ -153,7 +196,7 @@ namespace MSsqlTool.ViewModel
         private string GetDifferentConnectionWithName(string name)
         {
             return String.Format(
-                "data source=.\\SQLEXPRESS;initial catalog={0};integrated security=True;MultipleActiveResultSets=True;App=EntityFramework",
+                "data source=.\\SQLEXPRESS;initial catalog={0};integrated security=True;App=EntityFramework",
                 name);
         }
 
@@ -169,7 +212,7 @@ namespace MSsqlTool.ViewModel
                 {
                     getTableConnection.Open();
                     string selectTableString = "select name from sys.tables";
-                    SqlDataAdapter tablesNameAdapter = new SqlDataAdapter(selectTableString,getTableConnection);
+                    SqlDataAdapter tablesNameAdapter = new SqlDataAdapter(selectTableString, getTableConnection);
                     TableNames = new DataTable();
                     tablesNameAdapter.Fill(TableNames);
                     getTableConnection.Close();
@@ -178,12 +221,13 @@ namespace MSsqlTool.ViewModel
             catch (Exception e)
             {
                 logger.Error(e.Message);
-            }
-            foreach (DataRow row in TableNames.Rows)
-            {
-                tableList.Add(new SqlMenuModel(row["name"].ToString()){Level = "tables"});
+                getTableConnection.Close();
             }
             getTableConnection.Dispose();
+            foreach (DataRow row in TableNames.Rows)
+            {
+                tableList.Add(new SqlMenuModel(row["name"].ToString()) { Level = "tables" });
+            }
             return tableList;
         }
 
@@ -211,49 +255,62 @@ namespace MSsqlTool.ViewModel
                         SqlCommand exportCommand = new SqlCommand(exportDBString,exportDbConnection);
                         exportCommand.ExecuteNonQuery();
                         exportDbConnection.Close();
+                        MessageBox.Show(String.Format("数据库 {0} 已成功备份到文件夹 {1} 中", databaseName, exportFileLocation), "提示");
                     }
                 }
                 catch (Exception e)
                 {
+                    MessageBox.Show(e.Message, "导出错误", MessageBoxButton.YesNo, MessageBoxImage.Error);
                     logger.Error(e.Message);
                 }
-
-                MessageBox.Show(String.Format("数据库 {0} 已成功备份到文件夹 {1} 中", databaseName, exportFileLocation), "提示");
             }
 
         }
 
         private void ImportExecuted()
         {
-            PrepareForImport("test");
-        }
-
-        private void PrepareForImport(string databaseName)
-        {
-            databaseName = "mvb";
+            OpenFileDialog chooseFileDialog = new OpenFileDialog();
+            chooseFileDialog.Title = "选择导入文件";
+            chooseFileDialog.Multiselect = false;
+            chooseFileDialog.Filter = "数据库备份文件(*.bak)|*.bak";
+            string filePath = "";
+            string databaseName = "";
+            if (chooseFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                filePath = chooseFileDialog.FileName;
+                databaseName = Path.GetFileNameWithoutExtension(filePath);
+            }
             try
             {
-                if (MessageBox.Show("本地数据库中已有该数据库，是否立即删除？", "提醒", MessageBoxButton.YesNo, MessageBoxImage.Warning) ==
-                    MessageBoxResult.Yes)
+                using (_connection = new SqlConnection(connectString))
                 {
-                    using (SqlConnection dropConn = new SqlConnection(connectString))
+                    PrepareForImport(_connection, databaseName);
+                    ImportDataBase(_connection, filePath, databaseName);
+                }
+                InitializeData();
+            }
+            catch (Exception e)
+            {
+                logger.Error(e.Message);
+            }
+        }
+
+        private void PrepareForImport(SqlConnection dropConn,string databaseName)
+        {
+            try
+            {
+                dropConn.Open();
+                string getDataBaseString = "select name from sysdatabases";
+                SqlDataAdapter getDataBaseAdapter = new SqlDataAdapter(getDataBaseString,dropConn);
+                DataTable databaseTable = new DataTable();
+                getDataBaseAdapter.Fill(databaseTable);
+                dropConn.Close();
+                foreach (DataRow row in databaseTable.Rows)
+                {
+                    if (row["name"].ToString() == databaseName)
                     {
-                        try
-                        {
-                            dropConn.Open();
-                            SqlCommand dropCommand = new SqlCommand($"Use Master;drop database {databaseName};", dropConn);
-                            dropCommand.ExecuteNonQuery();
-                            MessageBox.Show("已在本地删除该数据库", "提醒");
-                            dropConn.Close();
-                        }
-                        catch (Exception e)
-                        {
-                            MessageBox.Show("删除出现异常，请查看日志");
-                            logger.Error(e.Message);
-                            dropConn.Close();
-                        }
+                        DropDataBase(databaseName);
                     }
-                   
                 }
             }
             catch (Exception e)
@@ -261,5 +318,93 @@ namespace MSsqlTool.ViewModel
                 logger.Error(e.Message);
             }
         }
+
+        private void DropDataBase(string databaseName)
+        {
+            if (MessageBox.Show($"本地数据库中已有数据库{databaseName}，是否立即删除？", "提醒", MessageBoxButton.YesNo, MessageBoxImage.Warning) ==
+                MessageBoxResult.Yes)
+            {
+                try
+                {
+                    using (SqlConnection dropConn = new SqlConnection(connectString))
+                    {
+                        dropConn.Open();
+                        SqlCommand dropCommand =
+                            new SqlCommand(
+                                $"use master;alter database {databaseName} set single_user with rollback immediate;drop database {databaseName};",
+                                dropConn);
+                        dropCommand.ExecuteNonQuery();
+                        MessageBox.Show($"已在本地删除数据库{databaseName}", "提醒");
+                        dropConn.Close();
+                    }
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show("删除出现异常，请查看日志");
+                    logger.Error(e.Message);
+                }
+
+            }
+        }
+
+        private void ImportDataBase(SqlConnection importConn, string filePath,string databaseName)
+        {
+            try
+            {
+                importConn.Open();
+                string importString = $"restore database {databaseName} from disk='{filePath}'";
+                SqlCommand importCommand = new SqlCommand(importString, importConn);
+                importCommand.ExecuteNonQuery();
+                importConn.Close();
+                MessageBox.Show($"导入数据库{databaseName}成功");
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"导入数据库{databaseName}出错");
+                logger.Error(e.Message);
+            }
+        }
+
+        private void OpenTableExecuted(string tableName)
+        {
+            if (OpenedTableList == null)
+            {
+                OpenedTableList = new List<OpenedTablesModel>()
+                {
+                    new OpenedTablesModel(tableName)
+                };
+                logger.Trace(tableName);
+            }
+            else
+            {
+                SetElseTabsFalse();
+                OpenedTableList = new List<OpenedTablesModel>(OpenedTableList)
+                {
+                    new OpenedTablesModel(tableName)
+                };
+            }
+            //OpenedTableList = (new List<string>(){"123", "456", "789"});
+
+        }
+
+        private void SetElseTabsFalse()
+        {
+            if (OpenedTableList != null)
+            {
+                foreach (var table in OpenedTableList)
+                {
+                    if (table.IsChoosed)
+                    {
+                        table.IsChoosed = false;
+                    }
+                }
+            }
+        }
+
+        private void RefreshExecuted()
+        {
+            InitializeData();
+        }
+
     }
 }

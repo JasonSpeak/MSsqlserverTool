@@ -8,7 +8,8 @@
 > - [X] show the databases(without system databases)
 > - [X] show the tables in these databases 
 > - [X] backup database function
-> - [ ] restore database function
+> - [X] restore database function
+> - [ ] OpenTables
 > - [ ] show the table's data
 > - [ ] add data into table
 > - [ ] delete data of table
