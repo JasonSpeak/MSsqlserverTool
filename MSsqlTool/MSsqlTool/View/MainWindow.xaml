@@ -30,7 +30,10 @@
                 Header="导出" />
         </ContextMenu>
         <ContextMenu x:Key="OpenTables">
-            <MenuItem Command="{Binding Source={StaticResource Locator}, Path=Main.OpenTableCommand}" Header="打开" />
+            <MenuItem
+                Command="{Binding Source={StaticResource Locator}, Path=Main.OpenTableCommand}"
+                CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}, Path=PlacementTarget.Header.TableFullName}"
+                Header="打开" />
         </ContextMenu>
         <percentageConverter:PercentageConverter x:Key="PercentageConverter" />
     </Window.Resources>
@@ -57,7 +60,7 @@
                                         <DataTrigger Binding="{Binding Level}" Value="tables">
                                             <Setter Property="ContextMenu" Value="{StaticResource OpenTables}" />
                                             <Setter Property="commandBehaviors:MouseDoubleClick.Command" Value="{Binding Source={StaticResource Locator}, Path=Main.OpenTableCommand}" />
-                                            <Setter Property="commandBehaviors:MouseDoubleClick.CommandParameter" Value="{Binding Name}" />
+                                            <Setter Property="commandBehaviors:MouseDoubleClick.CommandParameter" Value="{Binding TableFullName}" />
                                         </DataTrigger>
                                         <Trigger Property="IsMouseOver" Value="True">
                                             <Setter Property="IsSelected" Value="True" />
@@ -86,46 +89,78 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="50px" />
                 <RowDefinition Height="*" />
+                <RowDefinition Height="50px" />
             </Grid.RowDefinitions>
-            <StackPanel
-                x:Name="TableStackPanel"
-                Grid.Row="0"
-                Orientation="Horizontal">
-                <ListView ItemsSource="{Binding OpenedTableList, Mode=TwoWay}">
-                    <ListBox.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel IsItemsHost="True" Orientation="Horizontal" />
-                        </ItemsPanelTemplate>
-                    </ListBox.ItemsPanel>
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <materialDesign:Chip
-                                Width="{Binding Converter={StaticResource PercentageConverter}, ElementName=TableStackPanel, Path=ActualWidth, ConverterParameter=0.12}"
-                                Height="30px"
-                                Content="{Binding TableName}"
-                                IsDeletable="True" />
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                    <ListView.ItemContainerStyle>
-                        <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource MaterialDesignListView}">
-                            <Style.Triggers>
-                                
-                            </Style.Triggers>
-                        </Style>
-                    </ListView.ItemContainerStyle>
-                </ListView>
-                <!--<Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="3*"/>
-                    <ColumnDefinition Width="3*"/>
-                    <ColumnDefinition Width="3*"/>
-                    <ColumnDefinition Width="3*"/>
-                    <ColumnDefinition Width="3*"/>
-                    <ColumnDefinition Width="3*"/>
-                    <ColumnDefinition Width="2*"/>
-                </Grid.ColumnDefinitions>-->
-            </StackPanel>
+            <Grid Grid.Row="0" ShowGridLines="True">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="95*" />
+                    <ColumnDefinition Width="5*" />
+                </Grid.ColumnDefinitions>
+                <StackPanel
+                    x:Name="TableStackPanel"
+                    Grid.Column="0"
+                    Orientation="Horizontal">
+                    <ListView ItemsSource="{Binding OpenedTableList}">
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel IsItemsHost="True" Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <materialDesign:Chip
+                                    x:Name="Chip"
+                                    Width="{Binding Converter={StaticResource PercentageConverter}, ElementName=TableStackPanel, Path=ActualWidth, ConverterParameter=0.12}"
+                                    Height="30px"
+                                    Content="{Binding TableName}"
+                                    DeleteCommand="{Binding Source={StaticResource Locator}, Path=Main.CloseTabCommand}"
+                                    DeleteCommandParameter="{Binding TableName}"
+                                    IsDeletable="True" />
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding IsChoosed}" Value="true">
+                                        <Setter TargetName="Chip" Property="Background" Value="#3448a1" />
+                                        <Setter TargetName="Chip" Property="Foreground" Value="White" />
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </StackPanel>
+                <Grid Grid.Column="1">
+                    <materialDesign:PopupBox HorizontalAlignment="Center">
+                        <ListView ItemsSource="{Binding OpenedTableFoldedList}">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <materialDesign:Chip
+                                        x:Name="Chip"
+                                        Width="{Binding Converter={StaticResource PercentageConverter}, ElementName=TableStackPanel, Path=ActualWidth, ConverterParameter=0.12}"
+                                        Height="30px"
+                                        Content="{Binding TableName}"
+                                        DeleteCommand="{Binding Source={StaticResource Locator}, Path=Main.CloseFoldTabCommand}"
+                                        DeleteCommandParameter="{Binding TableName}"
+                                        IsDeletable="True" />
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </materialDesign:PopupBox>
+                </Grid>
+            </Grid>
             <Grid Grid.Row="1">
-                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" />
+                <DataGrid
+                    x:Name="TableDataGrid"
+                    Margin="0,8,0,0"
+                    CanUserAddRows="True"
+                    CanUserDeleteRows="True"
+                    CanUserSortColumns="False"
+                    ItemsSource="{Binding TableData.DataInTable,Mode=TwoWay}" />
+            </Grid>
+            <Grid Grid.Row="2">
+                <Button
+                    Width="100px"
+                    Command="{Binding ApplyUpdateCommand}"
+                    CommandParameter="{Binding ElementName=TableDataGrid,Path=DataContext}"
+                    Content="应用修改"
+                    Style="{StaticResource MaterialDesignFlatMidBgButton}" />
             </Grid>
         </Grid>
     </Grid>

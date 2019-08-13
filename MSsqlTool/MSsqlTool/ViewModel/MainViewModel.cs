@@ -17,6 +17,7 @@ using GalaSoft.MvvmLight.CommandWpf;
 using System.Windows.Forms;
 using NLog;
 using NLog.Fluent;
+using NLog.LogReceiverService;
 using DataRow = System.Data.DataRow;
 using MessageBox = System.Windows.MessageBox;
 
@@ -62,9 +63,25 @@ namespace MSsqlTool.ViewModel
 
         private RelayCommand _refreshCommand;
 
+        private RelayCommand<string> _closeTabCommand;
+
+        private RelayCommand<string> _closeFoldTabCommand;
+
+        private RelayCommand<object> _applyUpdateCommand;
+
         private List<SqlMenuModel> _mainDatabaseList;
 
         private List<OpenedTablesModel> _openedTableList;
+
+        private List<OpenedTablesModel> _openedTableFoldedList;
+
+        private TablesDataModel _tableData;
+
+        private SqlDataAdapter _dataAdapterForUpdate;
+
+        private DataTable _dataTableForUpdate;
+
+        private SqlCommandBuilder _commandBuilderForUpdate;
 
         public RelayCommand<string> ExportCommand
         {
@@ -121,6 +138,48 @@ namespace MSsqlTool.ViewModel
             set { _refreshCommand = value; }
         }
 
+        public RelayCommand<string> CloseTabCommand
+        {
+            get
+            {
+                if (_closeTabCommand == null)
+                {
+                    _closeTabCommand = new RelayCommand<string>((tableName) => CloseTabExecuted(tableName));
+                }
+
+                return _closeTabCommand;
+            }
+            set { _closeTabCommand = value; }
+        }
+
+        public RelayCommand<string> CloseFoldTabCommand
+        {
+            get
+            {
+                if (_closeFoldTabCommand == null)
+                {
+                    _closeFoldTabCommand = new RelayCommand<string>((tableName) => CloseFoldTabExecuted(tableName));
+                }
+
+                return _closeFoldTabCommand;
+            }
+            set { _closeFoldTabCommand = value; }
+        }
+
+        public RelayCommand<object> ApplyUpdateCommand
+        {
+            get
+            {
+                if (_applyUpdateCommand == null)
+                {
+                    _applyUpdateCommand = new RelayCommand<object>((dataTableFromXaml)=>ApplyUpdateExecuted(dataTableFromXaml));
+                }
+
+                return _applyUpdateCommand;
+            }
+            set { _applyUpdateCommand = value; }
+        }
+
         public List<SqlMenuModel> DataBaselist
         {
             get { return _dataBaselist; }
@@ -136,7 +195,6 @@ namespace MSsqlTool.ViewModel
             }
         }
 
-
         public List<OpenedTablesModel> OpenedTableList
         {
             get { return _openedTableList; }
@@ -144,6 +202,26 @@ namespace MSsqlTool.ViewModel
             {
                 _openedTableList = value;
                 RaisePropertyChanged(()=>OpenedTableList);
+            }
+        }
+
+        public List<OpenedTablesModel> OpenedTableFoldedList
+        {
+            get => _openedTableFoldedList;
+            set
+            {
+                _openedTableFoldedList = value;
+                RaisePropertyChanged(()=>OpenedTableFoldedList);
+            }
+        }
+
+        public TablesDataModel TableData
+        {
+            get => _tableData;
+            set
+            {
+                _tableData = value;
+                RaisePropertyChanged(()=>TableData);
             }
         }
 
@@ -226,7 +304,7 @@ namespace MSsqlTool.ViewModel
             getTableConnection.Dispose();
             foreach (DataRow row in TableNames.Rows)
             {
-                tableList.Add(new SqlMenuModel(row["name"].ToString()) { Level = "tables" });
+                tableList.Add(new SqlMenuModel(row["name"].ToString()) { Level = "tables" ,TableFullName = $"{databaseName}.{row["name"].ToString()}"});
             }
             return tableList;
         }
@@ -365,37 +443,121 @@ namespace MSsqlTool.ViewModel
             }
         }
 
-        private void OpenTableExecuted(string tableName)
+        private void OpenTableExecuted(string tableFullName)
         {
             if (OpenedTableList == null)
             {
                 OpenedTableList = new List<OpenedTablesModel>()
                 {
-                    new OpenedTablesModel(tableName)
+                    new OpenedTablesModel(tableFullName)
                 };
-                logger.Trace(tableName);
+                SetElseTabsFalse(tableFullName);
+            }
+            else if (OpenedTableList != null && OpenedTableList.Count < 6 && !IsThisTableOpendInTab(tableFullName))
+            {
+                OpenedTableList = new List<OpenedTablesModel>(OpenedTableList)
+                {
+                    new OpenedTablesModel(tableFullName)
+                };
+                SetElseTabsFalse(tableFullName);
+            }
+            else if (OpenedTableList != null && OpenedTableList.Count <= 6 && IsThisTableOpendInTab(tableFullName))
+            {
+                SetElseTabsFalse(tableFullName);
+            }
+            else if (OpenedTableList.Count == 6 && OpenedTableFoldedList == null && !IsThisTableOpendInTab(tableFullName))
+            {
+                OpenedTableFoldedList = new List<OpenedTablesModel>()
+                {
+                    new OpenedTablesModel(tableFullName){IsChoosed = false}
+                };
+            }
+            else if (OpenedTableList.Count == 6 && OpenedTableFoldedList != null && !IsThisTableOpenedInFolder(tableFullName))
+            {
+                OpenedTableFoldedList = new List<OpenedTablesModel>(OpenedTableFoldedList)
+                {
+                    new OpenedTablesModel(tableFullName){IsChoosed = false}
+                };
+            }
+            else if (OpenedTableList.Count == 6 && OpenedTableFoldedList != null && IsThisTableOpenedInFolder(tableFullName))
+            {
+                OpenedTablesModel tempModel = OpenedTableList[5];
+                OpenedTableList[5] = new OpenedTablesModel(tableFullName);
+                OpenedTableList = new List<OpenedTablesModel>(OpenedTableList);
+                SetElseTabsFalse(tableFullName);
+                OpenedTablesModel tableForDelete = new OpenedTablesModel();
+                foreach (var table in OpenedTableFoldedList)
+                {
+                    if (table.TableName == tableFullName)
+                    {
+                        tableForDelete = table;
+                    }
+                }
+                OpenedTableFoldedList.Remove(tableForDelete);
+                OpenedTableFoldedList = new List<OpenedTablesModel>(OpenedTableFoldedList)
+                {
+                    tempModel
+                };
+            }
+            GetTableData(tableFullName);
+        }
+
+        private void OpenedTableFold(string tableFullName)
+        {
+            if (OpenedTableFoldedList == null)
+            {
+                OpenedTableFoldedList = new List<OpenedTablesModel>()
+                {
+                    new OpenedTablesModel(tableFullName)
+                };
             }
             else
             {
-                SetElseTabsFalse();
-                OpenedTableList = new List<OpenedTablesModel>(OpenedTableList)
+                OpenedTableFoldedList = new List<OpenedTablesModel>(OpenedTableFoldedList)
                 {
-                    new OpenedTablesModel(tableName)
+                    new OpenedTablesModel(tableFullName)
                 };
             }
-            //OpenedTableList = (new List<string>(){"123", "456", "789"});
-
         }
 
-        private void SetElseTabsFalse()
+        private bool IsThisTableOpendInTab(string tableFullName)
+        {
+            foreach (var table in OpenedTableList)
+            {
+                if (table.TableName == tableFullName)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool IsThisTableOpenedInFolder(string tableFullName)
+        {
+            foreach (var table in OpenedTableFoldedList)
+            {
+                if (table.TableName == tableFullName)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private void SetElseTabsFalse(string tableFullName)
         {
             if (OpenedTableList != null)
             {
                 foreach (var table in OpenedTableList)
-                {
-                    if (table.IsChoosed)
+                {   
+                    if (table.IsChoosed && table.TableName != tableFullName)
                     {
                         table.IsChoosed = false;
+                    }
+
+                    if (table.TableName == tableFullName)
+                    {
+                        table.IsChoosed = true;
                     }
                 }
             }
@@ -404,7 +566,93 @@ namespace MSsqlTool.ViewModel
         private void RefreshExecuted()
         {
             InitializeData();
+        }   
+
+        private void CloseTabExecuted(string tableFullName)
+        {
+            OpenedTablesModel deleteModel = new OpenedTablesModel();
+            foreach (var table in OpenedTableList)
+            {
+                if (table.TableName == tableFullName) 
+                {
+                    deleteModel = table;
+                }
+            }
+            OpenedTableList.Remove(deleteModel);
+            if (OpenedTableList.Count == 5 && OpenedTableFoldedList != null)
+            {
+                OpenedTableList.Add(OpenedTableFoldedList[0]);
+                deleteModel = OpenedTableFoldedList[0];
+                OpenedTableFoldedList.Remove(deleteModel);
+                if (OpenedTableFoldedList.Count != 0)
+                {
+                    OpenedTableFoldedList = new List<OpenedTablesModel>(OpenedTableFoldedList);
+                }
+                else
+                {
+                    OpenedTableFoldedList = null;
+                }
+            }
+            OpenedTableList = new List<OpenedTablesModel>(OpenedTableList);
+            
         }
 
+        private void CloseFoldTabExecuted(string tableFullName)
+        {
+            OpenedTablesModel deleteModel = new OpenedTablesModel();
+            foreach (var table in OpenedTableFoldedList)
+            {
+                if (table.TableName == tableFullName)
+                {
+                    deleteModel = table;
+                }
+            }
+
+            OpenedTableFoldedList.Remove(deleteModel);
+            OpenedTableFoldedList = new List<OpenedTablesModel>(OpenedTableFoldedList);
+        }
+
+        private void GetTableData(string tableFullName)
+        {
+            string databaseName = tableFullName.Split('.')[0];
+            string tableName = tableFullName.Split('.')[1];
+            _connection = new SqlConnection(GetDifferentConnectionWithName(databaseName));
+            try
+            {
+                _connection.Open();
+                string selectAll = $"select * from {tableName}";
+                _dataAdapterForUpdate = new SqlDataAdapter(selectAll, _connection);
+                _commandBuilderForUpdate = new SqlCommandBuilder(_dataAdapterForUpdate);
+                _dataTableForUpdate = new DataTable();
+                _dataAdapterForUpdate.Fill(_dataTableForUpdate);
+                _connection.Close();
+            }
+            catch (Exception e)
+            {
+                logger.Error(e.Message);
+            }
+            
+            TableData = new TablesDataModel();
+            TableData.DataBaseName = databaseName;
+            TableData.TableName = tableName;
+            TableData.DataInTable = _dataTableForUpdate;
+        }
+
+        private void ApplyUpdateExecuted(object dataTableFromXaml)
+        {
+            try
+            {
+                _connection.Open();
+                _dataAdapterForUpdate.Update(_dataTableForUpdate);
+                _connection.Close();
+                MessageBox.Show("数据修改成功");
+
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+                logger.Error(e.Message);
+            }
+        }
     }
 }

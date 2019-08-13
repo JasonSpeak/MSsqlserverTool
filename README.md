@@ -9,10 +9,11 @@
 > - [X] show the tables in these databases 
 > - [X] backup database function
 > - [X] restore database function
-> - [ ] OpenTables
-> - [ ] show the table's data
-> - [ ] add data into table
-> - [ ] delete data of table
-> - [ ] update data of table
+> - [X] OpenTables
+> - [X] show the table's data
+> - [X] add data into table
+> - [X] delete data of table
+> - [X] update data of table
 ---
+# Logic complete. Last thing is style.
 ## Working...  

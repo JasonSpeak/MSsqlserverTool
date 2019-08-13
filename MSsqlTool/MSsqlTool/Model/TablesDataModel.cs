@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,7 +8,7 @@ using GalaSoft.MvvmLight;
 
 namespace MSsqlTool.Model
 {
-    public class OpenedTablesModel:ObservableObject
+    public class TablesDataModel:ObservableObject
     {
         private string _tableName;
 
@@ -21,28 +22,28 @@ namespace MSsqlTool.Model
             }
         }
 
-        private bool _isChoosed;
+        private string _databaseName;
 
-        public bool IsChoosed
+        public string DataBaseName
         {
-            get => _isChoosed;
+            get => _databaseName;
             set
             {
-                _isChoosed = value;
-                RaisePropertyChanged(()=>IsChoosed);
+                _databaseName = value;
+                RaisePropertyChanged(()=>DataBaseName);
             }
         }
 
-        public OpenedTablesModel()
+        private DataTable _dataInTable;
+
+        public DataTable DataInTable
         {
-
+            get => _dataInTable;
+            set
+            {
+                _dataInTable = value;
+                RaisePropertyChanged(()=>DataInTable);
+            }
         }
-
-        public OpenedTablesModel(string name)
-        {
-            TableName = name;
-            IsChoosed = true;
-        }
-
     }
 }

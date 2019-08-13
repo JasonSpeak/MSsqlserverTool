@@ -94,6 +94,7 @@
     <Compile Include="CommandBehaviors\MouseDoubleClick.cs" />
     <Compile Include="Model\OpenedTablesModel.cs" />
     <Compile Include="Model\SqlMenuModel.cs" />
+    <Compile Include="Model\TablesDataModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\PercentageConverter.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />

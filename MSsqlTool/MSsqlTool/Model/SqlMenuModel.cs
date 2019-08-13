@@ -31,6 +31,18 @@ namespace MSsqlTool.Model
             }
         }
 
+        private string _tableFullName;
+
+        public string TableFullName
+        {
+            get => _tableFullName;
+            set
+            {
+                _tableFullName = value;
+                RaisePropertyChanged(()=>TableFullName);
+            }
+        }
+
         private List<SqlMenuModel> _menuTables;
 
         public List<SqlMenuModel> MenuTables
