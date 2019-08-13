@@ -441,3 +441,4 @@ RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_ApplyUpdateCommand>b__38_
 RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_ApplyUpdateCommand>b__38_0 => MainViewModel.ApplyUpdateExecuted 对于不返回任何键列信息的 SelectCommand，不支持 UpdateCommand 的动态 SQL 生成。
 RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_ApplyUpdateCommand>b__38_0 => MainViewModel.ApplyUpdateExecuted 对于不返回任何键列信息的 SelectCommand，不支持 UpdateCommand 的动态 SQL 生成。
 RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_ApplyUpdateCommand>b__38_0 => MainViewModel.ApplyUpdateExecuted 连接未关闭。 连接的当前状态为打开。
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_ApplyUpdateCommand>b__38_0 => MainViewModel.ApplyUpdateExecuted 对于不返回任何键列信息的 SelectCommand，不支持 DeleteCommand 的动态 SQL 生成。

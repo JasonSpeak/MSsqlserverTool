@@ -67,7 +67,7 @@ namespace MSsqlTool.ViewModel
 
         private RelayCommand<string> _closeFoldTabCommand;
 
-        private RelayCommand<object> _applyUpdateCommand;
+        private RelayCommand _applyUpdateCommand;
 
         private List<SqlMenuModel> _mainDatabaseList;
 
@@ -82,6 +82,8 @@ namespace MSsqlTool.ViewModel
         private DataTable _dataTableForUpdate;
 
         private SqlCommandBuilder _commandBuilderForUpdate;
+
+        private string _currentTable;
 
         public RelayCommand<string> ExportCommand
         {
@@ -166,13 +168,13 @@ namespace MSsqlTool.ViewModel
             set { _closeFoldTabCommand = value; }
         }
 
-        public RelayCommand<object> ApplyUpdateCommand
+        public RelayCommand ApplyUpdateCommand
         {
             get
             {
                 if (_applyUpdateCommand == null)
                 {
-                    _applyUpdateCommand = new RelayCommand<object>((dataTableFromXaml)=>ApplyUpdateExecuted(dataTableFromXaml));
+                    _applyUpdateCommand = new RelayCommand(ApplyUpdateExecuted);
                 }
 
                 return _applyUpdateCommand;
@@ -614,6 +616,7 @@ namespace MSsqlTool.ViewModel
 
         private void GetTableData(string tableFullName)
         {
+            _currentTable = tableFullName;
             string databaseName = tableFullName.Split('.')[0];
             string tableName = tableFullName.Split('.')[1];
             _connection = new SqlConnection(GetDifferentConnectionWithName(databaseName));
@@ -638,7 +641,7 @@ namespace MSsqlTool.ViewModel
             TableData.DataInTable = _dataTableForUpdate;
         }
 
-        private void ApplyUpdateExecuted(object dataTableFromXaml)
+        private void ApplyUpdateExecuted()
         {
             try
             {
@@ -646,6 +649,7 @@ namespace MSsqlTool.ViewModel
                 _dataAdapterForUpdate.Update(_dataTableForUpdate);
                 _connection.Close();
                 MessageBox.Show("数据修改成功");
+                GetTableData(_currentTable);
 
             }
             catch (Exception e)
