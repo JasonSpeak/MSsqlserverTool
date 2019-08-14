@@ -1,0 +1,1 @@
+RuntimeMethodInfo.UnsafeInvokeInternal => RuntimeMethodHandle.InvokeMethod => MainViewModel.ApplyUpdateExecuted 对于不返回任何键列信息的 SelectCommand，不支持 UpdateCommand 的动态 SQL 生成。

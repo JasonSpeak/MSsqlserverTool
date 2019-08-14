@@ -35,6 +35,11 @@
                 CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}, Path=PlacementTarget.Header.TableFullName}"
                 Header="打开" />
         </ContextMenu>
+        <ContextMenu x:Key="TabMenu">
+            <MenuItem Command="{Binding Source={StaticResource Locator}, Path=Main.CloseTabCommand}" Header="关闭" />
+            <MenuItem Header="关闭其他文档" />
+            <MenuItem Header="关闭所有文档" />
+        </ContextMenu>
         <percentageConverter:PercentageConverter x:Key="PercentageConverter" />
     </Window.Resources>
     <Grid ShowGridLines="True">
@@ -110,12 +115,30 @@
                             <DataTemplate>
                                 <materialDesign:Chip
                                     x:Name="Chip"
-                                    Width="{Binding Converter={StaticResource PercentageConverter}, ElementName=TableStackPanel, Path=ActualWidth, ConverterParameter=0.12}"
+                                    Width="{Binding Converter={StaticResource PercentageConverter}, ElementName=TableStackPanel, Path=ActualWidth, ConverterParameter=0.15}"
                                     Height="30px"
+                                    Command="{Binding Source={StaticResource Locator}, Path=Main.ClickTabCommand}"
+                                    CommandParameter="{Binding TableName}"
                                     Content="{Binding TableName}"
                                     DeleteCommand="{Binding Source={StaticResource Locator}, Path=Main.CloseTabCommand}"
                                     DeleteCommandParameter="{Binding TableName}"
-                                    IsDeletable="True" />
+                                    IsDeletable="True">
+                                    <materialDesign:Chip.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem
+                                                Command="{Binding Source={StaticResource Locator}, Path=Main.CloseTabCommand}"
+                                                CommandParameter="{Binding TableName}"
+                                                Header="关闭" />
+                                            <MenuItem
+                                                Command="{Binding Source={StaticResource Locator}, Path=Main.CloseOtherTabsCommand}"
+                                                CommandParameter="{Binding TableName}"
+                                                Header="关闭其他文档" />
+                                            <MenuItem 
+                                                Command="{Binding Source={StaticResource Locator}, Path=Main.CloseAllTabsCommand}" 
+                                                Header="关闭所有文档" />
+                                        </ContextMenu>
+                                    </materialDesign:Chip.ContextMenu>
+                                </materialDesign:Chip>
                                 <DataTemplate.Triggers>
                                     <DataTrigger Binding="{Binding IsChoosed}" Value="true">
                                         <Setter TargetName="Chip" Property="Background" Value="#3448a1" />
@@ -135,6 +158,8 @@
                                         x:Name="Chip"
                                         Width="{Binding Converter={StaticResource PercentageConverter}, ElementName=TableStackPanel, Path=ActualWidth, ConverterParameter=0.12}"
                                         Height="30px"
+                                        Command="{Binding Source={StaticResource Locator}, Path=Main.ClickFoldCommand}"
+                                        CommandParameter="{Binding TableName}"
                                         Content="{Binding TableName}"
                                         DeleteCommand="{Binding Source={StaticResource Locator}, Path=Main.CloseFoldTabCommand}"
                                         DeleteCommandParameter="{Binding TableName}"
@@ -152,13 +177,13 @@
                     CanUserAddRows="True"
                     CanUserDeleteRows="True"
                     CanUserSortColumns="False"
-                    ItemsSource="{Binding TableData.DataInTable,Mode=TwoWay}" />
+                    ItemsSource="{Binding TableData.DataInTable, Mode=TwoWay}" />
             </Grid>
             <Grid Grid.Row="2">
                 <Button
                     Width="100px"
                     Command="{Binding ApplyUpdateCommand}"
-                    CommandParameter="{Binding ElementName=TableDataGrid,Path=DataContext}"
+                    CommandParameter="{Binding ElementName=TableDataGrid, Path=DataContext}"
                     Content="应用修改"
                     Style="{StaticResource MaterialDesignFlatMidBgButton}" />
             </Grid>
