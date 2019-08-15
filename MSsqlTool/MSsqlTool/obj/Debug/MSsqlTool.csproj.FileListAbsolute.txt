@@ -84,3 +84,6 @@ C:\Users\JimiJimi\Desktop\MSsqlserverTool\MSsqlTool\MSsqlTool\obj\Debug\MSsqlToo
 C:\Users\JimiJimi\Desktop\MSsqlserverTool\MSsqlTool\MSsqlTool\obj\Debug\MSsqlTool.csproj.CopyComplete
 C:\Users\JimiJimi\Desktop\MSsqlserverTool\MSsqlTool\MSsqlTool\obj\Debug\MSsqlTool.exe
 C:\Users\JimiJimi\Desktop\MSsqlserverTool\MSsqlTool\MSsqlTool\obj\Debug\MSsqlTool.pdb
+E:\SmallTools\MSsqlTools\MSsqlTool\MSsqlTool\bin\Debug\Microsoft.Expression.Interactions.dll
+E:\SmallTools\MSsqlTools\MSsqlTool\MSsqlTool\bin\Debug\Microsoft.Expression.Interactions.xml
+E:\SmallTools\MSsqlTools\MSsqlTool\MSsqlTool\bin\Debug\System.Windows.Interactivity.xml

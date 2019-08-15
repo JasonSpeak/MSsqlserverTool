@@ -18,6 +18,7 @@ using System.Windows.Forms;
 using NLog;
 using NLog.Fluent;
 using NLog.LogReceiverService;
+using DataGrid = System.Windows.Controls.DataGrid;
 using DataRow = System.Data.DataRow;
 using MessageBox = System.Windows.MessageBox;
 
@@ -77,6 +78,16 @@ namespace MSsqlTool.ViewModel
 
         private RelayCommand _closeAllTabsCommand;
 
+        private RelayCommand<Window> _closeWindowCommand;
+
+        private RelayCommand<Window> _miniMizeWindowCommand;
+
+        private RelayCommand<Window> _restoreWindowCommand;
+
+        private RelayCommand<Window> _moveWindowCommand;
+
+        private RelayCommand<DataGrid> _selectAllCommand;
+
         private List<SqlMenuModel> _mainDatabaseList;
 
         private List<OpenedTablesModel> _openedTableList;
@@ -92,6 +103,14 @@ namespace MSsqlTool.ViewModel
         private SqlCommandBuilder _commandBuilderForUpdate;
 
         private string _currentTable;
+
+        private string _currentwindowState;
+
+        private string _restorePathData;
+
+        private string _restoreButtonTip;
+
+        private bool _isAllSelected;
 
         public RelayCommand<string> ExportCommand
         {
@@ -224,7 +243,8 @@ namespace MSsqlTool.ViewModel
             {
                 if (_closeOtherTabsCommand == null)
                 {
-                    _closeOtherTabsCommand = new RelayCommand<string>((tableFullName)=> CloseOtherTabsExecuted(tableFullName));
+                    _closeOtherTabsCommand =
+                        new RelayCommand<string>((tableFullName) => CloseOtherTabsExecuted(tableFullName));
                 }
 
                 return _closeOtherTabsCommand;
@@ -244,6 +264,78 @@ namespace MSsqlTool.ViewModel
                 return _closeAllTabsCommand;
             }
             set { _closeAllTabsCommand = value; }
+        }
+
+        public RelayCommand<Window> CloseWindowCommand
+        {
+            get
+            {
+                if (_closeWindowCommand == null)
+                {
+                    _closeWindowCommand =
+                        new RelayCommand<Window>((currentWindow) => CloseWindowExecuted(currentWindow));
+                }
+
+                return _closeWindowCommand;
+            }
+            set { _closeWindowCommand = value; }
+        }
+
+        public RelayCommand<Window> MiniMizeWindowCommand
+        {
+            get
+            {
+                if (_miniMizeWindowCommand == null)
+                {
+                    _miniMizeWindowCommand =
+                        new RelayCommand<Window>((currentWindow) => MiniMizeWindowExecuted(currentWindow));
+                }
+
+                return _miniMizeWindowCommand;
+            }
+            set { _miniMizeWindowCommand = value; }
+        }
+
+        public RelayCommand<Window> RestoreWindowCommand
+        {
+            get
+            {
+                if (_restoreWindowCommand == null)
+                {
+                    _restoreWindowCommand = new RelayCommand<Window>((currentWindow)=> RestoreWindowExecuted(currentWindow));
+                }
+
+                return _restoreWindowCommand;
+            }
+            set { _restoreWindowCommand = value; }
+        }
+
+        public RelayCommand<Window> MoveWindowCommand
+        {
+            get
+            {
+                if (_moveWindowCommand == null)
+                {
+                    _moveWindowCommand = new RelayCommand<Window>((currentWindow)=> MoveWindowExecuted(currentWindow));
+                }
+
+                return _moveWindowCommand;
+            }
+            set { _moveWindowCommand = value; }
+        }
+
+        public RelayCommand<DataGrid> SelectAllCommand
+        {
+            get
+            {
+                if (_selectAllCommand == null)
+                {
+                    _selectAllCommand = new RelayCommand<DataGrid>((dataGrid)=> SelectAllExecuted(dataGrid));
+                }
+
+                return _selectAllCommand;
+            }
+            set { _selectAllCommand = value; }
         }
 
         public List<SqlMenuModel> DataBaselist
@@ -291,9 +383,55 @@ namespace MSsqlTool.ViewModel
             }
         }
 
+        public string CurrentwindowState
+        {
+            get { return _currentwindowState; }
+            set
+            {
+                _currentwindowState = value;
+                RaisePropertyChanged(()=>CurrentwindowState);
+            }
+        }
+
+        public string RestorePathData
+        {
+            get { return _restorePathData; }
+            set
+            {
+                _restorePathData = value;
+                RaisePropertyChanged(()=>RestorePathData);
+            }
+        }
+
+        public string RestoreButtonTip
+        {
+            get { return _restoreButtonTip; }
+            set
+            {
+                _restoreButtonTip = value;
+                RaisePropertyChanged(()=>RestoreButtonTip);
+            }
+        }
+
+        public bool IsAllSelected
+        {
+            get { return _isAllSelected; }
+            set
+            {
+                _isAllSelected = value;
+                RaisePropertyChanged(()=>IsAllSelected);
+            }
+        }
+
+
         public MainViewModel()
         {
             InitializeData();
+            CurrentwindowState = "Maximized";
+            RestorePathData =
+                "F1M11,8L9,8 9,4 9,3 8,3 4,3 4,1 11,1z M8,11L1,11 1,4 3,4 4,4 8,4 8,8 8,9z M11,0L4,0 3,0 3,1 3,3 1,3 0,3 0,4 0,11 0,12 1,12 8,12 9,12 9,11 9,9 11,9 12,9 12,8 12,1 12,0z";
+            RestoreButtonTip = "向下还原";
+            IsAllSelected = false;
         }
 
         private void InitializeData()
@@ -723,7 +861,7 @@ namespace MSsqlTool.ViewModel
             {
                 logger.Error(e.Message);
             }
-
+            _connection.Close();
             TableData = new TablesDataModel();
             TableData.DataBaseName = databaseName;
             TableData.TableName = tableName;
@@ -810,5 +948,71 @@ namespace MSsqlTool.ViewModel
             OpenedTableFoldedList = new List<OpenedTablesModel>();
             TableData = new TablesDataModel();
         }
+
+        private void CloseWindowExecuted(Window currentWindow)
+        {
+            currentWindow.Close();
+        }
+
+        private void MiniMizeWindowExecuted(Window currentWindow)
+        {
+            currentWindow.WindowState = WindowState.Minimized;
+        }
+
+        private void RestoreWindowExecuted(Window currentWindow)
+        {
+            if (CurrentwindowState == "Maximized")
+            {
+                currentWindow.WindowState = WindowState.Normal;
+                CurrentwindowState = "Normal";
+                RestorePathData =
+                    "F1M11,11L1,11 1,1 11,1z M11,0L1,0 0,0 0,1 0,11 0,12 1,12 11,12 12,12 12,11 12,1 12,0z";
+                RestoreButtonTip = "最大化";
+            }
+            else if(CurrentwindowState == "Normal")
+            {
+                currentWindow.WindowState = WindowState.Maximized;
+                CurrentwindowState = "Maximized";
+                RestorePathData =
+                    "F1M11,8L9,8 9,4 9,3 8,3 4,3 4,1 11,1z M8,11L1,11 1,4 3,4 4,4 8,4 8,8 8,9z M11,0L4,0 3,0 3,1 3,3 1,3 0,3 0,4 0,11 0,12 1,12 8,12 9,12 9,11 9,9 11,9 12,9 12,8 12,1 12,0z";
+                RestoreButtonTip = "向下还原";
+            }
+        }
+
+        private void MoveWindowExecuted(Window currentWindow)
+        {
+            currentWindow.DragMove();
+        }
+
+        private void SelectAllExecuted(DataGrid dataGrid)
+        {
+            Console.WriteLine("11111111");
+            logger.Trace("1213134546543");
+            logger.Trace($"DataGrid name is {dataGrid.Name}");
+            if (!IsAllSelected)
+            {
+                for (int i = 0; i < dataGrid.Items.Count; i++)
+                {
+                    DataGridRow row = (DataGridRow)dataGrid.ItemContainerGenerator.ContainerFromIndex(i);
+                    if (row != null)
+                    {
+                        row.IsSelected = true;
+                        
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < dataGrid.Items.Count; i++)
+                {
+                    DataGridRow row = (DataGridRow)dataGrid.ItemContainerGenerator.ContainerFromIndex(i);
+                    if (row != null)
+                    {
+                        row.IsSelected = false;
+                    }
+                }
+            }
+        }
+
     }
 }

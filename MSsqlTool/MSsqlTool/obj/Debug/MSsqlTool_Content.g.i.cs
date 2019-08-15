@@ -8,6 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("icons/sql.png")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("icons/%e6%95%b0%e6%8d%ae%e5%ba%93.png")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("icons/%e8%a1%a8.png")]
 
 
