@@ -5,8 +5,6 @@ VisualStudioVersion = 15.0.28307.757
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSsqlTool", "MSsqlTool\MSsqlTool.csproj", "{0B06690B-8235-45F4-903B-CD7FCBBF8851}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Console_MSsqlTool_connectionTest", "C:\Users\lonwin\source\repos\Console_MSsqlTool_connectionTest\Console_MSsqlTool_connectionTest\Console_MSsqlTool_connectionTest.csproj", "{EAC51FC9-05DD-471A-B560-F0DFE7D67851}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,14 +21,6 @@ Global
 		{0B06690B-8235-45F4-903B-CD7FCBBF8851}.XBAP Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0B06690B-8235-45F4-903B-CD7FCBBF8851}.XBAP Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0B06690B-8235-45F4-903B-CD7FCBBF8851}.XBAP Release|Any CPU.Build.0 = Release|Any CPU
-		{EAC51FC9-05DD-471A-B560-F0DFE7D67851}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EAC51FC9-05DD-471A-B560-F0DFE7D67851}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EAC51FC9-05DD-471A-B560-F0DFE7D67851}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EAC51FC9-05DD-471A-B560-F0DFE7D67851}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EAC51FC9-05DD-471A-B560-F0DFE7D67851}.XBAP Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EAC51FC9-05DD-471A-B560-F0DFE7D67851}.XBAP Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EAC51FC9-05DD-471A-B560-F0DFE7D67851}.XBAP Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EAC51FC9-05DD-471A-B560-F0DFE7D67851}.XBAP Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

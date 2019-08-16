@@ -5,11 +5,8 @@
     xmlns:commandBehaviors="clr-namespace:MSsqlTool.CommandBehaviors"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:dm="clr-namespace:MSsqlTool.Model"
-    xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-    xmlns:local="clr-namespace:MSsqlTool"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:vm="clr-namespace:MSsqlTool.ViewModel"
     xmlns:wpf="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf"
     Title="MSsqlTool"
@@ -41,9 +38,6 @@
         </ContextMenu>
         <vm:PercentageConverter x:Key="PercentageConverter" />
         <vm:IconPathConverter x:Key="IconPathConverter" />
-
-        <Style BasedOn="{StaticResource MaterialDesignCheckBox}" TargetType="CheckBox" />
-
         <Style TargetType="{x:Type wpf:Chip}">
             <Setter Property="Height" Value="32"/>
             <Setter Property="HorizontalAlignment" Value="Left" />

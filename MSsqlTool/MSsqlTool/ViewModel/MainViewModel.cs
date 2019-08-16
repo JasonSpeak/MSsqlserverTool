@@ -555,7 +555,7 @@ namespace MSsqlTool.ViewModel
 
         #endregion
 
-        #region Executed functions of Commands
+        #region Executed functions
 
         private void ExportExecuted(string databaseName)
         {
