@@ -1,0 +1,148 @@
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted 1213134546543
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted window name is MSsqlTool
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted 1213134546543
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted window name is MSsqlTool
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted 1213134546543
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted window name is MSsqlTool
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__79_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_CheckForSelectAllCommand>b__83_0 => MainViewModel.CheckForSelectAllExecuted Check name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_CheckForSelectAllCommand>b__83_0 => MainViewModel.CheckForSelectAllExecuted Check name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_CheckForSelectAllCommand>b__83_0 => MainViewModel.CheckForSelectAllExecuted Check name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_CheckForSelectAllCommand>b__83_0 => MainViewModel.CheckForSelectAllExecuted Check name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_CheckForSelectAllCommand>b__83_0 => MainViewModel.CheckForSelectAllExecuted Check name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_CheckForSelectAllCommand>b__83_0 => MainViewModel.CheckForSelectAllExecuted Check name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_CheckForSelectAllCommand>b__83_0 => MainViewModel.CheckForSelectAllExecuted Check name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_CheckForSelectAllCommand>b__83_0 => MainViewModel.CheckForSelectAllExecuted Check name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_CheckForSelectAllCommand>b__83_0 => MainViewModel.CheckForSelectAllExecuted Check name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_CheckForSelectAllCommand>b__83_0 => MainViewModel.CheckForSelectAllExecuted Check name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_CheckForSelectAllCommand>b__83_0 => MainViewModel.CheckForSelectAllExecuted Check name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_CheckForSelectAllCommand>b__83_0 => MainViewModel.CheckForSelectAllExecuted Check name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid && Ischecked is False
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid && Ischecked is False
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid && Ischecked is True
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid && Ischecked is False
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid && Ischecked is True
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid && Ischecked is False
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid && Ischecked is True
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid && Ischecked is True
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid && Ischecked is True
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid && Ischecked is True
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid && Ischecked is True
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid && Ischecked is False
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid && Ischecked is True
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid && Ischecked is False
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid && Ischecked is True
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__80_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid && Ischecked is False
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__81_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid && Ischecked is True
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__81_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid && Ischecked is False
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__81_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid && Ischecked is True
+RuntimeMethodHandle.InvokeMethod => MainViewModel.<get_SelectAllCommand>b__81_0 => MainViewModel.SelectAllExecuted DataGrid name is TableDataGrid && Ischecked is True

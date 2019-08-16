@@ -9,18 +9,18 @@ using System.Windows.Input;
 
 namespace MSsqlTool.CommandBehaviors
 {
-    public class MouseLeftButtonDown
+    public class MouseLeftButtonUp
     {
         public static readonly System.Windows.DependencyProperty CommandProperty =
             DependencyProperty.RegisterAttached("Command",
                 typeof(ICommand),
-                typeof(MouseLeftButtonDown),
+                typeof(MouseLeftButtonUp),
                 new UIPropertyMetadata(CommandChanged));
 
         public static readonly DependencyProperty CommandParameterProperty =
             DependencyProperty.RegisterAttached("CommandParameter",
                 typeof(object),
-                typeof(MouseLeftButtonDown),
+                typeof(MouseLeftButtonUp),
                 new UIPropertyMetadata(null));
 
         public static void SetCommand(DependencyObject target, ICommand value)
@@ -39,26 +39,28 @@ namespace MSsqlTool.CommandBehaviors
 
         private static void CommandChanged(DependencyObject target, DependencyPropertyChangedEventArgs e)
         {
-            Grid grid = target as Grid;
-            if (grid != null)
+            
+            Control control= target as Control;
+            if (control != null)
             {
                 if ((e.NewValue != null) && (e.OldValue == null))
                 {
-                    grid.MouseLeftButtonDown += OnMouseLeftButtonDown;
+                    control.MouseLeftButtonUp += OnMouseLeftButtonUp;
                 }
                 else if ((e.NewValue == null) && (e.OldValue != null))
                 {
-                    grid.MouseLeftButtonDown -= OnMouseLeftButtonDown;
+                    control.MouseLeftButtonUp -= OnMouseLeftButtonUp;
                 }
             }
         }
 
-        private static void OnMouseLeftButtonDown(object sender, RoutedEventArgs e)
+        private static void OnMouseLeftButtonUp(object sender, RoutedEventArgs e)
         {
-            Grid grid = sender as Grid;
-            ICommand command = (ICommand)grid.GetValue(CommandProperty);
-            object commandParameter = grid.GetValue(CommandParameterProperty);
+            Control control = sender as Control;
+            ICommand command = (ICommand)control.GetValue(CommandProperty);
+            object commandParameter = control.GetValue(CommandParameterProperty);
             command.Execute(commandParameter);
+            Console.WriteLine($"control is {control}");
         }
     }
 }

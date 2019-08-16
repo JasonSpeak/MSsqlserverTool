@@ -99,6 +99,8 @@
     </ApplicationDefinition>
     <Compile Include="CommandBehaviors\MouseDoubleClick.cs" />
     <Compile Include="CommandBehaviors\MouseLeftButtonDown.cs" />
+    <Compile Include="CommandBehaviors\MouseLeftButtonUp.cs" />
+    <Compile Include="Model\boolModel.cs" />
     <Compile Include="Model\OpenedTablesModel.cs" />
     <Compile Include="Model\SqlMenuModel.cs" />
     <Compile Include="Model\TablesDataModel.cs" />

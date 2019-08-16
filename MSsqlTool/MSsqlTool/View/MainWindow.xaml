@@ -17,7 +17,8 @@
     Height="900"
     MinWidth="840"
     MinHeight="525"
-    AllowsTransparency="True"
+    ResizeMode="CanResize"
+    AllowsTransparency="False"
     DataContext="{Binding Source={StaticResource Locator}, Path=Main}"
     Icon="/MSsqlTool;component/Icons/SQL.png"
     TextElement.FontSize="16"
@@ -44,7 +45,7 @@
         <Style BasedOn="{StaticResource MaterialDesignCheckBox}" TargetType="CheckBox" />
 
         <Style TargetType="{x:Type wpf:Chip}">
-            <Setter Property="Height" Value="32" />
+            <Setter Property="Height" Value="32"/>
             <Setter Property="HorizontalAlignment" Value="Left" />
             <Setter Property="FontSize" Value="13" />
             <Setter Property="Background" Value="{DynamicResource MaterialDesignChipBackground}" />
@@ -63,7 +64,7 @@
                             <Border
                                 Grid.ColumnSpan="3"
                                 Background="{TemplateBinding Background}"
-                                CornerRadius="5" />
+                                CornerRadius="0" />
                             <ContentControl
                                 x:Name="IconControl"
                                 Width="32"
@@ -167,8 +168,8 @@
                 HorizontalAlignment="Left"
                 Source="../Icons/logo.png" />
             <Button
-                Width="30px"
-                Height="30px"
+                Width="25px"
+                Height="25px"
                 Margin="0,0,75,0"
                 HorizontalAlignment="Right"
                 Background="#3448a1"
@@ -177,8 +178,8 @@
                 ToolTip="最小化">
                 <Canvas>
                     <Path
-                        Canvas.Top="-1"
-                        Canvas.Right="-5"
+                        Canvas.Top="0"
+                        Canvas.Right="-3"
                         Width="12"
                         Height="1"
                         Data="F1M0,1L12.001,1 12.001,0 0,0z"
@@ -186,8 +187,8 @@
                 </Canvas>
             </Button>
             <Button
-                Width="30px"
-                Height="30px"
+                Width="25px"
+                Height="25px"
                 Margin="5,0,40,0"
                 HorizontalAlignment="Right"
                 Background="#3448a1"
@@ -196,8 +197,8 @@
                 ToolTip="{Binding RestoreButtonTip}">
                 <Canvas>
                     <Path
-                        Canvas.Left="-7"
-                        Canvas.Top="-6"
+                        Canvas.Left="-9"
+                        Canvas.Top="-5"
                         Width="12"
                         Height="12"
                         Data="{Binding RestorePathData}"
@@ -205,8 +206,8 @@
                 </Canvas>
             </Button>
             <Button
-                Width="30px"
-                Height="30px"
+                Width="25px"
+                Height="25px"
                 Margin="5,0,5,0"
                 HorizontalAlignment="Right"
                 Background="#3448a1"
@@ -215,8 +216,8 @@
                 ToolTip="关闭">
                 <Canvas>
                     <Path
-                        Canvas.Left="-6"
-                        Canvas.Top="-6"
+                        Canvas.Left="-9"
+                        Canvas.Top="-5"
                         Width="12"
                         Height="12"
                         Data="F1M11.706,0.706L11,0 5.852,5.146 0.706,0 -0.001,0.706 5.146,5.852 -0.001,11 0.706,11.706 5.852,6.56 11,11.706 11.706,11 6.56,5.852z"
@@ -296,17 +297,21 @@
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch">
                         <ListView ItemsSource="{Binding OpenedTableList}">
-                            <ListBox.ItemsPanel>
+                            <ListView.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <WrapPanel IsItemsHost="True" Orientation="Horizontal" />
                                 </ItemsPanelTemplate>
-                            </ListBox.ItemsPanel>
+                            </ListView.ItemsPanel>
                             <ListView.ItemTemplate>
                                 <DataTemplate>
-                                    <materialDesign:Chip
+                                    <Viewbox>
+                                        <Grid>
+                                        <materialDesign:Chip
                                         x:Name="Chip"
-                                        Width="{Binding Converter={StaticResource PercentageConverter}, ElementName=TableStackPanel, Path=ActualWidth, ConverterParameter=0.15}"
-                                        Height="30px"
+                                        Height="50px"
+                                        Width="{Binding Converter={StaticResource PercentageConverter}, ElementName=TableStackPanel, Path=ActualWidth, ConverterParameter=0.16}"
+                                        Margin="-10 -8 -9 0"
+                                        IsTabStop="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=ListViewItem},Path=IsSelected}"
                                         HorizontalAlignment="Stretch"
                                         VerticalAlignment="Stretch"
                                         Command="{Binding Source={StaticResource Locator}, Path=Main.ClickTabCommand}"
@@ -330,10 +335,13 @@
                                             </ContextMenu>
                                         </materialDesign:Chip.ContextMenu>
                                     </materialDesign:Chip>
+                                    </Grid>
+                                    </Viewbox>
                                     <DataTemplate.Triggers>
                                         <DataTrigger Binding="{Binding IsChoosed}" Value="true">
                                             <Setter TargetName="Chip" Property="Background" Value="#3448a1" />
                                             <Setter TargetName="Chip" Property="Foreground" Value="White" />
+                                            <Setter TargetName="Chip" Property="IsTabStop"  Value="True"></Setter>
                                         </DataTrigger>
                                     </DataTemplate.Triggers>
                                 </DataTemplate>
@@ -343,8 +351,7 @@
                     <Grid Grid.Column="1">
                         <materialDesign:PopupBox
                             HorizontalAlignment="Center"
-                            PlacementMode="BottomAndAlignRightEdges"
-                            StaysOpen="True">
+                            PlacementMode="BottomAndAlignRightEdges">
                             <materialDesign:PopupBox.ToggleContent>
                                 <Canvas>
                                     <Path
@@ -375,7 +382,8 @@
                         </materialDesign:PopupBox>
                     </Grid>
                 </Grid>
-                <Grid Grid.Row="1">
+                <Grid 
+                    Grid.Row="1">
                     <DataGrid
                         x:Name="TableDataGrid"
                         Margin="0,0,0,0"
@@ -397,20 +405,30 @@
                             </Style>
                         </DataGrid.ColumnHeaderStyle>
                         <DataGrid.Columns>
-                            <DataGridCheckBoxColumn Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type DataGridRow}}, Path=IsSelected}" CellStyle="{StaticResource MaterialDesignDataGridCell}">
+                            <DataGridCheckBoxColumn 
+                                Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type DataGridRow}}, Path=IsSelected}">
                                 <DataGridCheckBoxColumn.HeaderTemplate>
                                     <DataTemplate>
                                         <CheckBox
                                             x:Name="CheckBoxAll"
-                                            IsChecked="{Binding IsAllSelected, Mode=TwoWay}"
-                                            Style="{StaticResource {x:Type CheckBox}}"
-                                            ClickMode="Release"
+                                            IsEnabled="{Binding Source={StaticResource Locator},Path=Main.IsDataGridFill.IsChecked}"
+                                            IsChecked="{Binding Source={StaticResource Locator},Path=Main.IsAllSelected.IsChecked,Mode=TwoWay}"
+                                            Command="{Binding Source={StaticResource Locator},Path=Main.SelectAllCommand}"
+                                            CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type DataGrid}}}"
                                             ToolTip="全选/全不选">
                                         </CheckBox>
                                     </DataTemplate>
                                 </DataGridCheckBoxColumn.HeaderTemplate>
-                            </DataGridCheckBoxColumn>
+                                </DataGridCheckBoxColumn>
                         </DataGrid.Columns>
+                        <DataGrid.CellStyle>
+                            <Style TargetType="DataGridCell" BasedOn="{StaticResource MaterialDesignDataGridCell}">
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                <Setter Property="Background" Value='AliceBlue'></Setter>
+                                <Setter Property="commandBehaviors:MouseLeftButtonUp.Command" Value="{Binding Source={StaticResource Locator},Path=Main.CheckForSelectAllCommand}"></Setter>
+                                <Setter Property="commandBehaviors:MouseLeftButtonUp.CommandParameter" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type DataGrid}}}"></Setter>
+                            </Style>
+                        </DataGrid.CellStyle>
                     </DataGrid>
                 </Grid>
                 <Grid Grid.Row="2">

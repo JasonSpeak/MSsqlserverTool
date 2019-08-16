@@ -88,6 +88,8 @@ namespace MSsqlTool.ViewModel
 
         private RelayCommand<DataGrid> _selectAllCommand;
 
+        private RelayCommand<DataGrid> _checkForSelectAllCommand;
+
         private List<SqlMenuModel> _mainDatabaseList;
 
         private List<OpenedTablesModel> _openedTableList;
@@ -110,7 +112,9 @@ namespace MSsqlTool.ViewModel
 
         private string _restoreButtonTip;
 
-        private bool _isAllSelected;
+        private BoolModel _isAllSelected;
+
+        private BoolModel _isDataGridFill;
 
         public RelayCommand<string> ExportCommand
         {
@@ -338,6 +342,20 @@ namespace MSsqlTool.ViewModel
             set { _selectAllCommand = value; }
         }
 
+        public RelayCommand<DataGrid> CheckForSelectAllCommand
+        {
+            get
+            {
+                if (_checkForSelectAllCommand == null)
+                {
+                    _checkForSelectAllCommand = new RelayCommand<DataGrid>((dataGrid)=> CheckForSelectAllExecuted(dataGrid));
+                }
+
+                return _checkForSelectAllCommand;
+            }
+            set { _checkForSelectAllCommand = value; }
+        }
+
         public List<SqlMenuModel> DataBaselist
         {
             get { return _dataBaselist; }
@@ -413,7 +431,7 @@ namespace MSsqlTool.ViewModel
             }
         }
 
-        public bool IsAllSelected
+        public BoolModel IsAllSelected
         {
             get { return _isAllSelected; }
             set
@@ -423,6 +441,15 @@ namespace MSsqlTool.ViewModel
             }
         }
 
+        public BoolModel IsDataGridFill
+        {
+            get { return _isDataGridFill; }
+            set
+            {
+                _isDataGridFill = value;
+                RaisePropertyChanged(()=>IsDataGridFill);
+            }
+        }
 
         public MainViewModel()
         {
@@ -431,7 +458,10 @@ namespace MSsqlTool.ViewModel
             RestorePathData =
                 "F1M11,8L9,8 9,4 9,3 8,3 4,3 4,1 11,1z M8,11L1,11 1,4 3,4 4,4 8,4 8,8 8,9z M11,0L4,0 3,0 3,1 3,3 1,3 0,3 0,4 0,11 0,12 1,12 8,12 9,12 9,11 9,9 11,9 12,9 12,8 12,1 12,0z";
             RestoreButtonTip = "向下还原";
-            IsAllSelected = false;
+            IsAllSelected = new BoolModel();
+            IsAllSelected.IsChecked = false;
+            IsDataGridFill = new BoolModel();
+            IsDataGridFill.IsChecked = false;
         }
 
         private void InitializeData()
@@ -789,6 +819,13 @@ namespace MSsqlTool.ViewModel
                 }
             }
             OpenedTableList.Remove(deleteModel);
+            if (OpenedTableList.Count == 0)
+            {
+                IsDataGridFill = new BoolModel();
+                IsDataGridFill.IsChecked = false;
+                IsAllSelected = new BoolModel();
+                IsAllSelected.IsChecked = false;
+            }
             if (OpenedTableList.Count == 5 && OpenedTableFoldedList != null)
             {
                 OpenedTablesModel deleteFoldModel = new OpenedTablesModel();
@@ -866,6 +903,8 @@ namespace MSsqlTool.ViewModel
             TableData.DataBaseName = databaseName;
             TableData.TableName = tableName;
             TableData.DataInTable = _dataTableForUpdate;
+            IsDataGridFill = new BoolModel();
+            IsDataGridFill.IsChecked = true;
         }
 
         private void ApplyUpdateExecuted()
@@ -986,10 +1025,7 @@ namespace MSsqlTool.ViewModel
 
         private void SelectAllExecuted(DataGrid dataGrid)
         {
-            Console.WriteLine("11111111");
-            logger.Trace("1213134546543");
-            logger.Trace($"DataGrid name is {dataGrid.Name}");
-            if (!IsAllSelected)
+            if (IsAllSelected.IsChecked)
             {
                 for (int i = 0; i < dataGrid.Items.Count; i++)
                 {
@@ -997,9 +1033,11 @@ namespace MSsqlTool.ViewModel
                     if (row != null)
                     {
                         row.IsSelected = true;
-                        
+
                     }
                 }
+                IsAllSelected = new BoolModel();
+                IsAllSelected.IsChecked = true;
             }
             else
             {
@@ -1011,6 +1049,17 @@ namespace MSsqlTool.ViewModel
                         row.IsSelected = false;
                     }
                 }
+                IsAllSelected = new BoolModel();
+                IsAllSelected.IsChecked = false;
+            }
+        }
+
+        private void CheckForSelectAllExecuted(DataGrid dataGrid)
+        {
+            if (IsAllSelected.IsChecked)
+            {
+                IsAllSelected = new BoolModel();
+                IsAllSelected.IsChecked = false;
             }
         }
 
