@@ -15,5 +15,5 @@
 > - [X] delete data of table
 > - [X] update data of table
 ---
-# Logic complete. Last thing is style.
+## I think I have complete this project...maybe
 ## Working...  
