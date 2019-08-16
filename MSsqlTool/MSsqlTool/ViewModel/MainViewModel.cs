@@ -39,12 +39,14 @@ namespace MSsqlTool.ViewModel
     /// </summary>
     public class MainViewModel : ViewModelBase
     {
+        #region Private Properties
+
         private static readonly string connectString =
             ConfigurationManager.ConnectionStrings["ConnectString"].ToString();
 
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
-        private enum SysDataBases
+        private enum _sysDataBases
         {
             master,
             model,
@@ -115,6 +117,9 @@ namespace MSsqlTool.ViewModel
         private BoolModel _isAllSelected;
 
         private BoolModel _isDataGridFill;
+        #endregion
+
+        #region Public Properties
 
         public RelayCommand<string> ExportCommand
         {
@@ -450,6 +455,7 @@ namespace MSsqlTool.ViewModel
                 RaisePropertyChanged(()=>IsDataGridFill);
             }
         }
+        #endregion
 
         public MainViewModel()
         {
@@ -463,6 +469,10 @@ namespace MSsqlTool.ViewModel
             IsDataGridFill = new BoolModel();
             IsDataGridFill.IsChecked = false;
         }
+
+        #region Private Functions 
+
+        #region Initialize Functions
 
         private void InitializeData()
         {
@@ -487,7 +497,7 @@ namespace MSsqlTool.ViewModel
             List<string> tempDataBaseList = new List<string>();
             foreach (DataRow row in dataBaseTable.Rows)
             {
-                if (!Enum.IsDefined(typeof(SysDataBases), row["name"]))
+                if (!Enum.IsDefined(typeof(_sysDataBases), row["name"]))
                 {
                     tempDataBaseList.Add(row["name"].ToString());
                 }
@@ -542,6 +552,10 @@ namespace MSsqlTool.ViewModel
             }
             return tableList;
         }
+
+        #endregion
+
+        #region Executed functions of Commands
 
         private void ExportExecuted(string databaseName)
         {
@@ -603,76 +617,6 @@ namespace MSsqlTool.ViewModel
             }
             catch (Exception e)
             {
-                logger.Error(e.Message);
-            }
-        }
-
-        private void PrepareForImport(SqlConnection dropConn, string databaseName)
-        {
-            try
-            {
-                dropConn.Open();
-                string getDataBaseString = "select name from sysdatabases";
-                SqlDataAdapter getDataBaseAdapter = new SqlDataAdapter(getDataBaseString, dropConn);
-                DataTable databaseTable = new DataTable();
-                getDataBaseAdapter.Fill(databaseTable);
-                dropConn.Close();
-                foreach (DataRow row in databaseTable.Rows)
-                {
-                    if (row["name"].ToString() == databaseName)
-                    {
-                        DropDataBase(databaseName);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Error(e.Message);
-            }
-        }
-
-        private void DropDataBase(string databaseName)
-        {
-            if (MessageBox.Show($"本地数据库中已有数据库{databaseName}，是否立即删除？", "提醒", MessageBoxButton.YesNo, MessageBoxImage.Warning) ==
-                MessageBoxResult.Yes)
-            {
-                try
-                {
-                    using (SqlConnection dropConn = new SqlConnection(connectString))
-                    {
-                        dropConn.Open();
-                        SqlCommand dropCommand =
-                            new SqlCommand(
-                                $"use master;alter database {databaseName} set single_user with rollback immediate;drop database {databaseName};",
-                                dropConn);
-                        dropCommand.ExecuteNonQuery();
-                        MessageBox.Show($"已在本地删除数据库{databaseName}", "提醒");
-                        dropConn.Close();
-                    }
-                }
-                catch (Exception e)
-                {
-                    MessageBox.Show("删除出现异常，请查看日志");
-                    logger.Error(e.Message);
-                }
-
-            }
-        }
-
-        private void ImportDataBase(SqlConnection importConn, string filePath, string databaseName)
-        {
-            try
-            {
-                importConn.Open();
-                string importString = $"restore database {databaseName} from disk='{filePath}'";
-                SqlCommand importCommand = new SqlCommand(importString, importConn);
-                importCommand.ExecuteNonQuery();
-                importConn.Close();
-                MessageBox.Show($"导入数据库{databaseName}成功");
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show($"导入数据库{databaseName}出错");
                 logger.Error(e.Message);
             }
         }
@@ -740,67 +684,6 @@ namespace MSsqlTool.ViewModel
                 };
             }
             GetTableData(tableFullName);
-        }
-
-        private void OpenedTableFold(string tableFullName)
-        {
-            if (OpenedTableFoldedList == null)
-            {
-                OpenedTableFoldedList = new List<OpenedTablesModel>()
-                {
-                    new OpenedTablesModel(tableFullName){IsChoosed = false}
-                };
-            }
-            else
-            {
-                OpenedTableFoldedList = new List<OpenedTablesModel>(OpenedTableFoldedList)
-                {
-                    new OpenedTablesModel(tableFullName){IsChoosed = false}
-                };
-            }
-        }
-
-        private bool IsThisTableOpendInTab(string tableFullName)
-        {
-            foreach (var table in OpenedTableList)
-            {
-                if (table.TableName == tableFullName)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private bool IsThisTableOpenedInFolder(string tableFullName)
-        {
-            foreach (var table in OpenedTableFoldedList)
-            {
-                if (table.TableName == tableFullName)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private void SetElseTabsFalse(string tableFullName)
-        {
-            if (OpenedTableList != null)
-            {
-                foreach (var table in OpenedTableList)
-                {
-                    if (table.IsChoosed && table.TableName != tableFullName)
-                    {
-                        table.IsChoosed = false;
-                    }
-
-                    if (table.TableName == tableFullName)
-                    {
-                        table.IsChoosed = true;
-                    }
-                }
-            }
         }
 
         private void RefreshExecuted()
@@ -876,35 +759,6 @@ namespace MSsqlTool.ViewModel
 
             OpenedTableFoldedList.Remove(deleteModel);
             OpenedTableFoldedList = new List<OpenedTablesModel>(OpenedTableFoldedList);
-        }
-
-        private void GetTableData(string tableFullName)
-        {
-            _currentTable = tableFullName;
-            string databaseName = tableFullName.Split('.')[0];
-            string tableName = tableFullName.Split('.')[1];
-            _connection = new SqlConnection(GetDifferentConnectionWithName(databaseName));
-            try
-            {
-                _connection.Open();
-                string selectAll = $"select * from {tableName}";
-                _dataAdapterForUpdate = new SqlDataAdapter(selectAll, _connection);
-                _commandBuilderForUpdate = new SqlCommandBuilder(_dataAdapterForUpdate);
-                _dataTableForUpdate = new DataTable();
-                _dataAdapterForUpdate.Fill(_dataTableForUpdate);
-                _connection.Close();
-            }
-            catch (Exception e)
-            {
-                logger.Error(e.Message);
-            }
-            _connection.Close();
-            TableData = new TablesDataModel();
-            TableData.DataBaseName = databaseName;
-            TableData.TableName = tableName;
-            TableData.DataInTable = _dataTableForUpdate;
-            IsDataGridFill = new BoolModel();
-            IsDataGridFill.IsChecked = true;
         }
 
         private void ApplyUpdateExecuted()
@@ -1062,6 +916,174 @@ namespace MSsqlTool.ViewModel
                 IsAllSelected.IsChecked = false;
             }
         }
+
+        #endregion
+
+        #region Helper Functions in Executed Functions
+
+        private void PrepareForImport(SqlConnection dropConn, string databaseName)
+        {
+            try
+            {
+                dropConn.Open();
+                string getDataBaseString = "select name from sysdatabases";
+                SqlDataAdapter getDataBaseAdapter = new SqlDataAdapter(getDataBaseString, dropConn);
+                DataTable databaseTable = new DataTable();
+                getDataBaseAdapter.Fill(databaseTable);
+                dropConn.Close();
+                foreach (DataRow row in databaseTable.Rows)
+                {
+                    if (row["name"].ToString() == databaseName)
+                    {
+                        DropDataBase(databaseName);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error(e.Message);
+            }
+        }
+
+        private void DropDataBase(string databaseName)
+        {
+            if (MessageBox.Show($"本地数据库中已有数据库{databaseName}，是否立即删除？", "提醒", MessageBoxButton.YesNo, MessageBoxImage.Warning) ==
+                MessageBoxResult.Yes)
+            {
+                try
+                {
+                    using (SqlConnection dropConn = new SqlConnection(connectString))
+                    {
+                        dropConn.Open();
+                        SqlCommand dropCommand =
+                            new SqlCommand(
+                                $"use master;alter database {databaseName} set single_user with rollback immediate;drop database {databaseName};",
+                                dropConn);
+                        dropCommand.ExecuteNonQuery();
+                        MessageBox.Show($"已在本地删除数据库{databaseName}", "提醒");
+                        dropConn.Close();
+                    }
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show("删除出现异常，请查看日志");
+                    logger.Error(e.Message);
+                }
+
+            }
+        }
+
+        private void ImportDataBase(SqlConnection importConn, string filePath, string databaseName)
+        {
+            try
+            {
+                importConn.Open();
+                string importString = $"restore database {databaseName} from disk='{filePath}'";
+                SqlCommand importCommand = new SqlCommand(importString, importConn);
+                importCommand.ExecuteNonQuery();
+                importConn.Close();
+                MessageBox.Show($"导入数据库{databaseName}成功");
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"导入数据库{databaseName}出错");
+                logger.Error(e.Message);
+            }
+        }
+
+        private void OpenedTableFold(string tableFullName)
+        {
+            if (OpenedTableFoldedList == null)
+            {
+                OpenedTableFoldedList = new List<OpenedTablesModel>()
+                {
+                    new OpenedTablesModel(tableFullName){IsChoosed = false}
+                };
+            }
+            else
+            {
+                OpenedTableFoldedList = new List<OpenedTablesModel>(OpenedTableFoldedList)
+                {
+                    new OpenedTablesModel(tableFullName){IsChoosed = false}
+                };
+            }
+        }
+
+        private bool IsThisTableOpendInTab(string tableFullName)
+        {
+            foreach (var table in OpenedTableList)
+            {
+                if (table.TableName == tableFullName)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool IsThisTableOpenedInFolder(string tableFullName)
+        {
+            foreach (var table in OpenedTableFoldedList)
+            {
+                if (table.TableName == tableFullName)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private void SetElseTabsFalse(string tableFullName)
+        {
+            if (OpenedTableList != null)
+            {
+                foreach (var table in OpenedTableList)
+                {
+                    if (table.IsChoosed && table.TableName != tableFullName)
+                    {
+                        table.IsChoosed = false;
+                    }
+
+                    if (table.TableName == tableFullName)
+                    {
+                        table.IsChoosed = true;
+                    }
+                }
+            }
+        }
+
+        private void GetTableData(string tableFullName)
+        {
+            _currentTable = tableFullName;
+            string databaseName = tableFullName.Split('.')[0];
+            string tableName = tableFullName.Split('.')[1];
+            _connection = new SqlConnection(GetDifferentConnectionWithName(databaseName));
+            try
+            {
+                _connection.Open();
+                string selectAll = $"select * from {tableName}";
+                _dataAdapterForUpdate = new SqlDataAdapter(selectAll, _connection);
+                _commandBuilderForUpdate = new SqlCommandBuilder(_dataAdapterForUpdate);
+                _dataTableForUpdate = new DataTable();
+                _dataAdapterForUpdate.Fill(_dataTableForUpdate);
+                _connection.Close();
+            }
+            catch (Exception e)
+            {
+                logger.Error(e.Message);
+            }
+            _connection.Close();
+            TableData = new TablesDataModel();
+            TableData.DataBaseName = databaseName;
+            TableData.TableName = tableName;
+            TableData.DataInTable = _dataTableForUpdate;
+            IsDataGridFill = new BoolModel();
+            IsDataGridFill.IsChecked = true;
+        }
+
+        #endregion
+
+        #endregion
 
     }
 }
