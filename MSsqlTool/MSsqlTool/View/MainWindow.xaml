@@ -341,7 +341,7 @@
                                     </Viewbox>
                                     <DataTemplate.Triggers>
                                         <DataTrigger Binding="{Binding IsChoosed}" Value="true">
-                                            <Setter TargetName="Chip" Property="Background" Value="#3448a1" />
+                                            <Setter TargetName="Chip" Property="Background" Value="#283a89" />
                                             <Setter TargetName="Chip" Property="Foreground" Value="White" />
                                             <Setter TargetName="Chip" Property="IsTabStop"  Value="True"></Setter>
                                         </DataTrigger>
@@ -408,11 +408,16 @@
                         </DataGrid.ColumnHeaderStyle>
                         <DataGrid.Columns>
                             <DataGridCheckBoxColumn 
+                                ElementStyle="{StaticResource MaterialDesignDataGridCheckBoxColumnStyle}"
+                                Width="40"
                                 Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type DataGridRow}}, Path=IsSelected}">
                                 <DataGridCheckBoxColumn.HeaderTemplate>
                                     <DataTemplate>
                                         <CheckBox
                                             x:Name="CheckBoxAll"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Height="40"
                                             IsEnabled="{Binding Source={StaticResource Locator},Path=Main.IsDataGridOpened}"
                                             IsChecked="{Binding Source={StaticResource Locator},Path=Main.IsAllSelected,Mode=TwoWay}"
                                             Command="{Binding Source={StaticResource Locator},Path=Main.SelectAllCommand}"
@@ -421,14 +426,29 @@
                                         </CheckBox>
                                     </DataTemplate>
                                 </DataGridCheckBoxColumn.HeaderTemplate>
+                                <DataGridCheckBoxColumn.CellStyle>
+                                    <Style TargetType="DataGridCell" BasedOn="{StaticResource MaterialDesignDataGridCell}">
+                                        <Setter Property="Background" Value="#e8e8ec"></Setter>
+                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                        <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                        <Setter Property="Padding" Value="0 0 0 0"></Setter>
+                                    </Style>
+                                </DataGridCheckBoxColumn.CellStyle>
                                 </DataGridCheckBoxColumn>
                         </DataGrid.Columns>
                         <DataGrid.CellStyle>
                             <Style TargetType="DataGridCell" BasedOn="{StaticResource MaterialDesignDataGridCell}">
                                 <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                                <Setter Property="Background" Value='AliceBlue'></Setter>
-                                <Setter Property="commandBehaviors:MouseLeftButtonUp.Command" Value="{Binding Source={StaticResource Locator},Path=Main.CheckForSelectAllCommand}"></Setter>
-                                <Setter Property="commandBehaviors:MouseLeftButtonUp.CommandParameter" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type DataGrid}}}"></Setter>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="Background" Value='White'/>
+                                <Setter Property="Height" Value="40"></Setter>
+                                <Setter Property="commandBehaviors:MouseLeftButtonUp.Command" Value="{Binding Source={StaticResource Locator},Path=Main.CheckForSelectAllCommand}"/>
+                                <Setter Property="commandBehaviors:MouseLeftButtonUp.CommandParameter" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type DataGrid}}}"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="#b7dbff"/>
+                                    </Trigger>
+                                </Style.Triggers>
                             </Style>
                         </DataGrid.CellStyle>
                     </DataGrid>

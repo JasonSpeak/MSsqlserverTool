@@ -773,7 +773,11 @@ namespace MSsqlTool.ViewModel
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message);
+                _connection.Close();
+                if (e.Message.Contains("不返回任何键列信息"))
+                {
+                    MessageBox.Show("该数据库缺少主键，无法应用修改");
+                }
                 logger.Error(e.Message);
             }
         }
