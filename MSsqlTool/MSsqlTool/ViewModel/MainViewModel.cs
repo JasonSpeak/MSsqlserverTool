@@ -114,9 +114,10 @@ namespace MSsqlTool.ViewModel
 
         private string _restoreButtonTip;
 
-        private BoolModel _isAllSelected;
+        private bool _isDataGridOpened;
 
-        private BoolModel _isDataGridFill;
+        private bool _isAllSelected;
+
         #endregion
 
         #region Public Properties
@@ -436,7 +437,7 @@ namespace MSsqlTool.ViewModel
             }
         }
 
-        public BoolModel IsAllSelected
+        public bool IsAllSelected
         {
             get { return _isAllSelected; }
             set
@@ -446,13 +447,13 @@ namespace MSsqlTool.ViewModel
             }
         }
 
-        public BoolModel IsDataGridFill
+        public bool IsDataGridOpened
         {
-            get { return _isDataGridFill; }
+            get { return _isDataGridOpened; }
             set
             {
-                _isDataGridFill = value;
-                RaisePropertyChanged(()=>IsDataGridFill);
+                _isDataGridOpened = value;
+                RaisePropertyChanged(()=>IsDataGridOpened);
             }
         }
         #endregion
@@ -464,10 +465,8 @@ namespace MSsqlTool.ViewModel
             RestorePathData =
                 "F1M11,8L9,8 9,4 9,3 8,3 4,3 4,1 11,1z M8,11L1,11 1,4 3,4 4,4 8,4 8,8 8,9z M11,0L4,0 3,0 3,1 3,3 1,3 0,3 0,4 0,11 0,12 1,12 8,12 9,12 9,11 9,9 11,9 12,9 12,8 12,1 12,0z";
             RestoreButtonTip = "向下还原";
-            IsAllSelected = new BoolModel();
-            IsAllSelected.IsChecked = false;
-            IsDataGridFill = new BoolModel();
-            IsDataGridFill.IsChecked = false;
+            IsAllSelected = false;
+            IsDataGridOpened = false;
         }
 
         #region Private Functions 
@@ -491,6 +490,8 @@ namespace MSsqlTool.ViewModel
             }
             catch (Exception e)
             {
+                MessageBox.Show("链接本地数据库失败，请确认数据库实例名称是否为 SQLEXPRESS 。", "连接错误", MessageBoxButton.OKCancel,
+                    MessageBoxImage.Error);
                 logger.Error(e.Message);
                 _connection.Close();
             }
@@ -704,10 +705,8 @@ namespace MSsqlTool.ViewModel
             OpenedTableList.Remove(deleteModel);
             if (OpenedTableList.Count == 0)
             {
-                IsDataGridFill = new BoolModel();
-                IsDataGridFill.IsChecked = false;
-                IsAllSelected = new BoolModel();
-                IsAllSelected.IsChecked = false;
+                IsDataGridOpened = false;
+                IsAllSelected = false;
             }
             if (OpenedTableList.Count == 5 && OpenedTableFoldedList != null)
             {
@@ -879,7 +878,7 @@ namespace MSsqlTool.ViewModel
 
         private void SelectAllExecuted(DataGrid dataGrid)
         {
-            if (IsAllSelected.IsChecked)
+            if (IsAllSelected)
             {
                 for (int i = 0; i < dataGrid.Items.Count; i++)
                 {
@@ -890,8 +889,8 @@ namespace MSsqlTool.ViewModel
 
                     }
                 }
-                IsAllSelected = new BoolModel();
-                IsAllSelected.IsChecked = true;
+
+                IsAllSelected = true;
             }
             else
             {
@@ -903,17 +902,16 @@ namespace MSsqlTool.ViewModel
                         row.IsSelected = false;
                     }
                 }
-                IsAllSelected = new BoolModel();
-                IsAllSelected.IsChecked = false;
+
+                IsAllSelected = false;
             }
         }
 
         private void CheckForSelectAllExecuted(DataGrid dataGrid)
         {
-            if (IsAllSelected.IsChecked)
+            if (IsAllSelected)
             {
-                IsAllSelected = new BoolModel();
-                IsAllSelected.IsChecked = false;
+                IsAllSelected = false;
             }
         }
 
@@ -1077,8 +1075,7 @@ namespace MSsqlTool.ViewModel
             TableData.DataBaseName = databaseName;
             TableData.TableName = tableName;
             TableData.DataInTable = _dataTableForUpdate;
-            IsDataGridFill = new BoolModel();
-            IsDataGridFill.IsChecked = true;
+            IsDataGridOpened = true;
         }
 
         #endregion
