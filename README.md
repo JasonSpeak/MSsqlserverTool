@@ -1,4 +1,5 @@
-##table of Content
+## Table Of Content
+- [Table Of Content](#table-of-content)
 - [Usage](#usage)
 - [RuntimeVersion](#runtimeversion)
 - [WorkList](#worklist)
