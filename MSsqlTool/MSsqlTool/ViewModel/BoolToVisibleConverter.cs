@@ -7,11 +7,20 @@ using System.Windows.Data;
 
 namespace MSsqlTool.ViewModel
 {
-    internal class PercentageConverter:IValueConverter
+    internal class BoolToVisibleConverter:IValueConverter 
     {
-        public object Convert(object value, Type targetType, object parameter,System.Globalization.CultureInfo culture)
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            return System.Convert.ToDouble(value) * System.Convert.ToDouble(parameter);
+            bool isVisible = System.Convert.ToBoolean(value);
+            if (isVisible)
+            {
+                return "Visible";
+            }
+            else
+            {
+                return "Hidden";
+            }
+
         }
 
         public object ConvertBack(object value, Type targetType, object parameter,

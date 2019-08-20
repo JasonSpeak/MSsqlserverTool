@@ -9,7 +9,7 @@ namespace MSsqlTool.ViewModel
 {
     internal class IconPathConverter:IValueConverter
     {
-        public object Convert(object value, Type targeType, object parameter, System.Globalization.CultureInfo culture)
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             string level = System.Convert.ToString(value);
             if (level == "tables")
@@ -23,7 +23,7 @@ namespace MSsqlTool.ViewModel
 
         }
 
-        public object ConvertBack(object value, Type targeType, object parameter,
+        public object ConvertBack(object value, Type targetType, object parameter,
             System.Globalization.CultureInfo culture)
         {
             throw new NotImplementedException();

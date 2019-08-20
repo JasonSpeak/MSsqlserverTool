@@ -47,6 +47,7 @@
         </ContextMenu>
         <vm:PercentageConverter x:Key="PercentageConverter" />
         <vm:IconPathConverter x:Key="IconPathConverter" />
+        <vm:BoolToVisibleConverter x:Key="BoolToVisibleConverter"/>
         <Style TargetType="{x:Type wpf:Chip}">
             <Setter Property="Height" Value="32"/>
             <Setter Property="HorizontalAlignment" Value="Left" />
@@ -175,12 +176,13 @@
                 Margin="0,0,75,0"
                 HorizontalAlignment="Right"
                 Background="#3448a1"
+                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
                 Command="{Binding MiniMizeWindowCommand}"
                 CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
                 ToolTip="最小化">
                 <Canvas>
                     <Path
-                        Canvas.Top="1"
+                        Canvas.Top="-1"
                         Canvas.Right="-3"
                         Width="12"
                         Height="1"
@@ -194,13 +196,14 @@
                 Margin="5,0,40,0"
                 HorizontalAlignment="Right"
                 Background="#3448a1"
+                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
                 Command="{Binding RestoreWindowCommand}"
                 CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
                 ToolTip="{Binding RestoreButtonTip}">
                 <Canvas>
                     <Path
                         Canvas.Left="-9"
-                        Canvas.Top="-5"
+                        Canvas.Top="-7"
                         Width="12"
                         Height="12"
                         Data="{Binding RestorePathData}"
@@ -210,16 +213,26 @@
             <Button
                 Width="25px"
                 Height="25px"
-                Margin="5,0,5,0"
+                Margin="5,0,10,0"
                 HorizontalAlignment="Right"
                 Background="#3448a1"
                 Command="{Binding CloseWindowCommand}"
                 CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
                 ToolTip="关闭">
+                <Button.Style>
+                    <Style BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" TargetType="Button">
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="Red"/>
+                                <Setter Property="Foreground" Value="Red"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
                 <Canvas>
                     <Path
                         Canvas.Left="-9"
-                        Canvas.Top="-5"
+                        Canvas.Top="-7"
                         Width="12"
                         Height="12"
                         Data="F1M11.706,0.706L11,0 5.852,5.146 0.706,0 -0.001,0.706 5.146,5.852 -0.001,11 0.706,11.706 5.852,6.56 11,11.706 11.706,11 6.56,5.852z"
@@ -317,21 +330,21 @@
                                         HorizontalAlignment="Stretch"
                                         VerticalAlignment="Stretch"
                                         Command="{Binding Source={StaticResource Locator}, Path=Main.ClickTabCommand}"
-                                        CommandParameter="{Binding TableName}"
+                                        CommandParameter="{Binding TableFullName}"
                                         Content="{Binding TableName}"
                                         DeleteCommand="{Binding Source={StaticResource Locator}, Path=Main.CloseTabCommand}"
-                                        DeleteCommandParameter="{Binding TableName}"
+                                        DeleteCommandParameter="{Binding TableFullName}"
                                         IsDeletable="True"
                                         ToolTip="{Binding TableName}">
                                         <materialDesign:Chip.ContextMenu>
                                             <ContextMenu>
                                                 <MenuItem
                                                     Command="{Binding Source={StaticResource Locator}, Path=Main.CloseTabCommand}"
-                                                    CommandParameter="{Binding TableName}"
+                                                    CommandParameter="{Binding TableFullName}"
                                                     Header="关闭" />
                                                 <MenuItem
                                                     Command="{Binding Source={StaticResource Locator}, Path=Main.CloseOtherTabsCommand}"
-                                                    CommandParameter="{Binding TableName}"
+                                                    CommandParameter="{Binding TableFullName}"
                                                     Header="关闭其他文档" />
                                                 <MenuItem Command="{Binding Source={StaticResource Locator}, Path=Main.CloseAllTabsCommand}" Header="关闭所有文档" />
                                             </ContextMenu>
@@ -343,7 +356,6 @@
                                         <DataTrigger Binding="{Binding IsChoosed}" Value="true">
                                             <Setter TargetName="Chip" Property="Background" Value="#283a89" />
                                             <Setter TargetName="Chip" Property="Foreground" Value="White" />
-                                            <Setter TargetName="Chip" Property="IsTabStop"  Value="True"></Setter>
                                         </DataTrigger>
                                     </DataTemplate.Triggers>
                                 </DataTemplate>
@@ -353,6 +365,7 @@
                     <Grid Grid.Column="1">
                         <materialDesign:PopupBox
                             HorizontalAlignment="Center"
+                            Visibility="{Binding Converter={StaticResource BoolToVisibleConverter},Source={StaticResource Locator},Path=Main.IsTabFoldOpened}"
                             PlacementMode="BottomAndAlignRightEdges">
                             <materialDesign:PopupBox.ToggleContent>
                                 <Canvas>
@@ -373,10 +386,10 @@
                                             Width="{Binding Converter={StaticResource PercentageConverter}, ElementName=TableStackPanel, Path=ActualWidth, ConverterParameter=0.12}"
                                             Height="30px"
                                             Command="{Binding Source={StaticResource Locator}, Path=Main.ClickFoldCommand}"
-                                            CommandParameter="{Binding TableName}"
+                                            CommandParameter="{Binding TableFullName}"
                                             Content="{Binding TableName}"
                                             DeleteCommand="{Binding Source={StaticResource Locator}, Path=Main.CloseFoldTabCommand}"
-                                            DeleteCommandParameter="{Binding TableName}"
+                                            DeleteCommandParameter="{Binding TableFullName}"
                                             IsDeletable="True" />
                                     </DataTemplate>
                                 </ListView.ItemTemplate>
@@ -395,6 +408,7 @@
                         CanUserDeleteRows="True"
                         CanUserSortColumns="False"
                         GridLinesVisibility="All"
+                        Visibility="{Binding Converter={StaticResource BoolToVisibleConverter},Source={StaticResource Locator},Path=Main.IsDataGridOpened}"
                         ItemsSource="{Binding TableData.DataInTable, Mode=TwoWay}"
                         SelectionMode="Extended">
                         <DataGrid.ColumnHeaderStyle>
@@ -410,6 +424,7 @@
                             <DataGridCheckBoxColumn 
                                 ElementStyle="{StaticResource MaterialDesignDataGridCheckBoxColumnStyle}"
                                 Width="40"
+                                CanUserResize="False"
                                 Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type DataGridRow}}, Path=IsSelected}">
                                 <DataGridCheckBoxColumn.HeaderTemplate>
                                     <DataTemplate>

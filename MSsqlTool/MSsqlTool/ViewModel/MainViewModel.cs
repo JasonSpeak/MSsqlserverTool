@@ -25,18 +25,6 @@ using MessageBox = System.Windows.MessageBox;
 
 namespace MSsqlTool.ViewModel
 {
-    /// <summary>
-    /// This class contains properties that the main View can data bind to.
-    /// <para>
-    /// Use the <strong>mvvminpc</strong> snippet to add bindable properties to this ViewModel.
-    /// </para>
-    /// <para>
-    /// You can also use Blend to data bind with the tool's support.
-    /// </para>
-    /// <para>
-    /// See http://www.galasoft.ch/mvvm
-    /// </para>
-    /// </summary>
     public class MainViewModel : ViewModelBase
     {
         #region Private Properties
@@ -62,21 +50,21 @@ namespace MSsqlTool.ViewModel
 
         private RelayCommand _importCommand;
 
-        private RelayCommand<string> _openTableCommand;
+        private RelayCommand<string[]> _openTableCommand;
 
         private RelayCommand _refreshCommand;
 
-        private RelayCommand<string> _closeTabCommand;
+        private RelayCommand<string[]> _closeTabCommand;
 
-        private RelayCommand<string> _closeFoldTabCommand;
+        private RelayCommand<string[]> _closeFoldTabCommand;
 
         private RelayCommand _applyUpdateCommand;
 
-        private RelayCommand<string> _clickTabCommand;
+        private RelayCommand<string[]> _clickTabCommand;
 
-        private RelayCommand<string> _clickFoldCommand;
+        private RelayCommand<string[]> _clickFoldCommand;
 
-        private RelayCommand<string> _closeOtherTabsCommand;
+        private RelayCommand<string[]> _closeOtherTabsCommand;
 
         private RelayCommand _closeAllTabsCommand;
 
@@ -106,7 +94,7 @@ namespace MSsqlTool.ViewModel
 
         private SqlCommandBuilder _commandBuilderForUpdate;
 
-        private string _currentTable;
+        private string[] _currentTable;
 
         private string _currentwindowState;
 
@@ -117,6 +105,8 @@ namespace MSsqlTool.ViewModel
         private bool _isDataGridOpened;
 
         private bool _isAllSelected;
+
+        private bool _isTabFoldOpened;
 
         #endregion
 
@@ -149,13 +139,13 @@ namespace MSsqlTool.ViewModel
             set { _importCommand = value; }
         }
 
-        public RelayCommand<string> OpenTableCommand
+        public RelayCommand<string[]> OpenTableCommand
         {
             get
             {
                 if (_openTableCommand == null)
                 {
-                    _openTableCommand = new RelayCommand<string>((tableName) => OpenTableExecuted(tableName));
+                    _openTableCommand = new RelayCommand<string[]>((tableName) => OpenTableExecuted(tableName));
                 }
 
                 return _openTableCommand;
@@ -177,13 +167,13 @@ namespace MSsqlTool.ViewModel
             set { _refreshCommand = value; }
         }
 
-        public RelayCommand<string> CloseTabCommand
+        public RelayCommand<string[]> CloseTabCommand
         {
             get
             {
                 if (_closeTabCommand == null)
                 {
-                    _closeTabCommand = new RelayCommand<string>((tableName) => CloseTabExecuted(tableName));
+                    _closeTabCommand = new RelayCommand<string[]>((tableName) => CloseTabExecuted(tableName));
                 }
 
                 return _closeTabCommand;
@@ -191,13 +181,13 @@ namespace MSsqlTool.ViewModel
             set { _closeTabCommand = value; }
         }
 
-        public RelayCommand<string> CloseFoldTabCommand
+        public RelayCommand<string[]> CloseFoldTabCommand
         {
             get
             {
                 if (_closeFoldTabCommand == null)
                 {
-                    _closeFoldTabCommand = new RelayCommand<string>((tableName) => CloseFoldTabExecuted(tableName));
+                    _closeFoldTabCommand = new RelayCommand<string[]>((tableName) => CloseFoldTabExecuted(tableName));
                 }
 
                 return _closeFoldTabCommand;
@@ -219,13 +209,13 @@ namespace MSsqlTool.ViewModel
             set { _applyUpdateCommand = value; }
         }
 
-        public RelayCommand<string> ClickTabCommand
+        public RelayCommand<string[]> ClickTabCommand
         {
             get
             {
                 if (_clickTabCommand == null)
                 {
-                    _clickTabCommand = new RelayCommand<string>((tableFullName) => ClickTabExecuted(tableFullName));
+                    _clickTabCommand = new RelayCommand<string[]>((tableFullName) => ClickTabExecuted(tableFullName));
                 }
 
                 return _clickTabCommand;
@@ -233,13 +223,13 @@ namespace MSsqlTool.ViewModel
             set { _clickTabCommand = value; }
         }
 
-        public RelayCommand<string> ClickFoldCommand
+        public RelayCommand<string[]> ClickFoldCommand
         {
             get
             {
                 if (_clickFoldCommand == null)
                 {
-                    _clickFoldCommand = new RelayCommand<string>((tableFullName) => ClickFoldExecuted(tableFullName));
+                    _clickFoldCommand = new RelayCommand<string[]>((tableFullName) => ClickFoldExecuted(tableFullName));
                 }
 
                 return _clickFoldCommand;
@@ -247,14 +237,14 @@ namespace MSsqlTool.ViewModel
             set { _clickFoldCommand = value; }
         }
 
-        public RelayCommand<string> CloseOtherTabsCommand
+        public RelayCommand<string[]> CloseOtherTabsCommand
         {
             get
             {
                 if (_closeOtherTabsCommand == null)
                 {
                     _closeOtherTabsCommand =
-                        new RelayCommand<string>((tableFullName) => CloseOtherTabsExecuted(tableFullName));
+                        new RelayCommand<string[]>((tableFullName) => CloseOtherTabsExecuted(tableFullName));
                 }
 
                 return _closeOtherTabsCommand;
@@ -456,6 +446,16 @@ namespace MSsqlTool.ViewModel
                 RaisePropertyChanged(()=>IsDataGridOpened);
             }
         }
+
+        public bool IsTabFoldOpened
+        {
+            get => _isTabFoldOpened;
+            set
+            {
+                _isTabFoldOpened = value;
+                RaisePropertyChanged(()=>IsTabFoldOpened);
+            }
+        }
         #endregion
 
         public MainViewModel()
@@ -467,6 +467,7 @@ namespace MSsqlTool.ViewModel
             RestoreButtonTip = "向下还原";
             IsAllSelected = false;
             IsDataGridOpened = false;
+            IsTabFoldOpened = false;
         }
 
         #region Private Functions 
@@ -549,7 +550,10 @@ namespace MSsqlTool.ViewModel
             getTableConnection.Dispose();
             foreach (DataRow row in TableNames.Rows)
             {
-                tableList.Add(new SqlMenuModel(row["name"].ToString()) { Level = "tables", TableFullName = $"{databaseName}.{row["name"].ToString()}" });
+                string[] tableFullName = new string[2];
+                tableFullName[0] = databaseName;
+                tableFullName[1] = row["name"].ToString();
+                tableList.Add(new SqlMenuModel(row["name"].ToString()) { Level = "tables", TableFullName = tableFullName });
             }
             return tableList;
         }
@@ -578,7 +582,8 @@ namespace MSsqlTool.ViewModel
                     using (exportDbConnection = new SqlConnection(exportDBConnectionString))
                     {
                         exportDbConnection.Open();
-                        string exportDBString = String.Format("backup database {0} to disk='{1}\\{0}.bak'", databaseName, exportFileLocation);
+                        string exportDBString = String.Format("backup database [{0}] to disk='{1}\\{0}.bak'", databaseName, exportFileLocation);
+                        logger.Trace(exportDBString);
                         SqlCommand exportCommand = new SqlCommand(exportDBString, exportDbConnection);
                         exportCommand.ExecuteNonQuery();
                         exportDbConnection.Close();
@@ -622,7 +627,7 @@ namespace MSsqlTool.ViewModel
             }
         }
 
-        private void OpenTableExecuted(string tableFullName)
+        private void OpenTableExecuted(string[] tableFullName)
         {
             if (OpenedTableList == null)
             {
@@ -646,6 +651,7 @@ namespace MSsqlTool.ViewModel
             }
             else if (OpenedTableList.Count == 6 && OpenedTableFoldedList == null && !IsThisTableOpendInTab(tableFullName))
             {
+                IsTabFoldOpened = true;
                 OpenedTableFoldedList = new List<OpenedTablesModel>()
                 {
                     OpenedTableList[5]
@@ -654,8 +660,9 @@ namespace MSsqlTool.ViewModel
                 SetElseTabsFalse(tableFullName);
                 OpenedTableList = new List<OpenedTablesModel>(OpenedTableList);
             }
-            else if (OpenedTableList.Count == 6 && OpenedTableFoldedList != null && !IsThisTableOpenedInFolder(tableFullName))
+            else if (OpenedTableList.Count == 6 && OpenedTableFoldedList != null && !IsThisTableOpenedInFolder(tableFullName) && !IsThisTableOpendInTab(tableFullName))
             {
+                IsTabFoldOpened = true;
                 OpenedTableFoldedList = new List<OpenedTablesModel>(OpenedTableFoldedList)
                 {
                     OpenedTableList[5]
@@ -666,6 +673,7 @@ namespace MSsqlTool.ViewModel
             }
             else if (OpenedTableList.Count == 6 && OpenedTableFoldedList != null && IsThisTableOpenedInFolder(tableFullName))
             {
+                IsTabFoldOpened = true;
                 OpenedTablesModel tempModel = OpenedTableList[5];
                 OpenedTableList[5] = new OpenedTablesModel(tableFullName);
                 OpenedTableList = new List<OpenedTablesModel>(OpenedTableList);
@@ -673,7 +681,7 @@ namespace MSsqlTool.ViewModel
                 OpenedTablesModel tableForDelete = new OpenedTablesModel();
                 foreach (var table in OpenedTableFoldedList)
                 {
-                    if (table.TableName == tableFullName)
+                    if (table.TableFullName == tableFullName)
                     {
                         tableForDelete = table;
                     }
@@ -684,6 +692,17 @@ namespace MSsqlTool.ViewModel
                     tempModel
                 };
             }
+
+            if (OpenedTableFoldedList != null)
+            {
+                if (OpenedTableFoldedList.Count != 0)
+                {
+                    foreach (var table in OpenedTableFoldedList)
+                    {
+                        table.IsChoosed = false;
+                    }
+                }
+            }
             GetTableData(tableFullName);
         }
 
@@ -692,12 +711,12 @@ namespace MSsqlTool.ViewModel
             InitializeData();
         }
 
-        private void CloseTabExecuted(string tableFullName)
+        private void CloseTabExecuted(string[] tableFullName)
         {
             OpenedTablesModel deleteModel = new OpenedTablesModel();
             foreach (var table in OpenedTableList)
             {
-                if (table.TableName == tableFullName)
+                if (table.TableFullName == tableFullName)
                 {
                     deleteModel = table;
                 }
@@ -710,21 +729,26 @@ namespace MSsqlTool.ViewModel
             }
             if (OpenedTableList.Count == 5 && OpenedTableFoldedList != null)
             {
-                OpenedTablesModel deleteFoldModel = new OpenedTablesModel();
-                OpenedTableList.Add(OpenedTableFoldedList[0]);
-                deleteFoldModel = OpenedTableFoldedList[0];
-                OpenedTableFoldedList.Remove(deleteFoldModel);
                 if (OpenedTableFoldedList.Count != 0)
                 {
-                    foreach (var table in OpenedTableFoldedList)
+                    OpenedTablesModel deleteFoldModel = new OpenedTablesModel();
+                    OpenedTableList.Add(OpenedTableFoldedList[0]);
+                    deleteFoldModel = OpenedTableFoldedList[0];
+                    OpenedTableFoldedList.Remove(deleteFoldModel);
+                    if (OpenedTableFoldedList.Count != 0)
                     {
-                        table.IsChoosed = false;
+                        foreach (var table in OpenedTableFoldedList)
+                        {
+                            table.IsChoosed = false;
+                        }
+
+                        OpenedTableFoldedList = new List<OpenedTablesModel>(OpenedTableFoldedList);
                     }
-                    OpenedTableFoldedList = new List<OpenedTablesModel>(OpenedTableFoldedList);
-                }
-                else
-                {
-                    OpenedTableFoldedList = null;
+                    else
+                    {
+                        OpenedTableFoldedList = new List<OpenedTablesModel>();
+                        IsTabFoldOpened = false;
+                    }
                 }
             }
 
@@ -733,8 +757,8 @@ namespace MSsqlTool.ViewModel
                 if (OpenedTableList.Count != 0)
                 {
                     OpenedTableList[0].IsChoosed = true;
-                    SetElseTabsFalse(OpenedTableList[0].TableName);
-                    GetTableData(OpenedTableList[0].TableName);
+                    SetElseTabsFalse(OpenedTableList[0].TableFullName);
+                    GetTableData(OpenedTableList[0].TableFullName);
                 }
                 else
                 {
@@ -745,18 +769,22 @@ namespace MSsqlTool.ViewModel
 
         }
 
-        private void CloseFoldTabExecuted(string tableFullName)
+        private void CloseFoldTabExecuted(string[] tableFullName)
         {
             OpenedTablesModel deleteModel = new OpenedTablesModel();
             foreach (var table in OpenedTableFoldedList)
             {
-                if (table.TableName == tableFullName)
+                if (table.TableFullName == tableFullName)
                 {
                     deleteModel = table;
                 }
             }
 
             OpenedTableFoldedList.Remove(deleteModel);
+            if (OpenedTableFoldedList.Count == 0)
+            {
+                IsTabFoldOpened = false;
+            }
             OpenedTableFoldedList = new List<OpenedTablesModel>(OpenedTableFoldedList);
         }
 
@@ -782,12 +810,12 @@ namespace MSsqlTool.ViewModel
             }
         }
 
-        private void ClickTabExecuted(string tableFullName)
+        private void ClickTabExecuted(string[] tableFullName)
         {
             OpenedTablesModel clickedModel = new OpenedTablesModel();
             foreach (var table in OpenedTableList)
             {
-                if (table.TableName == tableFullName)
+                if (table.TableFullName == tableFullName)
                 {
                     table.IsChoosed = true;
                     SetElseTabsFalse(tableFullName);
@@ -796,12 +824,12 @@ namespace MSsqlTool.ViewModel
             }
         }
 
-        private void ClickFoldExecuted(string tableFullName)
+        private void ClickFoldExecuted(string[] tableFullName)
         {
             OpenedTablesModel tempModel = new OpenedTablesModel();
             foreach (var table in OpenedTableFoldedList)
             {
-                if (table.TableName == tableFullName)
+                if (table.TableFullName == tableFullName)
                 {
                     tempModel = table;
                 }
@@ -819,12 +847,12 @@ namespace MSsqlTool.ViewModel
             OpenedTableFoldedList = new List<OpenedTablesModel>(OpenedTableFoldedList);
         }
 
-        private void CloseOtherTabsExecuted(string tableFullName)
+        private void CloseOtherTabsExecuted(string[] tableFullName)
         {
             OpenedTablesModel oneTabModel = new OpenedTablesModel();
             foreach (var table in OpenedTableList)
             {
-                if (table.TableName == tableFullName)
+                if (table.TableFullName == tableFullName)
                 {
                     oneTabModel = table;
                 }
@@ -959,7 +987,7 @@ namespace MSsqlTool.ViewModel
                         dropConn.Open();
                         SqlCommand dropCommand =
                             new SqlCommand(
-                                $"use master;alter database {databaseName} set single_user with rollback immediate;drop database {databaseName};",
+                                $"use master;alter database [{databaseName}] set single_user with rollback immediate;drop database [{databaseName}];",
                                 dropConn);
                         dropCommand.ExecuteNonQuery();
                         MessageBox.Show($"已在本地删除数据库{databaseName}", "提醒");
@@ -980,7 +1008,7 @@ namespace MSsqlTool.ViewModel
             try
             {
                 importConn.Open();
-                string importString = $"restore database {databaseName} from disk='{filePath}'";
+                string importString = $"restore database [{databaseName}] from disk='{filePath}'";
                 SqlCommand importCommand = new SqlCommand(importString, importConn);
                 importCommand.ExecuteNonQuery();
                 importConn.Close();
@@ -993,29 +1021,11 @@ namespace MSsqlTool.ViewModel
             }
         }
 
-        private void OpenedTableFold(string tableFullName)
-        {
-            if (OpenedTableFoldedList == null)
-            {
-                OpenedTableFoldedList = new List<OpenedTablesModel>()
-                {
-                    new OpenedTablesModel(tableFullName){IsChoosed = false}
-                };
-            }
-            else
-            {
-                OpenedTableFoldedList = new List<OpenedTablesModel>(OpenedTableFoldedList)
-                {
-                    new OpenedTablesModel(tableFullName){IsChoosed = false}
-                };
-            }
-        }
-
-        private bool IsThisTableOpendInTab(string tableFullName)
+        private bool IsThisTableOpendInTab(string[] tableFullName)
         {
             foreach (var table in OpenedTableList)
             {
-                if (table.TableName == tableFullName)
+                if (table.TableFullName == tableFullName)
                 {
                     return true;
                 }
@@ -1023,11 +1033,11 @@ namespace MSsqlTool.ViewModel
             return false;
         }
 
-        private bool IsThisTableOpenedInFolder(string tableFullName)
+        private bool IsThisTableOpenedInFolder(string[] tableFullName)
         {
             foreach (var table in OpenedTableFoldedList)
             {
-                if (table.TableName == tableFullName)
+                if (table.TableFullName == tableFullName)
                 {
                     return true;
                 }
@@ -1035,18 +1045,18 @@ namespace MSsqlTool.ViewModel
             return false;
         }
 
-        private void SetElseTabsFalse(string tableFullName)
+        private void SetElseTabsFalse(string[] tableFullName)
         {
             if (OpenedTableList != null)
             {
                 foreach (var table in OpenedTableList)
                 {
-                    if (table.IsChoosed && table.TableName != tableFullName)
+                    if (table.IsChoosed && table.TableFullName != tableFullName)
                     {
                         table.IsChoosed = false;
                     }
 
-                    if (table.TableName == tableFullName)
+                    if (table.TableFullName == tableFullName)
                     {
                         table.IsChoosed = true;
                     }
@@ -1054,16 +1064,16 @@ namespace MSsqlTool.ViewModel
             }
         }
 
-        private void GetTableData(string tableFullName)
+        private void GetTableData(string[] tableFullName)
         {
             _currentTable = tableFullName;
-            string databaseName = tableFullName.Split('.')[0];
-            string tableName = tableFullName.Split('.')[1];
+            string databaseName = tableFullName[0];
+            string tableName = tableFullName[1];
             _connection = new SqlConnection(GetDifferentConnectionWithName(databaseName));
             try
             {
                 _connection.Open();
-                string selectAll = $"select * from {tableName}";
+                string selectAll = $"select * from [{tableName}]";
                 _dataAdapterForUpdate = new SqlDataAdapter(selectAll, _connection);
                 _commandBuilderForUpdate = new SqlCommandBuilder(_dataAdapterForUpdate);
                 _dataTableForUpdate = new DataTable();

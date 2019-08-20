@@ -33,6 +33,18 @@ namespace MSsqlTool.Model
             }
         }
 
+        private string[] _tableFullName;
+
+        public string[] TableFullName
+        {
+            get => _tableFullName;
+            set
+            {
+                _tableFullName = value;
+                RaisePropertyChanged(()=>TableFullName);
+            }
+        }
+
         public OpenedTablesModel()
         {
 
@@ -42,6 +54,13 @@ namespace MSsqlTool.Model
         {
             TableName = name;
             IsChoosed = true;
+        }
+
+        public OpenedTablesModel(string[] tableFullName)
+        {
+            TableFullName = tableFullName;
+            TableName = tableFullName[0] + "." + tableFullName[1];
+            IsChoosed = false;
         }
 
     }

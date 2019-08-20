@@ -132,6 +132,7 @@
     <Compile Include="Model\OpenedTablesModel.cs" />
     <Compile Include="Model\SqlMenuModel.cs" />
     <Compile Include="Model\TablesDataModel.cs" />
+    <Compile Include="ViewModel\BoolToVisibleConverter.cs" />
     <Compile Include="ViewModel\IconPathConverter.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\PercentageConverter.cs" />
@@ -183,9 +184,7 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Logs\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Resource Include="Icons\SQL.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

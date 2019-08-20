@@ -31,9 +31,9 @@ namespace MSsqlTool.Model
             }
         }
 
-        private string _tableFullName;
+        private string[] _tableFullName;
 
-        public string TableFullName
+        public string[] TableFullName
         {
             get => _tableFullName;
             set
