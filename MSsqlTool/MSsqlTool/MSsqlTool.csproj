@@ -127,9 +127,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="CommandBehaviors\MouseDoubleClick.cs" />
-    <Compile Include="CommandBehaviors\MouseLeftButtonDown.cs" />
-    <Compile Include="CommandBehaviors\MouseLeftButtonUp.cs" />
     <Compile Include="Model\OpenedTablesModel.cs" />
+    <Compile Include="Model\SqlHelperModel.cs" />
     <Compile Include="Model\SqlMenuModel.cs" />
     <Compile Include="Model\TablesDataModel.cs" />
     <Compile Include="ViewModel\BoolToVisibleConverter.cs" />
@@ -137,6 +136,18 @@
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\PercentageConverter.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
+    <Page Include="Styles\mainWindowStyle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ExportDataBaseName.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ImportDataBaseName.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -144,6 +155,12 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="View\ExportDataBaseName.xaml.cs">
+      <DependentUpon>ExportDataBaseName.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ImportDataBaseName.xaml.cs">
+      <DependentUpon>ImportDataBaseName.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

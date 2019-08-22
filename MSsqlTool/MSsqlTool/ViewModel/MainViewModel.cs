@@ -1,25 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using GalaSoft.MvvmLight;
-using MSsqlTool.Model;
-using System.Configuration;
-using System.Data;
-using System.Data.SqlClient;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Runtime.Remoting.Channels;
-using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
+﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
-using System.Windows.Forms;
+using MSsqlTool.Model;
 using NLog;
-using NLog.Fluent;
-using NLog.LogReceiverService;
+using System.Collections.Generic;
+using System.Configuration;
+using System.IO;
+using System.Windows.Controls;
+using System.Windows.Forms;
 using DataGrid = System.Windows.Controls.DataGrid;
-using DataRow = System.Data.DataRow;
 using MessageBox = System.Windows.MessageBox;
 
 
@@ -42,11 +30,9 @@ namespace MSsqlTool.ViewModel
             tempdb
         }
 
-        private SqlConnection _connection;
-
-        private List<SqlMenuModel> _dataBaselist;
-
         private RelayCommand<string> _exportCommand;
+
+        private RelayCommand<string> _deleteCommand;
 
         private RelayCommand _importCommand;
 
@@ -68,14 +54,6 @@ namespace MSsqlTool.ViewModel
 
         private RelayCommand _closeAllTabsCommand;
 
-        private RelayCommand<Window> _closeWindowCommand;
-
-        private RelayCommand<Window> _miniMizeWindowCommand;
-
-        private RelayCommand<Window> _restoreWindowCommand;
-
-        private RelayCommand<Window> _moveWindowCommand;
-
         private RelayCommand<DataGrid> _selectAllCommand;
 
         private RelayCommand<DataGrid> _checkForSelectAllCommand;
@@ -88,19 +66,7 @@ namespace MSsqlTool.ViewModel
 
         private TablesDataModel _tableData;
 
-        private SqlDataAdapter _dataAdapterForUpdate;
-
-        private DataTable _dataTableForUpdate;
-
-        private SqlCommandBuilder _commandBuilderForUpdate;
-
         private string[] _currentTable;
-
-        private string _currentwindowState;
-
-        private string _restorePathData;
-
-        private string _restoreButtonTip;
 
         private bool _isDataGridOpened;
 
@@ -123,6 +89,19 @@ namespace MSsqlTool.ViewModel
                 return _exportCommand;
             }
             set { _exportCommand = value; }
+        }
+
+        public RelayCommand<string> DeleteCommand
+        {
+            get
+            {
+                if (_deleteCommand == null)
+                {
+                    _deleteCommand = new RelayCommand<string>((databaseName)=> DeleteExecuted(databaseName));
+                }
+                return _deleteCommand;
+            }
+            set { _deleteCommand = value; }
         }
 
         public RelayCommand ImportCommand
@@ -266,64 +245,6 @@ namespace MSsqlTool.ViewModel
             set { _closeAllTabsCommand = value; }
         }
 
-        public RelayCommand<Window> CloseWindowCommand
-        {
-            get
-            {
-                if (_closeWindowCommand == null)
-                {
-                    _closeWindowCommand =
-                        new RelayCommand<Window>((currentWindow) => CloseWindowExecuted(currentWindow));
-                }
-
-                return _closeWindowCommand;
-            }
-            set { _closeWindowCommand = value; }
-        }
-
-        public RelayCommand<Window> MiniMizeWindowCommand
-        {
-            get
-            {
-                if (_miniMizeWindowCommand == null)
-                {
-                    _miniMizeWindowCommand =
-                        new RelayCommand<Window>((currentWindow) => MiniMizeWindowExecuted(currentWindow));
-                }
-
-                return _miniMizeWindowCommand;
-            }
-            set { _miniMizeWindowCommand = value; }
-        }
-
-        public RelayCommand<Window> RestoreWindowCommand
-        {
-            get
-            {
-                if (_restoreWindowCommand == null)
-                {
-                    _restoreWindowCommand = new RelayCommand<Window>((currentWindow)=> RestoreWindowExecuted(currentWindow));
-                }
-
-                return _restoreWindowCommand;
-            }
-            set { _restoreWindowCommand = value; }
-        }
-
-        public RelayCommand<Window> MoveWindowCommand
-        {
-            get
-            {
-                if (_moveWindowCommand == null)
-                {
-                    _moveWindowCommand = new RelayCommand<Window>((currentWindow)=> MoveWindowExecuted(currentWindow));
-                }
-
-                return _moveWindowCommand;
-            }
-            set { _moveWindowCommand = value; }
-        }
-
         public RelayCommand<DataGrid> SelectAllCommand
         {
             get
@@ -352,14 +273,16 @@ namespace MSsqlTool.ViewModel
             set { _checkForSelectAllCommand = value; }
         }
 
-        public List<SqlMenuModel> DataBaselist
-        {
-            get { return _dataBaselist; }
-        }
-
         public List<SqlMenuModel> MainDatabaseList
         {
-            get { return _mainDatabaseList; }
+            get
+            {
+                if (_mainDatabaseList == null)
+                {
+                    _mainDatabaseList = SqlMenuModel.InitializeData();
+                }
+                return _mainDatabaseList;
+            }
             set
             {
                 _mainDatabaseList = value;
@@ -397,36 +320,6 @@ namespace MSsqlTool.ViewModel
             }
         }
 
-        public string CurrentwindowState
-        {
-            get { return _currentwindowState; }
-            set
-            {
-                _currentwindowState = value;
-                RaisePropertyChanged(()=>CurrentwindowState);
-            }
-        }
-
-        public string RestorePathData
-        {
-            get { return _restorePathData; }
-            set
-            {
-                _restorePathData = value;
-                RaisePropertyChanged(()=>RestorePathData);
-            }
-        }
-
-        public string RestoreButtonTip
-        {
-            get { return _restoreButtonTip; }
-            set
-            {
-                _restoreButtonTip = value;
-                RaisePropertyChanged(()=>RestoreButtonTip);
-            }
-        }
-
         public bool IsAllSelected
         {
             get { return _isAllSelected; }
@@ -460,105 +353,10 @@ namespace MSsqlTool.ViewModel
 
         public MainViewModel()
         {
-            InitializeData();
-            CurrentwindowState = "Maximized";
-            RestorePathData =
-                "F1M11,8L9,8 9,4 9,3 8,3 4,3 4,1 11,1z M8,11L1,11 1,4 3,4 4,4 8,4 8,8 8,9z M11,0L4,0 3,0 3,1 3,3 1,3 0,3 0,4 0,11 0,12 1,12 8,12 9,12 9,11 9,9 11,9 12,9 12,8 12,1 12,0z";
-            RestoreButtonTip = "向下还原";
             IsAllSelected = false;
             IsDataGridOpened = false;
             IsTabFoldOpened = false;
         }
-
-        #region Private Functions 
-
-        #region Initialize Functions
-
-        private void InitializeData()
-        {
-            DataTable dataBaseTable = new DataTable();
-            try
-            {
-                using (_connection = new SqlConnection(connectString))
-                {
-                    _connection.Open();
-                    string selectDataBasesString = "select name from sysdatabases";
-                    SqlDataAdapter dataBaseAdapter = new SqlDataAdapter(selectDataBasesString, _connection);
-                    dataBaseTable = new DataTable();
-                    dataBaseAdapter.Fill(dataBaseTable);
-                    _connection.Close();
-                }
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show("链接本地数据库失败，请确认数据库实例名称是否为 SQLEXPRESS 。", "连接错误", MessageBoxButton.OKCancel,
-                    MessageBoxImage.Error);
-                logger.Error(e.Message);
-                _connection.Close();
-            }
-            List<string> tempDataBaseList = new List<string>();
-            foreach (DataRow row in dataBaseTable.Rows)
-            {
-                if (!Enum.IsDefined(typeof(_sysDataBases), row["name"]))
-                {
-                    tempDataBaseList.Add(row["name"].ToString());
-                }
-            }
-            _dataBaselist = new List<SqlMenuModel>();
-            foreach (string name in tempDataBaseList)
-            {
-                List<SqlMenuModel> tablesList = GetTableList(name);
-                SqlMenuModel tempMenuModel = new SqlMenuModel() { Name = name, MenuTables = tablesList, Level = "databases" };
-                _dataBaselist.Add(tempMenuModel);
-            }
-            MainDatabaseList = new List<SqlMenuModel>
-            {
-                new SqlMenuModel() { Name = "数据库", MenuTables = _dataBaselist, Level = "main" }
-            };
-        }
-
-        private string GetDifferentConnectionWithName(string name)
-        {
-            return String.Format(
-                "data source=.\\SQLEXPRESS;initial catalog={0};integrated security=True;App=EntityFramework",
-                name);
-        }
-
-        private List<SqlMenuModel> GetTableList(string databaseName)
-        {
-            List<SqlMenuModel> tableList = new List<SqlMenuModel>();
-            SqlConnection getTableConnection = new SqlConnection();
-            DataTable TableNames = new DataTable();
-            string GetTableConnString = GetDifferentConnectionWithName(databaseName);
-            try
-            {
-                using (getTableConnection = new SqlConnection(GetTableConnString))
-                {
-                    getTableConnection.Open();
-                    string selectTableString = "select name from sys.tables";
-                    SqlDataAdapter tablesNameAdapter = new SqlDataAdapter(selectTableString, getTableConnection);
-                    TableNames = new DataTable();
-                    tablesNameAdapter.Fill(TableNames);
-                    getTableConnection.Close();
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Error(e.Message);
-                getTableConnection.Close();
-            }
-            getTableConnection.Dispose();
-            foreach (DataRow row in TableNames.Rows)
-            {
-                string[] tableFullName = new string[2];
-                tableFullName[0] = databaseName;
-                tableFullName[1] = row["name"].ToString();
-                tableList.Add(new SqlMenuModel(row["name"].ToString()) { Level = "tables", TableFullName = tableFullName });
-            }
-            return tableList;
-        }
-
-        #endregion
 
         #region Executed functions
 
@@ -575,28 +373,15 @@ namespace MSsqlTool.ViewModel
                     return;
                 }
                 exportFileLocation = chooseExportFolder.SelectedPath;
-                string exportDBConnectionString = GetDifferentConnectionWithName(databaseName);
-                SqlConnection exportDbConnection = new SqlConnection();
-                try
-                {
-                    using (exportDbConnection = new SqlConnection(exportDBConnectionString))
-                    {
-                        exportDbConnection.Open();
-                        string exportDBString = String.Format("backup database [{0}] to disk='{1}\\{0}.bak'", databaseName, exportFileLocation);
-                        logger.Trace(exportDBString);
-                        SqlCommand exportCommand = new SqlCommand(exportDBString, exportDbConnection);
-                        exportCommand.ExecuteNonQuery();
-                        exportDbConnection.Close();
-                        MessageBox.Show(String.Format("数据库 {0} 已成功备份到文件夹 {1} 中", databaseName, exportFileLocation), "提示");
-                    }
-                }
-                catch (Exception e)
-                {
-                    MessageBox.Show(e.Message, "导出错误", MessageBoxButton.YesNo, MessageBoxImage.Error);
-                    logger.Error(e.Message);
-                }
+                SqlHelperModel.ExportDataBaseHelper(databaseName,exportFileLocation);
             }
 
+        }
+
+        private void DeleteExecuted(string databaseName)
+        {
+            SqlHelperModel.DropDataBaseHelper(databaseName);
+            MainDatabaseList = SqlMenuModel.InitializeData();
         }
 
         private void ImportExecuted()
@@ -609,21 +394,15 @@ namespace MSsqlTool.ViewModel
             string databaseName = "";
             if (chooseFileDialog.ShowDialog() == DialogResult.OK)
             {
+                if (string.IsNullOrEmpty(chooseFileDialog.FileName))
+                {
+                    MessageBox.Show("你还未选定备份文件！", "提示");
+                    return;
+                }
                 filePath = chooseFileDialog.FileName;
                 databaseName = Path.GetFileNameWithoutExtension(filePath);
-            }
-            try
-            {
-                using (_connection = new SqlConnection(connectString))
-                {
-                    PrepareForImport(_connection, databaseName);
-                    ImportDataBase(_connection, filePath, databaseName);
-                }
-                InitializeData();
-            }
-            catch (Exception e)
-            {
-                logger.Error(e.Message);
+                SqlHelperModel.ImportDataBaseHelper(databaseName,filePath);
+                MainDatabaseList = SqlMenuModel.InitializeData();
             }
         }
 
@@ -708,7 +487,7 @@ namespace MSsqlTool.ViewModel
 
         private void RefreshExecuted()
         {
-            InitializeData();
+            MainDatabaseList = SqlMenuModel.InitializeData();
         }
 
         private void CloseTabExecuted(string[] tableFullName)
@@ -790,23 +569,14 @@ namespace MSsqlTool.ViewModel
 
         private void ApplyUpdateExecuted()
         {
-            try
+            if (TableData.DataInTable.GetChanges() == null)
             {
-                _connection.Open();
-                _dataAdapterForUpdate.Update(_dataTableForUpdate);
-                _connection.Close();
-                MessageBox.Show("数据修改成功");
-                GetTableData(_currentTable);
-
+                MessageBox.Show("还未进行任何修改");
             }
-            catch (Exception e)
+            else
             {
-                _connection.Close();
-                if (e.Message.Contains("不返回任何键列信息"))
-                {
-                    MessageBox.Show("该数据库缺少主键，无法应用修改");
-                }
-                logger.Error(e.Message);
+                SqlHelperModel.ApplyUpdateHelper();
+                GetTableData(_currentTable);
             }
         }
 
@@ -873,41 +643,6 @@ namespace MSsqlTool.ViewModel
             TableData = new TablesDataModel();
         }
 
-        private void CloseWindowExecuted(Window currentWindow)
-        {
-            currentWindow.Close();
-        }
-
-        private void MiniMizeWindowExecuted(Window currentWindow)
-        {
-            currentWindow.WindowState = WindowState.Minimized;
-        }
-
-        private void RestoreWindowExecuted(Window currentWindow)
-        {
-            if (CurrentwindowState == "Maximized")
-            {
-                currentWindow.WindowState = WindowState.Normal;
-                CurrentwindowState = "Normal";
-                RestorePathData =
-                    "F1M11,11L1,11 1,1 11,1z M11,0L1,0 0,0 0,1 0,11 0,12 1,12 11,12 12,12 12,11 12,1 12,0z";
-                RestoreButtonTip = "最大化";
-            }
-            else if(CurrentwindowState == "Normal")
-            {
-                currentWindow.WindowState = WindowState.Maximized;
-                CurrentwindowState = "Maximized";
-                RestorePathData =
-                    "F1M11,8L9,8 9,4 9,3 8,3 4,3 4,1 11,1z M8,11L1,11 1,4 3,4 4,4 8,4 8,8 8,9z M11,0L4,0 3,0 3,1 3,3 1,3 0,3 0,4 0,11 0,12 1,12 8,12 9,12 9,11 9,9 11,9 12,9 12,8 12,1 12,0z";
-                RestoreButtonTip = "向下还原";
-            }
-        }
-
-        private void MoveWindowExecuted(Window currentWindow)
-        {
-            currentWindow.DragMove();
-        }
-
         private void SelectAllExecuted(DataGrid dataGrid)
         {
             if (IsAllSelected)
@@ -921,7 +656,6 @@ namespace MSsqlTool.ViewModel
 
                     }
                 }
-
                 IsAllSelected = true;
             }
             else
@@ -934,7 +668,6 @@ namespace MSsqlTool.ViewModel
                         row.IsSelected = false;
                     }
                 }
-
                 IsAllSelected = false;
             }
         }
@@ -950,76 +683,6 @@ namespace MSsqlTool.ViewModel
         #endregion
 
         #region Helper Functions in Executed Functions
-
-        private void PrepareForImport(SqlConnection dropConn, string databaseName)
-        {
-            try
-            {
-                dropConn.Open();
-                string getDataBaseString = "select name from sysdatabases";
-                SqlDataAdapter getDataBaseAdapter = new SqlDataAdapter(getDataBaseString, dropConn);
-                DataTable databaseTable = new DataTable();
-                getDataBaseAdapter.Fill(databaseTable);
-                dropConn.Close();
-                foreach (DataRow row in databaseTable.Rows)
-                {
-                    if (row["name"].ToString() == databaseName)
-                    {
-                        DropDataBase(databaseName);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Error(e.Message);
-            }
-        }
-
-        private void DropDataBase(string databaseName)
-        {
-            if (MessageBox.Show($"本地数据库中已有数据库{databaseName}，是否立即删除？", "提醒", MessageBoxButton.YesNo, MessageBoxImage.Warning) ==
-                MessageBoxResult.Yes)
-            {
-                try
-                {
-                    using (SqlConnection dropConn = new SqlConnection(connectString))
-                    {
-                        dropConn.Open();
-                        SqlCommand dropCommand =
-                            new SqlCommand(
-                                $"use master;alter database [{databaseName}] set single_user with rollback immediate;drop database [{databaseName}];",
-                                dropConn);
-                        dropCommand.ExecuteNonQuery();
-                        MessageBox.Show($"已在本地删除数据库{databaseName}", "提醒");
-                        dropConn.Close();
-                    }
-                }
-                catch (Exception e)
-                {
-                    MessageBox.Show("删除出现异常，请查看日志");
-                    logger.Error(e.Message);
-                }
-
-            }
-        }
-
-        private void ImportDataBase(SqlConnection importConn, string filePath, string databaseName)
-        {
-            try
-            {
-                importConn.Open();
-                string importString = $"restore database [{databaseName}] from disk='{filePath}'";
-                SqlCommand importCommand = new SqlCommand(importString, importConn);
-                importCommand.ExecuteNonQuery();
-                importConn.Close();
-                MessageBox.Show($"导入数据库{databaseName}成功");
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show($"导入数据库{databaseName}出错");
-                logger.Error(e.Message);
-            }
-        }
 
         private bool IsThisTableOpendInTab(string[] tableFullName)
         {
@@ -1067,34 +730,14 @@ namespace MSsqlTool.ViewModel
         private void GetTableData(string[] tableFullName)
         {
             _currentTable = tableFullName;
-            string databaseName = tableFullName[0];
-            string tableName = tableFullName[1];
-            _connection = new SqlConnection(GetDifferentConnectionWithName(databaseName));
-            try
+            TableData = new TablesDataModel
             {
-                _connection.Open();
-                string selectAll = $"select * from [{tableName}]";
-                _dataAdapterForUpdate = new SqlDataAdapter(selectAll, _connection);
-                _commandBuilderForUpdate = new SqlCommandBuilder(_dataAdapterForUpdate);
-                _dataTableForUpdate = new DataTable();
-                _dataAdapterForUpdate.Fill(_dataTableForUpdate);
-                _connection.Close();
-            }
-            catch (Exception e)
-            {
-                logger.Error(e.Message);
-            }
-            _connection.Close();
-            TableData = new TablesDataModel();
-            TableData.DataBaseName = databaseName;
-            TableData.TableName = tableName;
-            TableData.DataInTable = _dataTableForUpdate;
+                DataBaseName = tableFullName[0],
+                TableName = tableFullName[1],
+                DataInTable = SqlHelperModel.GetTableDataHelper(tableFullName)
+            };
             IsDataGridOpened = true;
         }
-
         #endregion
-
-        #endregion
-
     }
 }
