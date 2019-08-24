@@ -5,24 +5,186 @@
     xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
     xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
     xmlns:viewModel="clr-namespace:MSsqlTool.ViewModel"
-    xmlns:wpf="http://materialdesigninxaml.net/winfx/xaml/themes">
+    xmlns:wpf="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:controlzEx="clr-namespace:ControlzEx;assembly=MaterialDesignThemes.Wpf">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Button.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Menu.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ToolTip.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
     <Style x:Key="WindowTitleStyle" TargetType="{x:Type Window}">
         <Setter Property="WindowChrome.WindowChrome">
             <Setter.Value>
                 <WindowChrome
                     CaptionHeight="40"
-                    CornerRadius="0"
+                    CornerRadius="5"
                     GlassFrameThickness="1" />
             </Setter.Value>
         </Setter>
         <Setter Property="WindowStyle" Value="SingleBorderWindow" />
         <Setter Property="AllowsTransparency" Value="false" />
-        <Setter Property="Margin" Value="5,0,0,0" />
+        <Setter Property="MaxWidth" Value="1680"/>
+        <Setter Property="MaxHeight" Value="1050"/>
+        <Setter Property="MinWidth" Value="840"/>
+        <Setter Property="MinHeight" Value="525"/>
+        <Setter Property="Title" Value="MSsqlTool"/>
+        <Setter Property="Icon" Value="/MSsqlTool;component/Icons/SQL.png"/>
+        <Setter Property="TextElement.FontSize" Value="16"/>
+        <Setter Property="TextElement.FontWeight" Value="Medium"/>
+        <Setter Property="WindowState" Value="Normal"/>
+        <Setter Property="Background" Value="#3448a1"></Setter>
+    </Style>
+
+    <Style x:Key="LogoStyle" TargetType="{x:Type Image}">
+        <Style.Setters>
+            <Setter Property="Margin" Value="5,5,0,6"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="Source" Value="../Icons/logo.png"/>
+            <Setter Property="Stretch" Value="Uniform"/>
+            <Setter Property="StretchDirection" Value="Both"/>
+        </Style.Setters>
+    </Style>
+
+    <Style x:Key="TitleGridStyle" TargetType="{x:Type Grid}">
+        <Setter Property="Background" Value="#3448a1"/>
+        <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True"/>
+    </Style>
+
+    <Style TargetType="{x:Type Button}" x:Key="MaterialDesignPopupBoxButton">
+        <Setter Property="VerticalContentAlignment" Value="Bottom" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="Padding" Value="16 0 16 16" />
+        <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Grid>
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup Name="CommonStates">
+                                <VisualStateGroup.Transitions>
+                                    <VisualTransition GeneratedDuration="0:0:0.3" To="Normal">
+                                        <VisualTransition.GeneratedEasingFunction>
+                                            <CircleEase EasingMode="EaseOut"/>
+                                        </VisualTransition.GeneratedEasingFunction>
+                                    </VisualTransition>
+                                </VisualStateGroup.Transitions>
+                                <VisualState Name="Normal"/>
+                                <VisualState Name="MouseOver">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="MouseOverBorder" Storyboard.TargetProperty="Opacity" To="0.1" Duration="0"/>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState Name="Disabled">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" To="0.48" Duration="0"/>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <Border x:Name="MouseOverBorder" Opacity="0" Background="{TemplateBinding Foreground, Converter={StaticResource BrushRoundConverter}}"/>
+                        <wpf:Ripple Feedback="{TemplateBinding Foreground, Converter={StaticResource BrushRoundConverter}}"
+                                    Focusable="False"
+                                    MinHeight="48"
+                                    Content="{TemplateBinding Content}"
+                                    ContentTemplate="{TemplateBinding ContentTemplate}"
+                                    ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
+                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                    HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                    VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"                                                                
+                                    Padding="{TemplateBinding Padding}"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type wpf:PopupBox}" x:Key="LonwinPopupBox">
+        <Setter Property="ToggleContent" Value="{StaticResource MaterialDesignPopupBoxToggleContent}" />
+        <Setter Property="wpf:RippleAssist.Feedback" Value="{DynamicResource MaterialDesignFlatButtonRipple}" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="wpf:ShadowAssist.ShadowDepth" Value="Depth3" />
+        <Setter Property="TextElement.FontWeight" Value="Normal" />
+        <Setter Property="Padding" Value="0 0 0 0" />
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type wpf:PopupBox}">
+                    <ControlTemplate.Resources>
+                        <Style TargetType="Separator" BasedOn="{StaticResource MaterialDesignSeparator}"/>
+                        <Style TargetType="ToggleButton" x:Key="ToggleButtonStyle">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <wpf:Ripple Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Focusable="False"
+                                                    ClipToBounds="False"
+                                                    wpf:RippleAssist.IsCentered="True"
+                                                    HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                                    VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                    Padding="{TemplateBinding Padding}" 
+                                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ControlTemplate.Resources>
+                    <Grid>
+                        <ToggleButton x:Name="PART_Toggle" Style="{StaticResource ToggleButtonStyle}" IsChecked="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=IsPopupOpen, Mode=TwoWay}"
+                                      Content="{TemplateBinding ToggleContent}" ContentTemplate="{TemplateBinding ToggleContentTemplate}"
+                                      Cursor="Hand" TabIndex="{TemplateBinding TabIndex}" VerticalAlignment="Center" IsTabStop="{TemplateBinding IsTabStop}"
+                                      />
+                        <controlzEx:PopupEx x:Name="PART_Popup" 
+                                            IsOpen="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=IsPopupOpen, Mode=TwoWay}"
+                                            CustomPopupPlacementCallback="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=PopupPlacementMethod}"
+                                            HorizontalOffset="5"
+                                            VerticalOffset="5"
+                                            PlacementTarget="{Binding ElementName=PART_Toggle}"
+                                            Placement="Custom"
+                                            PopupAnimation="Fade"
+                                            AllowsTransparency="True">
+                            <wpf:Card Content="{TemplateBinding PopupContent}" ContentTemplate="{TemplateBinding PopupContentTemplate}"
+                                      Foreground="{DynamicResource MaterialDesignBody}"
+                                      FontSize="15"
+                                      FontWeight="Regular"
+                                      Padding="{TemplateBinding Padding}"
+                                      RenderOptions.ClearTypeHint="Enabled"
+                                      Margin="5">
+                                <wpf:Card.Resources>
+                                    <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignPopupBoxButton}" />
+                                </wpf:Card.Resources>
+                            </wpf:Card>
+                        </controlzEx:PopupEx>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter Property="Opacity" Value="0.23"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="FoldTabsListViewStyle" TargetType="{x:Type ListView}">
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Width" Value="200"/>
+    </Style>
+
+    <Style x:Key="FoldTabsListViewItemStyle" TargetType="{x:Type ListViewItem}">
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value=" #b7dbff"/>
+                <Setter Property="BorderBrush" Value=" #b7dbff"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <Style x:Key="TabChip" TargetType="{x:Type wpf:Chip}">
-        <Setter Property="Height" Value="32" />
-        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="Height" Value="50px"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="VerticalAlignment" Value="Stretch"/>
+        <Setter Property="IsDeletable" Value="True"/>
         <Setter Property="FontSize" Value="13" />
         <Setter Property="Background" Value="{DynamicResource MaterialDesignChipBackground}" />
         <Setter Property="IconBackground" Value="{DynamicResource PrimaryHueMidBrush}" />
@@ -127,6 +289,91 @@
         </Setter>
     </Style>
 
+    <Style x:Key="FoldTabChipStyle" TargetType="{x:Type wpf:Chip}">
+        <Setter Property="Height" Value="32" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Background" Value="{DynamicResource MaterialDesignChipBackground}" />
+        <Setter Property="IconBackground" Value="{DynamicResource PrimaryHueMidBrush}" />
+        <Setter Property="IconForeground" Value="{DynamicResource PrimaryHueMidForegroundBrush}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type wpf:Chip}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Border CornerRadius="16" Background="{TemplateBinding Background}" Grid.ColumnSpan="3" />
+                        <ContentControl Content="{TemplateBinding Icon}"
+                                        x:Name="IconControl"
+                                        Background="{TemplateBinding IconBackground}"
+                                        Foreground="{TemplateBinding IconForeground}"
+                                        FontSize="17"
+                                        FontWeight="Regular"
+                                        IsTabStop="False"
+                                        Visibility="{TemplateBinding Icon, Converter={StaticResource NullableToVisibilityConverter}}"
+                                        VerticalAlignment="Center"
+                                        VerticalContentAlignment="Center"
+                                        HorizontalContentAlignment="Center"
+                                        Height="32" Width="32">
+                            <ContentControl.Clip>
+                                <EllipseGeometry RadiusX="16" RadiusY="16" Center="16,16" />
+                            </ContentControl.Clip>
+                            <ContentControl.Template>
+                                <ControlTemplate TargetType="ContentControl">
+                                    <Border Background="{TemplateBinding Background}">
+                                        <ContentPresenter Content="{TemplateBinding Content}"
+                                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                                    </Border>
+                                </ControlTemplate>
+                            </ContentControl.Template>
+                        </ContentControl>
+                        <ContentControl Content="{TemplateBinding Content}"
+                                        ContentTemplate="{TemplateBinding ContentTemplate}"
+                                        ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
+                                        ContentStringFormat="{TemplateBinding ContentTemplateSelector}"                                        
+                                        x:Name="TextBlock"
+                                        IsTabStop="False"
+                                        VerticalAlignment="Center"
+                                        Margin="8 0 12 0"
+                                        Grid.Column="1"/>
+                        <Button Grid.Column="2" Visibility="{TemplateBinding IsDeletable, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                x:Name="PART_DeleteButton"
+                                ToolTip="{TemplateBinding DeleteToolTip}"
+                                Margin="-6 0 8 0"
+                                VerticalAlignment="Center"
+                                Width="16" Height="16">
+                            <Button.Template>
+                                <ControlTemplate>
+                                    <Grid>
+                                        <Ellipse x:Name="Bg" Fill="#FFA6A6A6" Stroke="#FF009587" StrokeThickness="0" />
+                                        <wpf:PackIcon Kind="Close" Width="12" Height="12"
+                                                        HorizontalAlignment="Center"
+                                                        VerticalAlignment="Center" />
+                                    </Grid>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="Bg" Property="StrokeThickness" Value="1" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger SourceName="IconControl" Property="Visibility" Value="Collapsed">
+                            <Setter TargetName="TextBlock" Property="Margin" Value="12 0 12 0" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style
         x:Key="TreeViewItemStyle"
         BasedOn="{StaticResource MaterialDesignTreeViewItem}"
@@ -163,8 +410,14 @@
     </Style>
 
     <Style x:Key="TitleCloseButtonStyle" TargetType="{x:Type Button}">
+        <Setter Property="Width" Value="20px"/>
+        <Setter Property="Height" Value="20px"/>
+        <Setter Property="Margin" Value="5,0,10,0"/>
+        <Setter Property="HorizontalAlignment" Value="Right"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Foreground" Value="Black" />
+        <Setter Property="ToolTip" Value="关闭"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
@@ -189,8 +442,15 @@
     </Style>
 
     <Style x:Key="TitleMinimizeButtonStyle" TargetType="{x:Type Button}">
+        <Setter Property="Width" Value="20px"/>
+        <Setter Property="Height" Value="20px"/>
+        <Setter Property="Margin" Value="0,0,70,0"/>
+        <Setter Property="HorizontalAlignment" Value="Right"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Background" Value="#3448a1"/>
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Foreground" Value="Black" />
+        <Setter Property="ToolTip" Value="最小化"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
@@ -214,10 +474,23 @@
         </Setter>
     </Style>
 
+    <Style x:Key="MiniMizePathStyle" TargetType="{x:Type Path}">
+        <Setter Property="Data" Value="F1M0,1L12.001,1 12.001,0 0,0z"/> 
+        <Setter Property="Fill" Value="#FF9AA4D0"/> 
+        <Setter Property="Height" Value="1"/>
+    </Style>
+
+    <Style x:Key="ClosePathStyle" TargetType="{x:Type Path}">
+        <Setter Property="Width" Value="12"/>
+        <Setter Property="Height" Value="12"/>
+        <Setter Property="Data" Value="F1M11.706,0.706L11,0 5.852,5.146 0.706,0 -0.001,0.706 5.146,5.852 -0.001,11 0.706,11.706 5.852,6.56 11,11.706 11.706,11 6.56,5.852z"/>
+        <Setter Property="Fill" Value="#FFA0A9D3"/>
+    </Style>
+
     <Style x:Key="RestorePathStyle" TargetType="{x:Type Path}">
         <Setter Property="Width" Value="12" />
         <Setter Property="Height" Value="12" />
-        <Setter Property="Fill" Value="#FFA0A9D3" />
+        <Setter Property="Fill" Value="#FF9AA4D0" />
         <Style.Triggers>
             <DataTrigger 
                 Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=WindowState}" 
@@ -237,74 +510,55 @@
     </Style>
 
     <Style x:Key="TitleNormalButtonStyle" TargetType="{x:Type Button}">
+        <Setter Property="Width" Value="20px"/>
+        <Setter Property="Height" Value="20px"/>
+        <Setter Property="Margin" Value="5,0,40,0"/>
+        <Setter Property="HorizontalAlignment" Value="Right"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Background" Value="#3448a1"/>
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Foreground" Value="Black" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border
+                        x:Name="MyBackgroundElement"
+                        BorderBrush="#3448a1"
+                        BorderThickness="0">
+                        <ContentPresenter
+                            x:Name="ButtonContentPresenter"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="MyBackgroundElement" Property="Background" Value="GhostWhite" />
+                            <Setter TargetName="MyBackgroundElement" Property="Opacity" Value="0.7" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
         <Style.Triggers>
             <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=WindowState}" Value="Maximized">
                 <Setter Property="ToolTip" Value="向下还原" />
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type Button}">
-                            <Border
-                                x:Name="MyBackgroundElement"
-                                BorderBrush="#3448a1"
-                                BorderThickness="0">
-                                <ContentPresenter
-                                    x:Name="ButtonContentPresenter"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center" />
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="MouseLeftButtonDown">
-                                        <ei:ChangePropertyAction
-                                            PropertyName="WindowState"
-                                            TargetObject="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
-                                            Value="Normal" />
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="MyBackgroundElement" Property="Background" Value="GhostWhite" />
-                                    <Setter TargetName="MyBackgroundElement" Property="Opacity" Value="0.7" />
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
             </DataTrigger>
             <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=WindowState}" Value="Normal">
                 <Setter Property="ToolTip" Value="最大化" />
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type Button}">
-                            <Border
-                                x:Name="MyBackgroundElement"
-                                BorderBrush="#3448a1"
-                                BorderThickness="0">
-                                <ContentPresenter
-                                    x:Name="ButtonContentPresenter"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center" />
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="MouseLeftButtonDown">
-                                        <ei:ChangePropertyAction
-                                            PropertyName="WindowState"
-                                            TargetObject="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
-                                            Value="Maximized" />
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="MyBackgroundElement" Property="Background" Value="GhostWhite" />
-                                    <Setter TargetName="MyBackgroundElement" Property="Opacity" Value="0.7" />
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
             </DataTrigger>
         </Style.Triggers>
+    </Style>
+
+    <Style x:Key="TreeViewIconStyle" TargetType="{x:Type Image}">
+        <Setter Property="Width" Value="15px"/>
+        <Setter Property="Height" Value="15px"/>
+    </Style>
+
+    <Style x:Key="PopBoxPathStyle" TargetType="{x:Type Path}">
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Data" Value="F1M0,0L0,1 1,1 1,2 2,2 2,3 3,3 3,4 4,4 4,5 5,5 5,4 6,4 6,3 7,3 7,2 8,2 8,1 9,1 9,0z"/>
+        <Setter Property="Fill" Value="#FF868999"/>
     </Style>
 
     <Style x:Key="MaterialDesignDataGridCell" TargetType="{x:Type DataGridCell}">
@@ -423,6 +677,14 @@
         x:Key="LonwinDataGrid"
         BasedOn="{StaticResource MaterialDesignDataGrid}"
         TargetType="{x:Type DataGrid}">
+        <Setter Property="Margin" Value="0,0,0,0"/>
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="CanUserAddRows" Value="True"/>
+        <Setter Property="CanUserDeleteRows" Value="True"/>
+        <Setter Property="CanUserSortColumns" Value="False"/>
+        <Setter Property="SelectionMode" Value="Extended"/>
+        <Setter Property="GridLinesVisibility" Value="All"/>
         <Setter Property="wpf:DataGridAssist.AutoGeneratedEditingTextStyle" Value="{StaticResource LonwinDataGridTextColumnEditingStyle}" />
     </Style>
 
@@ -456,6 +718,12 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type CheckBox}" x:Key="CheckAllBox">
+        <Setter Property="Height" Value="40"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
 
     <ContextMenu x:Key="DatabaseMenu" Style="{StaticResource LonwinContextMenu}">

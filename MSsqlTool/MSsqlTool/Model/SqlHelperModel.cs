@@ -85,7 +85,7 @@ namespace MSsqlTool.Model
                 using (var conn = new SqlConnection(ConnectString))
                 {
                     PrepareForImport(conn, dataBaseName);
-                    ImportDataBase(conn, filePath, dataBaseName);
+                    ImportDataBase(conn, filePath);
                 }
             }
             catch (Exception e)
@@ -163,20 +163,31 @@ namespace MSsqlTool.Model
             }
         }
 
-        private static void ImportDataBase(SqlConnection importConn, string filePath, string databaseName)
+        private static void ImportDataBase(SqlConnection importConn, string filePath)
         {
             try
             {
                 importConn.Open();
-                var importString = $"restore database [{databaseName}] from disk='{filePath}'";
+                var importString = "DECLARE @Table TABLE (LogicalName varchar(128),[PhysicalName] varchar(128), [Type] varchar, " +
+                                   "[FileGroupName] varchar(128), [Size] varchar(128), [MaxSize] varchar(128), [FileId] varchar(128)," +
+                                   "[CreateLSN] varchar(128), [DropLSN] varchar(128), [UniqueId] varchar(128), [ReadOnlyLSN] varchar(128), " +
+                                   "[ReadWriteLSN] varchar(128),[BackupSizeInBytes] varchar(128), [SourceBlockSize] varchar(128), " +
+                                   "[FileGroupId] varchar(128), [LogGroupGUID] varchar(128), [DifferentialBaseLSN] varchar(128), " +
+                                   "[DifferentialBaseGUID] varchar(128), [IsReadOnly] varchar(128), [IsPresent] varchar(128), [TDEThumbprint] varchar(128))"+
+                                   $"DECLARE @Path varchar(1000)='{filePath}'" +
+                                   "DECLARE @LogicalNameData varchar(128),@LogicalNameLog varchar(128)" +
+                                   "INSERT INTO @table EXEC('RESTORE FILELISTONLY FROM DISK = ''' +@Path+ '''')" +
+                                   "SET @LogicalNameData = (SELECT LogicalName FROM @Table WHERE Type= 'D')" +
+                                   "SET @LogicalNameLog = (SELECT LogicalName FROM @Table WHERE Type='L')" +
+                                   $"restore database @LogicalNameData from disk='{filePath}';";
                 var importCommand = new SqlCommand(importString, importConn);
                 importCommand.ExecuteNonQuery();
                 importConn.Close();
-                MessageBox.Show($"导入数据库{databaseName}成功");
+                MessageBox.Show($"导入数据库成功");
             }
             catch (Exception e)
             {
-                MessageBox.Show($"导入数据库{databaseName}出错");
+                MessageBox.Show($"导入数据库出错\n{e.Message}");
                 Logger.Error(e.Message);
             }
         }

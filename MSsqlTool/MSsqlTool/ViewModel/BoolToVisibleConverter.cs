@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 using System.Windows.Data;
 
 namespace MSsqlTool.ViewModel
@@ -10,11 +11,11 @@ namespace MSsqlTool.ViewModel
             bool isVisible = System.Convert.ToBoolean(value);
             if (isVisible)
             {
-                return "Visible";
+                return Visibility.Visible;
             }
             else
             {
-                return "Hidden";
+                return Visibility.Hidden;
             }
 
         }

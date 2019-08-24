@@ -1,4 +1,4 @@
-﻿using System;
+﻿ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -11,6 +11,8 @@ namespace MSsqlTool.Model
     public class TablesDataModel:ObservableObject
     {
         private string _tableName;
+        private string _databaseName;
+        private DataTable _dataInTable;
 
         public string TableName
         {
@@ -22,8 +24,6 @@ namespace MSsqlTool.Model
             }
         }
 
-        private string _databaseName;
-
         public string DataBaseName
         {
             get => _databaseName;
@@ -33,8 +33,6 @@ namespace MSsqlTool.Model
                 RaisePropertyChanged(()=>DataBaseName);
             }
         }
-
-        private DataTable _dataInTable;
 
         public DataTable DataInTable
         {

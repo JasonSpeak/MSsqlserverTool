@@ -50,12 +50,6 @@ namespace MSsqlTool.Model
 
         }
 
-        public OpenedTablesModel(string name)
-        {
-            TableName = name;
-            IsChoosed = true;
-        }
-
         public OpenedTablesModel(string[] tableFullName)
         {
             TableFullName = tableFullName;
