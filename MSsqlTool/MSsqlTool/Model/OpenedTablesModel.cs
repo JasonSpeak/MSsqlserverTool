@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GalaSoft.MvvmLight;
+﻿using GalaSoft.MvvmLight;
 
 namespace MSsqlTool.Model
 {
     public class OpenedTablesModel:ObservableObject
     {
         private string _tableName;
+        private string[] _tableFullName;
+        private bool _isChoosed;
 
         public string TableName
         {
@@ -21,7 +18,6 @@ namespace MSsqlTool.Model
             }
         }
 
-        private bool _isChoosed;
 
         public bool IsChoosed
         {
@@ -33,7 +29,6 @@ namespace MSsqlTool.Model
             }
         }
 
-        private string[] _tableFullName;
 
         public string[] TableFullName
         {
@@ -54,7 +49,7 @@ namespace MSsqlTool.Model
         {
             TableFullName = tableFullName;
             TableName = tableFullName[0] + "." + tableFullName[1];
-            IsChoosed = false;
+            _isChoosed = false;
         }
 
     }

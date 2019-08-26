@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using NLog;
+using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using NLog;
 
 namespace MSsqlTool.Model
 {
-    public class SqlHelperModel
+    public static class SqlHelperModel
     {
         private static readonly string ConnectString =
             ConfigurationManager.ConnectionStrings["ConnectString"].ToString(); 
@@ -23,10 +20,6 @@ namespace MSsqlTool.Model
         private static SqlDataAdapter _dataAdapterForUpdate;
 
         private static DataTable _dataTableForUpdate;
-
-        private static SqlCommandBuilder _commandBuilderForUpdate;
-
-        private static string[] _currentTable;
 
 
         public static void ExportDataBaseHelper(string dataBaseName,string exportFileLocation)
@@ -84,8 +77,9 @@ namespace MSsqlTool.Model
             {
                 using (var conn = new SqlConnection(ConnectString))
                 {
-                    PrepareForImport(conn, dataBaseName);
-                    ImportDataBase(conn, filePath);
+                    var logicName = GetLogicNameFromBak(conn, filePath);
+                    PrepareForImport(conn, logicName);
+                    ImportDataBase(conn, logicName,filePath);
                 }
             }
             catch (Exception e)
@@ -96,7 +90,6 @@ namespace MSsqlTool.Model
 
         public static DataTable GetTableDataHelper(string[] tableFullName)
         {
-            _currentTable = tableFullName;
             var databaseName = tableFullName[0];
             var tableName = tableFullName[1];
             _connection = new SqlConnection(SqlMenuModel.GetDifferentConnectionWithName(databaseName));
@@ -105,7 +98,6 @@ namespace MSsqlTool.Model
                 _connection.Open();
                 var selectAll = $"select * from [{tableName}]";
                 _dataAdapterForUpdate = new SqlDataAdapter(selectAll, _connection);
-                _commandBuilderForUpdate = new SqlCommandBuilder(_dataAdapterForUpdate);
                 _dataTableForUpdate = new DataTable();
                 _dataAdapterForUpdate.Fill(_dataTableForUpdate);
                 _connection.Close();
@@ -139,7 +131,7 @@ namespace MSsqlTool.Model
         }
 
 
-        private static void PrepareForImport(SqlConnection dropConn, string databaseName)
+        private static void PrepareForImport(SqlConnection dropConn, string logicName)
         {
             try
             {
@@ -149,12 +141,9 @@ namespace MSsqlTool.Model
                 var databaseTable = new DataTable();
                 getDataBaseAdapter.Fill(databaseTable);
                 dropConn.Close();
-                foreach (DataRow row in databaseTable.Rows)
+                foreach (var row in databaseTable.Rows.Cast<DataRow>().Where(row => row["name"].ToString() == logicName))
                 {
-                    if (row["name"].ToString() == databaseName)
-                    {
-                        DropDataBaseHelper(databaseName);
-                    }
+                    DropDataBaseHelper(logicName);
                 }
             }
             catch (Exception e)
@@ -163,24 +152,13 @@ namespace MSsqlTool.Model
             }
         }
 
-        private static void ImportDataBase(SqlConnection importConn, string filePath)
+        private static void ImportDataBase(SqlConnection importConn,string logicName, string filePath)
         {
             try
             {
                 importConn.Open();
-                var importString = "DECLARE @Table TABLE (LogicalName varchar(128),[PhysicalName] varchar(128), [Type] varchar, " +
-                                   "[FileGroupName] varchar(128), [Size] varchar(128), [MaxSize] varchar(128), [FileId] varchar(128)," +
-                                   "[CreateLSN] varchar(128), [DropLSN] varchar(128), [UniqueId] varchar(128), [ReadOnlyLSN] varchar(128), " +
-                                   "[ReadWriteLSN] varchar(128),[BackupSizeInBytes] varchar(128), [SourceBlockSize] varchar(128), " +
-                                   "[FileGroupId] varchar(128), [LogGroupGUID] varchar(128), [DifferentialBaseLSN] varchar(128), " +
-                                   "[DifferentialBaseGUID] varchar(128), [IsReadOnly] varchar(128), [IsPresent] varchar(128), [TDEThumbprint] varchar(128))"+
-                                   $"DECLARE @Path varchar(1000)='{filePath}'" +
-                                   "DECLARE @LogicalNameData varchar(128),@LogicalNameLog varchar(128)" +
-                                   "INSERT INTO @table EXEC('RESTORE FILELISTONLY FROM DISK = ''' +@Path+ '''')" +
-                                   "SET @LogicalNameData = (SELECT LogicalName FROM @Table WHERE Type= 'D')" +
-                                   "SET @LogicalNameLog = (SELECT LogicalName FROM @Table WHERE Type='L')" +
-                                   $"restore database @LogicalNameData from disk='{filePath}';";
-                var importCommand = new SqlCommand(importString, importConn);
+                var importScript = $"RESTORE DATABASE {logicName} FROM DISK='{filePath}';";
+                var importCommand = new SqlCommand(importScript, importConn);
                 importCommand.ExecuteNonQuery();
                 importConn.Close();
                 MessageBox.Show($"导入数据库成功");
@@ -189,6 +167,39 @@ namespace MSsqlTool.Model
             {
                 MessageBox.Show($"导入数据库出错\n{e.Message}");
                 Logger.Error(e.Message);
+            }
+        }
+
+        private static string GetLogicNameFromBak(SqlConnection Conn, string filePath)
+        {
+            try
+            {
+                Conn.Open();
+                var getLogicNameScript =
+                    "DECLARE @Table TABLE (LogicalName varchar(128),[PhysicalName] varchar(128), [Type] varchar, " +
+                    "[FileGroupName] varchar(128), [Size] varchar(128), [MaxSize] varchar(128), [FileId] varchar(128)," +
+                    "[CreateLSN] varchar(128), [DropLSN] varchar(128), [UniqueId] varchar(128), [ReadOnlyLSN] varchar(128), " +
+                    "[ReadWriteLSN] varchar(128),[BackupSizeInBytes] varchar(128), [SourceBlockSize] varchar(128), " +
+                    "[FileGroupId] varchar(128), [LogGroupGUID] varchar(128), [DifferentialBaseLSN] varchar(128), " +
+                    "[DifferentialBaseGUID] varchar(128), [IsReadOnly] varchar(128), [IsPresent] varchar(128), [TDEThumbprint] varchar(128))" +
+                    $"DECLARE @Path varchar(1000)='{filePath}'" +
+                    "DECLARE @LogicalNameData varchar(128),@LogicalNameLog varchar(128)" +
+                    "INSERT INTO @table EXEC('RESTORE FILELISTONLY FROM DISK = ''' +@Path+ '''')" +
+                    "SET @LogicalNameData = (SELECT LogicalName FROM @Table WHERE Type= 'D')" +
+                    "SET @LogicalNameLog = (SELECT LogicalName FROM @Table WHERE Type='L')" +
+                    "SELECT @LogicalNameData AS [LogicalName]";
+                var getLogicNameAdapter = new SqlDataAdapter(getLogicNameScript, Conn);
+                var logicNameTable = new DataTable();
+                getLogicNameAdapter.Fill(logicNameTable);
+                var logicName = logicNameTable.Rows[0]["LogicalName"].ToString();
+                Conn.Close();
+                return logicName;
+            }
+            catch (Exception e)
+            {
+                Conn.Close();
+                Logger.Error(e.Message);
+                return null;
             }
         }
     }

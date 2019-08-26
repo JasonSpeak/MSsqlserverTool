@@ -136,7 +136,7 @@
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\PercentageConverter.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
-    <Page Include="Styles\mainWindowStyle.xaml">
+    <Page Include="Styles\MainWindowStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

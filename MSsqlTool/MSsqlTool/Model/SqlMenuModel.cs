@@ -1,15 +1,11 @@
-﻿using System;
+﻿using GalaSoft.MvvmLight;
+using NLog;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GalaSoft.MvvmLight;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Windows;
-using MSsqlTool.ViewModel;
-using NLog;
 
 namespace MSsqlTool.Model
 {

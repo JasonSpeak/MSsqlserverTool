@@ -1,4 +1,5 @@
-﻿using GalaSoft.MvvmLight;
+﻿using System.Collections;
+using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using MSsqlTool.Model;
 using System.Collections.Generic;
@@ -31,6 +32,7 @@ namespace MSsqlTool.ViewModel
         public ICommand CloseWindowCommand { get; }
         public ICommand ChangeWindowStateCommand { get; }
         public ICommand MinimizeWindowCommand { get; }
+        public ICommand ResizeWindowCommand { get; }
         public ICommand ExportCommand { get; }
         public ICommand DeleteCommand { get; }
         public ICommand ImportCommand { get; }
@@ -123,6 +125,7 @@ namespace MSsqlTool.ViewModel
             CloseWindowCommand = new RelayCommand(OnCloseWindowCommandExecuted);
             ChangeWindowStateCommand = new RelayCommand(OnChangeWindowStateExecuted);
             MinimizeWindowCommand = new RelayCommand(OnMinimizeWindowExecuted);
+            ResizeWindowCommand = new RelayCommand(OnResizeWindowExecuted);
             ExportCommand = new RelayCommand<string>(OnExportCommandExecuted);
             DeleteCommand = new RelayCommand<string>(OnDeleteExecuted);
             ImportCommand = new RelayCommand(OnImportExecuted);
@@ -141,7 +144,7 @@ namespace MSsqlTool.ViewModel
 
         #region Executed functions
 
-        private void OnExportCommandExecuted(string databaseName)
+        private static void OnExportCommandExecuted(string databaseName)
         {
             var chooseExportFolder = new FolderBrowserDialog {Description = @"选择导出路径"};
             if (chooseExportFolder.ShowDialog() != DialogResult.OK) return;
@@ -154,12 +157,12 @@ namespace MSsqlTool.ViewModel
             SqlHelperModel.ExportDataBaseHelper(databaseName, exportFileLocation);
         }
 
-        private void OnCloseWindowCommandExecuted()
+        private static void OnCloseWindowCommandExecuted()
         {
             System.Windows.Application.Current.Shutdown();
         }                                                                              
 
-        private void OnChangeWindowStateExecuted()
+        private static void OnChangeWindowStateExecuted()
         {
             if (System.Windows.Application.Current.MainWindow != null && System.Windows.Application.Current.MainWindow.WindowState == WindowState.Maximized)
             {
@@ -172,10 +175,23 @@ namespace MSsqlTool.ViewModel
             }
         }
 
-        private void OnMinimizeWindowExecuted()
+        private static void OnMinimizeWindowExecuted()
         {
             if (System.Windows.Application.Current.MainWindow != null)
                 System.Windows.Application.Current.MainWindow.WindowState = WindowState.Minimized;
+        }
+
+        private static void OnResizeWindowExecuted()
+        {
+            if (System.Windows.Application.Current.MainWindow != null && System.Windows.Application.Current.MainWindow.WindowState == WindowState.Maximized)
+            {
+                System.Windows.Application.Current.MainWindow.BorderThickness = new Thickness(8);
+            }
+            else
+            {
+                if (System.Windows.Application.Current.MainWindow != null)
+                    System.Windows.Application.Current.MainWindow.BorderThickness = new Thickness(0);
+            }
         }
 
         private void OnDeleteExecuted(string databaseName)
@@ -186,22 +202,20 @@ namespace MSsqlTool.ViewModel
 
         private void OnImportExecuted()
         {
-            OpenFileDialog chooseFileDialog = new OpenFileDialog
+            var chooseFileDialog = new OpenFileDialog
             {
                 Title = @"选择导入文件", Multiselect = false, Filter = @"数据库备份文件(*.bak)|*.bak"
             };
-            if (chooseFileDialog.ShowDialog() == DialogResult.OK)
+            if (chooseFileDialog.ShowDialog() != DialogResult.OK) return;
+            if (string.IsNullOrEmpty(chooseFileDialog.FileName))
             {
-                if (string.IsNullOrEmpty(chooseFileDialog.FileName))
-                {
-                    MessageBox.Show("你还未选定备份文件！", "提示");
-                    return;
-                }
-                var filePath = chooseFileDialog.FileName;
-                var databaseName = Path.GetFileNameWithoutExtension(filePath);
-                SqlHelperModel.ImportDataBaseHelper(databaseName,filePath);
-                MainDatabaseList = SqlMenuModel.InitializeData();
+                MessageBox.Show("你还未选定备份文件！", "提示");
+                return;
             }
+            var filePath = chooseFileDialog.FileName;
+            var databaseName = Path.GetFileNameWithoutExtension(filePath);
+            SqlHelperModel.ImportDataBaseHelper(databaseName,filePath);
+            MainDatabaseList = SqlMenuModel.InitializeData();
         }
 
         private void OnOpenTableExecuted(string[] tableFullName)
@@ -238,7 +252,7 @@ namespace MSsqlTool.ViewModel
 
         private void OnCloseTabExecuted(string[] tableFullName)
         {
-            OpenedTablesModel deleteTab = OpenedTableList.FirstOrDefault(table => table.TableFullName == tableFullName);
+            var deleteTab = OpenedTableList.FirstOrDefault(table => table.TableFullName == tableFullName);
             OpenedTableList.Remove(deleteTab);
             if (OpenedTableFoldedList.Count != 0)
             {
@@ -368,17 +382,17 @@ namespace MSsqlTool.ViewModel
 
         #region Helper Functions in Executed Functions
 
-        private bool IsThisTableOpenedInTab(string[] tableFullName)
+        private bool IsThisTableOpenedInTab(IEnumerable tableFullName)
         {
             return OpenedTableList.Any(table => table.TableFullName == tableFullName);
         }
 
-        private bool IsThisTableOpenedInFolder(string[] tableFullName)
+        private bool IsThisTableOpenedInFolder(IEnumerable tableFullName)
         {
             return OpenedTableFoldedList.Any(table => table.TableFullName == tableFullName);
         }
 
-        private void SetElseTabsFalse(string[] tableFullName)
+        private void SetElseTabsFalse(IEnumerable tableFullName)
         {
             OpenedTableList.ForEach(table => table.IsChoosed = false);
             OpenedTableList.FirstOrDefault(table => table.TableFullName == tableFullName).IsChoosed = true;

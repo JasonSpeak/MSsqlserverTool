@@ -13,17 +13,21 @@
     Style="{DynamicResource WindowTitleStyle}"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="SizeChanged">
+            <i:InvokeCommandAction Command="{Binding ResizeWindowCommand}"></i:InvokeCommandAction>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <Window.Resources>
-        <ResourceDictionary Source="../Styles/mainWindowStyle.xaml" />
+        <ResourceDictionary Source="../Styles/MainWindowStyle.xaml" />
     </Window.Resources>
-    <Grid Margin="0,0,0,5">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="20*" />
         </Grid.RowDefinitions>
         <Grid
             Grid.Row="0"
-            Margin="6,0,-6,0"
             Style="{DynamicResource TitleGridStyle}">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="MouseLeftButtonDown">
@@ -43,12 +47,13 @@
         </Grid>
         <Grid Grid.Row="1" Background="#3448a1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="3*" />
+                <ColumnDefinition Width="3*" MinWidth="150px" MaxWidth="350px"/>
                 <ColumnDefinition Width="17*" />
             </Grid.ColumnDefinitions>
+            <GridSplitter Grid.Column="0" Style="{StaticResource GridSplitterStyle}"></GridSplitter>
             <Grid
                 Grid.Column="0"
-                Margin="5,0,5,0"
+                Margin="5,0,5,5"
                 Background="White">
                 <TreeView
                     HorizontalContentAlignment="Left"
@@ -59,7 +64,7 @@
                             DataType="{x:Type dm:SqlMenuModel}"
                             ItemContainerStyle="{StaticResource TreeViewItemStyle}"
                             ItemsSource="{Binding MenuTables}">
-                            <StackPanel Margin="-5px" Orientation="Horizontal">
+                            <StackPanel Orientation="Horizontal">
                                 <Image Source="{Binding Converter={StaticResource IconPathConverter}, Path=Level}" Style="{DynamicResource TreeViewIconStyle}" />
                                 <TextBlock Margin="5" Text="{Binding Name}" />
                             </StackPanel>
@@ -75,7 +80,7 @@
             </Grid>
             <Grid
                 Grid.Column="1"
-                Margin="0,0,5,0"
+                Margin="0,0,5,5"
                 Background="White">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="50px" />
@@ -88,10 +93,8 @@
                         <ColumnDefinition Width="5*" />
                     </Grid.ColumnDefinitions>
                     <StackPanel
-                        x:Name="TableStackPanel"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Stretch">
-                        <ListView ItemsSource="{Binding OpenedTableList}">
+                        x:Name="TableStackPanel">
+                        <ListView ItemsSource="{Binding OpenedTableList}" ItemContainerStyle="{StaticResource TabsListViewItemStyle}">
                             <ListView.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <WrapPanel IsItemsHost="True" Orientation="Horizontal" />
@@ -104,7 +107,7 @@
                                             <materialDesign:Chip
                                                 x:Name="Chip"
                                                 Width="{Binding Converter={StaticResource PercentageConverter}, ElementName=TableStackPanel, Path=ActualWidth, ConverterParameter=0.16}"
-                                                Margin="-10,-8,-9,0"
+                                                Margin="-2 0 0 0"
                                                 Command="{Binding Source={StaticResource Locator}, Path=Main.ClickTabCommand}"
                                                 CommandParameter="{Binding TableFullName}"
                                                 Content="{Binding TableName}"
@@ -141,7 +144,6 @@
                     </StackPanel>
                     <Grid Grid.Column="1">
                         <materialDesign:PopupBox
-                            StaysOpen="True"
                             Style="{DynamicResource LonwinPopupBox}"
                             Visibility="{Binding Converter={StaticResource BoolToVisibleConverter}, Source={StaticResource Locator}, Path=Main.IsTabFoldOpened}">
                             <materialDesign:PopupBox.ToggleContent>
@@ -159,16 +161,12 @@
                                             <Viewbox>
                                                 <materialDesign:Chip
                                                     x:Name="Chip"
-                                                    Width="196"
-                                                    Height="30px"
-                                                    Margin="-5,0,0,0"
                                                     Command="{Binding Source={StaticResource Locator}, Path=Main.ClickFoldCommand}"
                                                     CommandParameter="{Binding TableFullName}"
                                                     Content="{Binding TableName}"
                                                     DeleteCommand="{Binding Source={StaticResource Locator}, Path=Main.CloseFoldTabCommand}"
                                                     DeleteCommandParameter="{Binding TableFullName}"
-                                                    IsDeletable="True"
-                                                    Style="{DynamicResource TabChip}"
+                                                    Style="{DynamicResource FoldTabChipStyle}"
                                                     ToolTip="{Binding TableName}" />
                                             </Viewbox>
                                         </StackPanel>
@@ -188,7 +186,6 @@
                         Visibility="{Binding Converter={StaticResource BoolToVisibleConverter}, Source={StaticResource Locator}, Path=Main.IsDataGridOpened}">
                         <DataGrid.Columns>
                             <DataGridCheckBoxColumn
-                                Width="40"
                                 Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type DataGridRow}}, Path=IsSelected}"
                                 CanUserResize="False"
                                 CellStyle="{StaticResource DataGridCheckBoxCellStyle}"
@@ -197,13 +194,9 @@
                                     <DataTemplate>
                                         <CheckBox
                                             x:Name="CheckBoxAll"
-                                            Height="40"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
                                             Command="{Binding Source={StaticResource Locator}, Path=Main.SelectAllCommand}"
                                             CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type DataGrid}}}"
                                             IsChecked="{Binding Source={StaticResource Locator}, Path=Main.IsAllSelected, Mode=TwoWay}"
-                                            IsEnabled="{Binding Source={StaticResource Locator}, Path=Main.IsDataGridOpened}"
                                             ToolTip="全选/全不选" />
                                     </DataTemplate>
                                 </DataGridCheckBoxColumn.HeaderTemplate>
