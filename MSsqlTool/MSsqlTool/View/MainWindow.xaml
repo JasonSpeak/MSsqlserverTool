@@ -15,7 +15,7 @@
     mc:Ignorable="d">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="SizeChanged">
-            <i:InvokeCommandAction Command="{Binding ResizeWindowCommand}"></i:InvokeCommandAction>
+            <i:InvokeCommandAction Command="{Binding ResizeWindowCommand}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <Window.Resources>
@@ -26,31 +26,32 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="20*" />
         </Grid.RowDefinitions>
-        <Grid
-            Grid.Row="0"
-            Style="{DynamicResource TitleGridStyle}">
+        <Grid Grid.Row="0" Style="{StaticResource TitleGridStyle}">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="MouseLeftButtonDown">
                     <ei:CallMethodAction MethodName="DragMove" TargetObject="{Binding ElementName=CurrentWindow}" />
                 </i:EventTrigger>
             </i:Interaction.Triggers>
-            <Image Style="{DynamicResource LogoStyle}" />
+            <Image Style="{StaticResource LogoStyle}" />
             <Button Command="{Binding MinimizeWindowCommand}" Style="{StaticResource TitleMinimizeButtonStyle}">
-                <Path Style="{DynamicResource MiniMizePathStyle}" />
+                <Path Style="{StaticResource MiniMizePathStyle}" />
             </Button>
             <Button Command="{Binding ChangeWindowStateCommand}" Style="{StaticResource TitleNormalButtonStyle}">
                 <Path Style="{StaticResource RestorePathStyle}" />
             </Button>
             <Button Command="{Binding CloseWindowCommand}" Style="{StaticResource TitleCloseButtonStyle}">
-                <Path Style="{DynamicResource ClosePathStyle}" />
+                <Path Style="{StaticResource ClosePathStyle}" />
             </Button>
         </Grid>
         <Grid Grid.Row="1" Background="#3448a1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="3*" MinWidth="150px" MaxWidth="350px"/>
+                <ColumnDefinition
+                    Width="3*"
+                    MinWidth="150px"
+                    MaxWidth="350px" />
                 <ColumnDefinition Width="17*" />
             </Grid.ColumnDefinitions>
-            <GridSplitter Grid.Column="0" Style="{StaticResource GridSplitterStyle}"></GridSplitter>
+            <GridSplitter Grid.Column="0" Style="{StaticResource GridSplitterStyle}" />
             <Grid
                 Grid.Column="0"
                 Margin="5,0,5,5"
@@ -65,17 +66,11 @@
                             ItemContainerStyle="{StaticResource TreeViewItemStyle}"
                             ItemsSource="{Binding MenuTables}">
                             <StackPanel Orientation="Horizontal">
-                                <Image Source="{Binding Converter={StaticResource IconPathConverter}, Path=Level}" Style="{DynamicResource TreeViewIconStyle}" />
+                                <Image Source="{Binding Converter={StaticResource IconPathConverter}, Path=Level}" Style="{StaticResource TreeViewIconStyle}" />
                                 <TextBlock Margin="5" Text="{Binding Name}" />
                             </StackPanel>
                         </HierarchicalDataTemplate>
                     </TreeView.ItemTemplate>
-                    <TreeView.ContextMenu>
-                        <ContextMenu Style="{StaticResource LonwinContextMenu}">
-                            <MenuItem Command="{Binding ImportCommand}" Header="导入" />
-                            <MenuItem Command="{Binding RefreshCommand}" Header="刷新" />
-                        </ContextMenu>
-                    </TreeView.ContextMenu>
                 </TreeView>
             </Grid>
             <Grid
@@ -85,16 +80,14 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="50px" />
                     <RowDefinition Height="*" />
-                    <RowDefinition Height="40px" />
                 </Grid.RowDefinitions>
                 <Grid Grid.Row="0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="95*" />
                         <ColumnDefinition Width="5*" />
                     </Grid.ColumnDefinitions>
-                    <StackPanel
-                        x:Name="TableStackPanel">
-                        <ListView ItemsSource="{Binding OpenedTableList}" ItemContainerStyle="{StaticResource TabsListViewItemStyle}">
+                    <StackPanel x:Name="TableStackPanel">
+                        <ListView ItemContainerStyle="{StaticResource TabsListViewItemStyle}" ItemsSource="{Binding OpenedTableList}">
                             <ListView.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <WrapPanel IsItemsHost="True" Orientation="Horizontal" />
@@ -107,7 +100,7 @@
                                             <materialDesign:Chip
                                                 x:Name="Chip"
                                                 Width="{Binding Converter={StaticResource PercentageConverter}, ElementName=TableStackPanel, Path=ActualWidth, ConverterParameter=0.16}"
-                                                Margin="-2 0 0 0"
+                                                Margin="-2,0,0,0"
                                                 Command="{Binding Source={StaticResource Locator}, Path=Main.ClickTabCommand}"
                                                 CommandParameter="{Binding TableFullName}"
                                                 Content="{Binding TableName}"
@@ -143,18 +136,16 @@
                         </ListView>
                     </StackPanel>
                     <Grid Grid.Column="1">
-                        <materialDesign:PopupBox
-                            Style="{DynamicResource LonwinPopupBox}"
-                            Visibility="{Binding Converter={StaticResource BoolToVisibleConverter}, Source={StaticResource Locator}, Path=Main.IsTabFoldOpened}">
+                        <materialDesign:PopupBox Style="{StaticResource LonwinPopupBox}" Visibility="{Binding Converter={StaticResource BoolToVisibleConverter}, Source={StaticResource Locator}, Path=Main.IsTabFoldOpened}">
                             <materialDesign:PopupBox.ToggleContent>
                                 <Grid Width="40" Height="40">
-                                    <Path Style="{DynamicResource PopBoxPathStyle}" />
+                                    <Path Style="{StaticResource PopBoxPathStyle}" />
                                 </Grid>
                             </materialDesign:PopupBox.ToggleContent>
                             <ListView
-                                ItemContainerStyle="{DynamicResource FoldTabsListViewItemStyle}"
+                                ItemContainerStyle="{StaticResource FoldTabsListViewItemStyle}"
                                 ItemsSource="{Binding OpenedTableFoldedList}"
-                                Style="{DynamicResource FoldTabsListViewStyle}">
+                                Style="{StaticResource FoldTabsListViewStyle}">
                                 <ListView.ItemTemplate>
                                     <DataTemplate>
                                         <StackPanel>
@@ -166,7 +157,7 @@
                                                     Content="{Binding TableName}"
                                                     DeleteCommand="{Binding Source={StaticResource Locator}, Path=Main.CloseFoldTabCommand}"
                                                     DeleteCommandParameter="{Binding TableFullName}"
-                                                    Style="{DynamicResource FoldTabChipStyle}"
+                                                    Style="{StaticResource FoldTabChipStyle}"
                                                     ToolTip="{Binding TableName}" />
                                             </Viewbox>
                                         </StackPanel>
@@ -178,7 +169,6 @@
                 </Grid>
                 <Grid Grid.Row="1">
                     <DataGrid
-                        x:Name="TableDataGrid"
                         CellStyle="{StaticResource DataGridCellStyle}"
                         ColumnHeaderStyle="{StaticResource DataGridColumnHeaderStyle}"
                         ItemsSource="{Binding TableData.DataInTable, Mode=TwoWay}"
@@ -202,16 +192,12 @@
                                 </DataGridCheckBoxColumn.HeaderTemplate>
                             </DataGridCheckBoxColumn>
                         </DataGrid.Columns>
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="CurrentCellChanged">
+                                <i:InvokeCommandAction Command="{Binding Source={StaticResource Locator}, Path=Main.ApplyUpdateCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type DataGrid}}}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
                     </DataGrid>
-                </Grid>
-                <Grid Grid.Row="2">
-                    <Button
-                        Width="100px"
-                        Command="{Binding ApplyUpdateCommand}"
-                        CommandParameter="{Binding ElementName=TableDataGrid, Path=DataContext}"
-                        Content="应用修改"
-                        Style="{StaticResource MaterialDesignFlatMidBgButton}"
-                        Visibility="{Binding Converter={StaticResource BoolToVisibleConverter}, Source={StaticResource Locator}, Path=Main.IsDataGridOpened}" />
                 </Grid>
             </Grid>
         </Grid>

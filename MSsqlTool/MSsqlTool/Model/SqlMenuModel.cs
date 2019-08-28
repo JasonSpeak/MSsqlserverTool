@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Windows;
 
 namespace MSsqlTool.Model
@@ -30,7 +31,7 @@ namespace MSsqlTool.Model
 
         private string _level;
 
-        private string[] _tableFullName;
+        private TableFullNameModel _tableFullName;
 
         private List<SqlMenuModel> _menuTables;
 
@@ -55,7 +56,7 @@ namespace MSsqlTool.Model
             }
         }
 
-        public string[] TableFullName
+        public TableFullNameModel TableFullName
         {
             get => _tableFullName;
             set
@@ -83,7 +84,7 @@ namespace MSsqlTool.Model
                 using (_initializeConn = new SqlConnection(ConnectString))
                 {
                     _initializeConn.Open();
-                    const string selectDataBasesString = "select name from sysdatabases";
+                    const string selectDataBasesString = "SELECT NAME FROM SYSDATABASES";
                     var dataBaseAdapter = new SqlDataAdapter(selectDataBasesString, _initializeConn);
                     dataBaseTable = new DataTable();
                     dataBaseAdapter.Fill(dataBaseTable);
@@ -97,21 +98,8 @@ namespace MSsqlTool.Model
                 Logger.Error(e.Message);
                 _initializeConn.Close();
             }
-            var tempDataBaseList = new List<string>();
-            foreach (DataRow row in dataBaseTable.Rows)
-            {
-                if (!Enum.IsDefined(typeof(SqlMenuModel.SysDataBases), row["name"]))
-                {
-                    tempDataBaseList.Add(row["name"].ToString());
-                }
-            }
-            var dataBaseList = new List<SqlMenuModel>();
-            foreach (var name in tempDataBaseList)
-            {
-                var tablesList = GetTableList(name);
-                var tempMenuModel = new SqlMenuModel() { Name = name, MenuTables = tablesList, Level = "databases" };
-                dataBaseList.Add(tempMenuModel);
-            }
+            var tempDataBaseList = (from DataRow row in dataBaseTable.Rows where !Enum.IsDefined(typeof(SqlMenuModel.SysDataBases), row["name"]) select row["name"].ToString()).ToList();
+            var dataBaseList = (from name in tempDataBaseList let tablesList = GetTableList(name) select new SqlMenuModel() {Name = name, MenuTables = tablesList, Level = "databases"}).ToList();
             var mainDatabaseList = new List<SqlMenuModel>
             {
                 new SqlMenuModel() { Name = "数据库", MenuTables = dataBaseList, Level = "main" }
@@ -145,9 +133,7 @@ namespace MSsqlTool.Model
             getTableConnection.Dispose();
             foreach (DataRow row in tableNames.Rows)
             {
-                var tableFullName = new string[2];
-                tableFullName[0] = databaseName;
-                tableFullName[1] = row["name"].ToString();
+                var tableFullName = new TableFullNameModel(databaseName,row["name"].ToString());
                 tableList.Add(new SqlMenuModel() { Name = row["name"].ToString(), Level = "tables", TableFullName = tableFullName });
             }
             return tableList;
