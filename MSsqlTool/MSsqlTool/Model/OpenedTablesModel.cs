@@ -5,7 +5,7 @@ namespace MSsqlTool.Model
     public class OpenedTablesModel:ObservableObject
     {
         private string _tableName;
-        private string[] _tableFullName;
+        private TableFullNameModel _tableFullName;
         private bool _isChoosed;
 
         public string TableName
@@ -30,7 +30,7 @@ namespace MSsqlTool.Model
         }
 
 
-        public string[] TableFullName
+        public TableFullNameModel TableFullName
         {
             get => _tableFullName;
             set
@@ -40,15 +40,10 @@ namespace MSsqlTool.Model
             }
         }
 
-        public OpenedTablesModel()
-        {
-
-        }
-
-        public OpenedTablesModel(string[] tableFullName)
+        public OpenedTablesModel(TableFullNameModel tableFullName)
         {
             TableFullName = tableFullName;
-            TableName = tableFullName[0] + "." + tableFullName[1];
+            TableName = tableFullName.DataBaseName + "." + tableFullName.TableName;
             _isChoosed = false;
         }
 

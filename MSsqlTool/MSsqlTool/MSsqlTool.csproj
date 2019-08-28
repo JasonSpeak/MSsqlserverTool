@@ -126,10 +126,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="CommandBehaviors\MouseDoubleClick.cs" />
     <Compile Include="Model\OpenedTablesModel.cs" />
     <Compile Include="Model\SqlHelperModel.cs" />
     <Compile Include="Model\SqlMenuModel.cs" />
+    <Compile Include="Model\TableFullNameModel.cs" />
     <Compile Include="Model\TablesDataModel.cs" />
     <Compile Include="ViewModel\BoolToVisibleConverter.cs" />
     <Compile Include="ViewModel\IconPathConverter.cs" />

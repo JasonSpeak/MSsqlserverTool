@@ -1,14 +1,20 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using MSsqlTool.Model;
 using System.Collections.Generic;
+using System.Data.Common;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
+using NLog;
+using Cursor = System.Windows.Forms.Cursor;
+using Cursors = System.Windows.Forms.Cursors;
 using DataGrid = System.Windows.Controls.DataGrid;
 using MessageBox = System.Windows.MessageBox;
 
@@ -18,11 +24,13 @@ namespace MSsqlTool.ViewModel
     public class MainViewModel : ViewModelBase
     {
         #region Private Properties
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private List<SqlMenuModel> _mainDatabaseList;
         private List<OpenedTablesModel> _openedTableList;
         private List<OpenedTablesModel> _openedTableFoldedList;
         private TablesDataModel _tableData;
-        private string[] _currentTable;
+        private SqlDataAdapter _dataAdapterForUpdate;
+        private TableFullNameModel _currentTable;
         private bool _isDataGridOpened;
         private bool _isAllSelected;
         private bool _isTabFoldOpened;
@@ -33,6 +41,7 @@ namespace MSsqlTool.ViewModel
         public ICommand ChangeWindowStateCommand { get; }
         public ICommand MinimizeWindowCommand { get; }
         public ICommand ResizeWindowCommand { get; }
+        public ICommand LoadingRowCommand { get; }
         public ICommand ExportCommand { get; }
         public ICommand DeleteCommand { get; }
         public ICommand ImportCommand { get; }
@@ -118,6 +127,7 @@ namespace MSsqlTool.ViewModel
             MainDatabaseList = SqlMenuModel.InitializeData();
             OpenedTableList = new List<OpenedTablesModel>();
             OpenedTableFoldedList = new List<OpenedTablesModel>();
+            _dataAdapterForUpdate = new SqlDataAdapter();
             IsAllSelected = false;
             IsDataGridOpened = false;
             IsTabFoldOpened = false;
@@ -126,17 +136,18 @@ namespace MSsqlTool.ViewModel
             ChangeWindowStateCommand = new RelayCommand(OnChangeWindowStateExecuted);
             MinimizeWindowCommand = new RelayCommand(OnMinimizeWindowExecuted);
             ResizeWindowCommand = new RelayCommand(OnResizeWindowExecuted);
+            //LoadingRowCommand = new RelayCommand<>();
             ExportCommand = new RelayCommand<string>(OnExportCommandExecuted);
             DeleteCommand = new RelayCommand<string>(OnDeleteExecuted);
             ImportCommand = new RelayCommand(OnImportExecuted);
-            OpenTableCommand = new RelayCommand<string[]>(OnOpenTableExecuted);
+            OpenTableCommand = new RelayCommand<TableFullNameModel>(OnOpenTableExecuted);
             RefreshCommand = new RelayCommand(OnRefreshExecuted);
-            CloseTabCommand = new RelayCommand<string[]>(OnCloseTabExecuted);
-            CloseFoldTabCommand = new RelayCommand<string[]>(OnCloseFoldTabExecuted);
+            CloseTabCommand = new RelayCommand<TableFullNameModel>(OnCloseTabExecuted);
+            CloseFoldTabCommand = new RelayCommand<TableFullNameModel>(OnCloseFoldTabExecuted);
             ApplyUpdateCommand = new RelayCommand(OnApplyUpdateExecuted);
-            ClickTabCommand = new RelayCommand<string[]>(OnClickTabExecuted);
-            ClickFoldCommand = new RelayCommand<string[]>(OnClickFoldExecuted);
-            CloseOtherTabsCommand = new RelayCommand<string[]>(OnCloseOtherTabsExecuted);
+            ClickTabCommand = new RelayCommand<TableFullNameModel>(OnClickTabExecuted);
+            ClickFoldCommand = new RelayCommand<TableFullNameModel>(OnClickFoldExecuted);
+            CloseOtherTabsCommand = new RelayCommand<TableFullNameModel>(OnCloseOtherTabsExecuted);
             CloseAllTabsCommand = new RelayCommand(OnCloseAllTabsExecuted);
             SelectAllCommand = new RelayCommand<ItemsControl>(OnSelectAllExecuted);
             CheckForSelectAllCommand = new RelayCommand<DataGrid>(OnCheckForSelectAllExecuted);
@@ -154,6 +165,29 @@ namespace MSsqlTool.ViewModel
                 return;
             }
             var exportFileLocation = chooseExportFolder.SelectedPath;
+            var allBakFiles = Directory.GetFiles(exportFileLocation, "*.bak");
+            var bakFileName = $"{exportFileLocation}{databaseName}.bak";
+            foreach (var file in allBakFiles)
+            {
+                Logger.Trace(bakFileName);
+                Logger.Trace(file);
+            }
+            if (allBakFiles.Contains(bakFileName))
+            {
+                if (MessageBox.Show("该目录中已有该数据库备份文件，是否覆盖原备份？", "Warning", MessageBoxButton.YesNo,
+                        MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                {
+                    var fileLocation = $"{exportFileLocation}{databaseName}.bak";
+                    try
+                    {
+                        File.Delete(fileLocation);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e.Message);
+                    }
+                }
+            }
             SqlHelperModel.ExportDataBaseHelper(databaseName, exportFileLocation);
         }
 
@@ -194,10 +228,37 @@ namespace MSsqlTool.ViewModel
             }
         }
 
+        private static void OnLoadingRowExecuted(DataGridRowEventArgs e)
+        {
+            e.Row.Header = e.Row.GetIndex() + 1;
+        }
+
         private void OnDeleteExecuted(string databaseName)
         {
+            Cursor.Current = Cursors.WaitCursor;
             SqlHelperModel.DropDataBaseHelper(databaseName);
             MainDatabaseList = SqlMenuModel.InitializeData();
+            Cursor.Current = Cursors.Default;
+            if (OpenedTableList.Count != 0)
+            {
+                OpenedTableList.RemoveAll(tab => tab.TableFullName.DataBaseName == databaseName);
+            }
+
+            if (OpenedTableFoldedList.Count != 0)
+            {
+                OpenedTableFoldedList.RemoveAll(tab => tab.TableFullName.DataBaseName == databaseName);
+            }
+
+            if (OpenedTableList.Count != 0)
+            {
+                OpenedTableList[0].IsChoosed = true;
+            }
+            else
+            {
+                IsDataGridOpened = false;
+            }
+            OpenedTableList = new List<OpenedTablesModel>(OpenedTableList);
+            OpenedTableFoldedList = new List<OpenedTablesModel>(OpenedTableFoldedList);
         }
 
         private void OnImportExecuted()
@@ -213,12 +274,13 @@ namespace MSsqlTool.ViewModel
                 return;
             }
             var filePath = chooseFileDialog.FileName;
-            var databaseName = Path.GetFileNameWithoutExtension(filePath);
-            SqlHelperModel.ImportDataBaseHelper(databaseName,filePath);
+            Cursor.Current = Cursors.WaitCursor;
+            SqlHelperModel.ImportDataBaseHelper(filePath);
             MainDatabaseList = SqlMenuModel.InitializeData();
+            Cursor.Current = Cursors.Default;
         }
 
-        private void OnOpenTableExecuted(string[] tableFullName)
+        private void OnOpenTableExecuted(TableFullNameModel tableFullName)
         {
             if (OpenedTableList.Count < 6 && !IsThisTableOpenedInTab(tableFullName))
             {
@@ -250,7 +312,7 @@ namespace MSsqlTool.ViewModel
             MainDatabaseList = SqlMenuModel.InitializeData();
         }
 
-        private void OnCloseTabExecuted(string[] tableFullName)
+        private void OnCloseTabExecuted(TableFullNameModel tableFullName)
         {
             var deleteTab = OpenedTableList.FirstOrDefault(table => table.TableFullName == tableFullName);
             OpenedTableList.Remove(deleteTab);
@@ -280,7 +342,7 @@ namespace MSsqlTool.ViewModel
             OpenedTableFoldedList = new List<OpenedTablesModel>(OpenedTableFoldedList);
         }
 
-        private void OnCloseFoldTabExecuted(string[] tableFullName)
+        private void OnCloseFoldTabExecuted(TableFullNameModel tableFullName)
         {
             OpenedTableFoldedList.Remove(
                 OpenedTableFoldedList.FirstOrDefault(table => table.TableFullName == tableFullName));
@@ -293,24 +355,26 @@ namespace MSsqlTool.ViewModel
 
         private void OnApplyUpdateExecuted()
         {
-            if (TableData.DataInTable.GetChanges() == null)
+            if (TableData.DataInTable.GetChanges() == null)return;
+            try
             {
-                MessageBox.Show("还未进行任何修改");
-            }
-            else
-            {
-                SqlHelperModel.ApplyUpdateHelper();
+                SqlHelperModel.ApplyUpdateHelper(_dataAdapterForUpdate, TableData.DataInTable);
                 GetTableData(_currentTable);
             }
+            catch (Exception e)
+            {
+                Logger.Trace(e.Message);
+            }
+            
         }
 
-        private void OnClickTabExecuted(string[] tableFullName)
+        private void OnClickTabExecuted(TableFullNameModel tableFullName)
         {
             SetElseTabsFalse(tableFullName);
             GetTableData(tableFullName);
         }
 
-        private void OnClickFoldExecuted(string[] tableFullName)
+        private void OnClickFoldExecuted(TableFullNameModel tableFullName)
         {
             OpenedTableFoldedList.Add(OpenedTableList[5]);
             OpenedTableList[5] = OpenedTableFoldedList.FirstOrDefault(table => table.TableFullName == tableFullName);
@@ -322,7 +386,7 @@ namespace MSsqlTool.ViewModel
             OpenedTableFoldedList = new List<OpenedTablesModel>(OpenedTableFoldedList);
         }
 
-        private void OnCloseOtherTabsExecuted(string[] tableFullName)
+        private void OnCloseOtherTabsExecuted(TableFullNameModel tableFullName)
         {
             OpenedTableList = new List<OpenedTablesModel>()
             {
@@ -382,30 +446,30 @@ namespace MSsqlTool.ViewModel
 
         #region Helper Functions in Executed Functions
 
-        private bool IsThisTableOpenedInTab(IEnumerable tableFullName)
+        private bool IsThisTableOpenedInTab(TableFullNameModel tableFullName)
         {
             return OpenedTableList.Any(table => table.TableFullName == tableFullName);
         }
 
-        private bool IsThisTableOpenedInFolder(IEnumerable tableFullName)
+        private bool IsThisTableOpenedInFolder(TableFullNameModel tableFullName)
         {
             return OpenedTableFoldedList.Any(table => table.TableFullName == tableFullName);
         }
 
-        private void SetElseTabsFalse(IEnumerable tableFullName)
+        private void SetElseTabsFalse(TableFullNameModel tableFullName)
         {
             OpenedTableList.ForEach(table => table.IsChoosed = false);
             OpenedTableList.FirstOrDefault(table => table.TableFullName == tableFullName).IsChoosed = true;
         }
 
-        private void GetTableData(string[] tableFullName)
+        private void GetTableData(TableFullNameModel tableFullName)
         {
             _currentTable = tableFullName;
             TableData = new TablesDataModel
             {
-                DataBaseName = tableFullName[0],
-                TableName = tableFullName[1],
-                DataInTable = SqlHelperModel.GetTableDataHelper(tableFullName)
+                DataBaseName = tableFullName.DataBaseName,
+                TableName = tableFullName.TableName,
+                DataInTable = SqlHelperModel.GetTableDataHelper(tableFullName,ref _dataAdapterForUpdate)
             };
             IsDataGridOpened = true;
         }

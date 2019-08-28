@@ -15,13 +15,6 @@ namespace MSsqlTool.Model
 
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private static SqlConnection _connection;
-
-        private static SqlDataAdapter _dataAdapterForUpdate;
-
-        private static DataTable _dataTableForUpdate;
-
-
         public static void ExportDataBaseHelper(string dataBaseName,string exportFileLocation)
         {
             var exportDbConnectionString = SqlMenuModel.GetDifferentConnectionWithName(dataBaseName);
@@ -31,7 +24,7 @@ namespace MSsqlTool.Model
                 using (exportDbConnection = new SqlConnection(exportDbConnectionString))
                 {
                     exportDbConnection.Open();
-                    var exportDbString = string.Format("backup database [{0}] to disk='{1}\\{0}.bak'", dataBaseName, exportFileLocation);
+                    var exportDbString = string.Format("BACKUP DATABASE [{0}] TO DISK='{1}\\{0}.bak'", dataBaseName, exportFileLocation);
                     SqlCommand exportCommand = new SqlCommand(exportDbString, exportDbConnection);
                     exportCommand.ExecuteNonQuery();
                     exportDbConnection.Close();
@@ -57,7 +50,7 @@ namespace MSsqlTool.Model
                     dropConn.Open();
                     var dropCommand =
                         new SqlCommand(
-                            $"use master;alter database [{dataBaseName}] set single_user with rollback immediate;drop database [{dataBaseName}];",
+                            $"USE MASTER;ALTER DATABASE [{dataBaseName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;DROP DATABASE [{dataBaseName}];",
                             dropConn);
                     dropCommand.ExecuteNonQuery();
                     MessageBox.Show($"已在本地删除数据库{dataBaseName}", "提醒");
@@ -71,7 +64,7 @@ namespace MSsqlTool.Model
             }
         }
 
-        public static void ImportDataBaseHelper(string dataBaseName, string filePath)
+        public static void ImportDataBaseHelper(string filePath)
         {
             try
             {
@@ -88,37 +81,34 @@ namespace MSsqlTool.Model
             }
         }
 
-        public static DataTable GetTableDataHelper(string[] tableFullName)
+        public static DataTable GetTableDataHelper(TableFullNameModel tableFullName,ref SqlDataAdapter dataAdapterForUpdate)
         {
-            var databaseName = tableFullName[0];
-            var tableName = tableFullName[1];
-            _connection = new SqlConnection(SqlMenuModel.GetDifferentConnectionWithName(databaseName));
+            var databaseName = tableFullName.DataBaseName;
+            var tableName = tableFullName.TableName;
+            var dataTableForUpdate = new DataTable();
+            var connection = new SqlConnection(SqlMenuModel.GetDifferentConnectionWithName(databaseName));
             try
             {
-                _connection.Open();
-                var selectAll = $"select * from [{tableName}]";
-                _dataAdapterForUpdate = new SqlDataAdapter(selectAll, _connection);
-                _dataTableForUpdate = new DataTable();
-                _dataAdapterForUpdate.Fill(_dataTableForUpdate);
-                _connection.Close();
+                connection.Open();
+                var selectAll = $"SELECT * FROM [{tableName}]";
+                dataAdapterForUpdate = new SqlDataAdapter(selectAll, connection);
+                var builder = new SqlCommandBuilder(dataAdapterForUpdate);
+                dataAdapterForUpdate.Fill(dataTableForUpdate);
+                connection.Close();
             }
             catch (Exception e)
             {
+                connection.Close();
                 Logger.Error(e.Message);
             }
-
-            _connection.Close();
-            return _dataTableForUpdate;
+            return dataTableForUpdate;
         }
 
-        public static void ApplyUpdateHelper()
+        public static void ApplyUpdateHelper(SqlDataAdapter dataAdapterForUpdate,DataTable dataTableForUpdate)
         {
             try
             {
-                _connection.Open();
-                _dataAdapterForUpdate.Update(_dataTableForUpdate);
-                _connection.Close();
-                MessageBox.Show("数据修改成功");
+                dataAdapterForUpdate.Update(dataTableForUpdate);
             }
             catch (Exception e)
             {
@@ -136,7 +126,7 @@ namespace MSsqlTool.Model
             try
             {
                 dropConn.Open();
-                const string getDataBaseString = "select name from sysdatabases";
+                const string getDataBaseString = "SELECT NAME FROM SYSDATABASES";
                 var getDataBaseAdapter = new SqlDataAdapter(getDataBaseString, dropConn);
                 var databaseTable = new DataTable();
                 getDataBaseAdapter.Fill(databaseTable);
@@ -157,7 +147,7 @@ namespace MSsqlTool.Model
             try
             {
                 importConn.Open();
-                var importScript = $"RESTORE DATABASE {logicName} FROM DISK='{filePath}';";
+                var importScript = $"RESTORE DATABASE [{logicName}] FROM DISK='{filePath}';";
                 var importCommand = new SqlCommand(importScript, importConn);
                 importCommand.ExecuteNonQuery();
                 importConn.Close();
@@ -170,11 +160,11 @@ namespace MSsqlTool.Model
             }
         }
 
-        private static string GetLogicNameFromBak(SqlConnection Conn, string filePath)
+        private static string GetLogicNameFromBak(SqlConnection conn, string filePath)
         {
             try
             {
-                Conn.Open();
+                conn.Open();
                 var getLogicNameScript =
                     "DECLARE @Table TABLE (LogicalName varchar(128),[PhysicalName] varchar(128), [Type] varchar, " +
                     "[FileGroupName] varchar(128), [Size] varchar(128), [MaxSize] varchar(128), [FileId] varchar(128)," +
@@ -188,16 +178,16 @@ namespace MSsqlTool.Model
                     "SET @LogicalNameData = (SELECT LogicalName FROM @Table WHERE Type= 'D')" +
                     "SET @LogicalNameLog = (SELECT LogicalName FROM @Table WHERE Type='L')" +
                     "SELECT @LogicalNameData AS [LogicalName]";
-                var getLogicNameAdapter = new SqlDataAdapter(getLogicNameScript, Conn);
+                var getLogicNameAdapter = new SqlDataAdapter(getLogicNameScript, conn);
                 var logicNameTable = new DataTable();
                 getLogicNameAdapter.Fill(logicNameTable);
                 var logicName = logicNameTable.Rows[0]["LogicalName"].ToString();
-                Conn.Close();
+                conn.Close();
                 return logicName;
             }
             catch (Exception e)
             {
-                Conn.Close();
+                conn.Close();
                 Logger.Error(e.Message);
                 return null;
             }
