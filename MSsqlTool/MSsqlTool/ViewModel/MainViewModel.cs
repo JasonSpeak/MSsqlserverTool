@@ -165,25 +165,13 @@ namespace MSsqlTool.ViewModel
             {
                 var allBakFiles = Directory.GetFiles(exportFileLocation, "*.bak");
                 var bakFileName = $"{exportFileLocation}{databaseName}.bak";
-                foreach (var file in allBakFiles)
-                {
-                    Logger.Trace(bakFileName);
-                    Logger.Trace(file);
-                }
                 if (allBakFiles.Contains(bakFileName))
                 {
                     if (MessageBox.Show("该目录中已有该数据库备份文件，是否覆盖原备份？", "Warning", MessageBoxButton.YesNo,
                             MessageBoxImage.Warning) == MessageBoxResult.Yes)
                     {
                         var fileLocation = $"{exportFileLocation}{databaseName}.bak";
-                        try
-                        {
-                            File.Delete(fileLocation);
-                        }
-                        catch (Exception e)
-                        {
-                            Logger.Error(e.Message);
-                        }
+                        File.Delete(fileLocation);
                     }
                 }
             }

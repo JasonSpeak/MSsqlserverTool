@@ -1,22 +1,25 @@
 ﻿using System;
 using System.Windows.Data;
+using NLog;
 
 namespace MSsqlTool.ViewModel
 {
     internal class IconPathConverter:IValueConverter
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            string level = System.Convert.ToString(value);
-            if (level == "tables")
+            try
             {
-                return @"..\Icons\table.png";
+                var level = System.Convert.ToString(value);
+                return level == "tables" ? @"..\Icons\table.png" : @"..\Icons\database.png";
             }
-            else
+            catch (Exception e)
             {
-                return @"..\Icons\database.png";
+                Logger.Error(e.Message);
+                throw;
             }
-
         }
 
         public object ConvertBack(object value, Type targetType, object parameter,

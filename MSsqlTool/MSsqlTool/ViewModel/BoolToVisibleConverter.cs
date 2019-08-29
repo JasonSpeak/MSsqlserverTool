@@ -1,23 +1,26 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Data;
+using NLog;
 
 namespace MSsqlTool.ViewModel
 {
     internal class BoolToVisibleConverter:IValueConverter 
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            bool isVisible = System.Convert.ToBoolean(value);
-            if (isVisible)
+            try
             {
-                return Visibility.Visible;
+                var isVisible = System.Convert.ToBoolean(value);
+                return isVisible ? Visibility.Visible : Visibility.Hidden;
             }
-            else
+            catch (Exception e)
             {
-                return Visibility.Hidden;
+                Logger.Error(e.Message);
+                throw;
             }
-
         }
 
         public object ConvertBack(object value, Type targetType, object parameter,
