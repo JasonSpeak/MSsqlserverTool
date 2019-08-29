@@ -10,6 +10,7 @@
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Button.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Menu.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ToolTip.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/themes/materialdesigntheme.popupbox.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 
     <viewModel:PercentageConverter x:Key="PercentageConverter" />
@@ -39,7 +40,7 @@
 
     <Style x:Key="LogoStyle" TargetType="{x:Type Image}">
         <Style.Setters>
-            <Setter Property="Margin" Value="20,10,0,10" />
+            <Setter Property="Margin" Value="20,10,0,11" />
             <Setter Property="HorizontalAlignment" Value="Left" />
             <Setter Property="Source" Value="../Icons/logo.png" />
             <Setter Property="Stretch" Value="Uniform" />
@@ -76,7 +77,7 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="MyBackgroundElement" Property="Background" Value="Red" />
+                            <Setter TargetName="MyBackgroundElement" Property="Background" Value="#d01212" />
                             <Setter TargetName="MyBackgroundElement" Property="Opacity" Value="0.7" />
                         </Trigger>
                     </ControlTemplate.Triggers>
@@ -122,7 +123,6 @@
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="HorizontalAlignment" Value="Left" />
         <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
@@ -276,7 +276,8 @@
     <Style x:Key="LonwinPopupBox" TargetType="{x:Type wpf:PopupBox}">
         <Setter Property="ToggleContent" Value="{StaticResource MaterialDesignPopupBoxToggleContent}" />
         <Setter Property="wpf:RippleAssist.Feedback" Value="{DynamicResource MaterialDesignFlatButtonRipple}" />
-        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="wpf:ShadowAssist.ShadowDepth" Value="Depth3" />
         <Setter Property="TextElement.FontWeight" Value="Normal" />
         <Setter Property="Padding" Value="0,0,0,0" />
@@ -375,7 +376,6 @@
         <Setter Property="Height" Value="50px" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="VerticalAlignment" Value="Stretch" />
-        <Setter Property="IsDeletable" Value="True" />
         <Setter Property="FontSize" Value="13" />
         <Setter Property="Background" Value="{DynamicResource MaterialDesignChipBackground}" />
         <Setter Property="IconBackground" Value="{DynamicResource PrimaryHueMidBrush}" />
@@ -398,6 +398,7 @@
                             x:Name="IconControl"
                             Width="32"
                             Height="32"
+                            Grid.Column="0"
                             VerticalAlignment="Center"
                             HorizontalContentAlignment="Center"
                             VerticalContentAlignment="Center"
@@ -478,6 +479,11 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="IsDeletable" Value="True"></Setter>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <Style x:Key="FoldTabChipStyle" TargetType="{x:Type wpf:Chip}">
@@ -486,7 +492,6 @@
         <Setter Property="Width" Value="196" />
         <Setter Property="Height" Value="30px" />
         <Setter Property="Margin" Value="-1,0,0,0" />
-        <Setter Property="IsDeletable" Value="True" />
         <Setter Property="Background" Value="{DynamicResource MaterialDesignChipBackground}" />
         <Setter Property="IconBackground" Value="{DynamicResource PrimaryHueMidBrush}" />
         <Setter Property="IconForeground" Value="{DynamicResource PrimaryHueMidForegroundBrush}" />
@@ -506,6 +511,7 @@
                             CornerRadius="0" />
                         <ContentControl
                             x:Name="IconControl"
+                            Grid.Column="0"
                             Width="32"
                             Height="32"
                             VerticalAlignment="Center"
@@ -588,6 +594,11 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="IsDeletable" Value="True"></Setter>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <Style x:Key="LonwinTreeViewItem" TargetType="{x:Type TreeViewItem}">
@@ -985,8 +996,8 @@
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="Background" Value="White" />
-        <Setter Property="MinWidth" Value="25" />
-        <Setter Property="Height" Value="25" />
+        <Setter Property="MinWidth" Value="30" />
+        <Setter Property="Height" Value="30" />
         <Style.Triggers>
             <Trigger Property="IsSelected" Value="True">
                 <Setter Property="Background" Value="#b7dbff" />
@@ -1007,12 +1018,7 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type DataGridCell}">
-                            <Grid Background="#e8e8ec">
-                                <!--<Path
-                                    Width="12"
-                                    Height="12"
-                                    Data="F1M0,0L0,1 1,1 1,2 2,2 2,3 3,3 3,4 4,4 4,5 5,5 5,4 6,4 6,3 7,3 7,2 8,2 8,1 9,1 9,0z"
-                                    Fill="#FF868999" />-->
+                            <Grid Background="#e8e8ec" IsEnabled="False" IsHitTestVisible="False">
                                 <wpf:PackIcon
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Center"
@@ -1040,7 +1046,6 @@
                     <Border
                         x:Name="border"
                         Width="auto"
-                        Padding="0,-1,0,2"
                         Background="{TemplateBinding Background}"
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}"

@@ -1,4 +1,5 @@
-MSsqlTool/MSsqlTool/bin/Debug
-MSsqlTool/MSsqlTool/obj/Debug
+MSsqlTool/MSsqlTool/bin
+MSsqlTool/MSsqlTool/obj
+MSsqlTool/MSsqlTool/Connected Services
 MSsqlTool/MSsqlTool/publish
 MSsqlTool/.vs

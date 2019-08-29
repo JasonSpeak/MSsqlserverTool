@@ -14,25 +14,11 @@ namespace MSsqlTool.Model
     {   
         private static readonly string ConnectString =
             ConfigurationManager.ConnectionStrings["ConnectString"].ToString();
-
         private static SqlConnection _initializeConn;
-
-        private enum SysDataBases
-        {
-            master,
-            model,
-            msdb,   
-            tempdb  
-        }
-
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
         private string _name;
-
         private string _level;
-
         private TableFullNameModel _tableFullName;
-
         private List<SqlMenuModel> _menuTables;
 
 
@@ -84,7 +70,7 @@ namespace MSsqlTool.Model
                 using (_initializeConn = new SqlConnection(ConnectString))
                 {
                     _initializeConn.Open();
-                    const string selectDataBasesString = "SELECT NAME FROM SYSDATABASES";
+                    const string selectDataBasesString = "SELECT NAME FROM SYSDATABASES WHERE SID != 0x01";
                     var dataBaseAdapter = new SqlDataAdapter(selectDataBasesString, _initializeConn);
                     dataBaseTable = new DataTable();
                     dataBaseAdapter.Fill(dataBaseTable);
@@ -98,7 +84,7 @@ namespace MSsqlTool.Model
                 Logger.Error(e.Message);
                 _initializeConn.Close();
             }
-            var tempDataBaseList = (from DataRow row in dataBaseTable.Rows where !Enum.IsDefined(typeof(SqlMenuModel.SysDataBases), row["name"]) select row["name"].ToString()).ToList();
+            var tempDataBaseList = (from DataRow row in dataBaseTable.Rows select row["name"].ToString()).ToList();
             var dataBaseList = (from name in tempDataBaseList let tablesList = GetTableList(name) select new SqlMenuModel() {Name = name, MenuTables = tablesList, Level = "databases"}).ToList();
             var mainDatabaseList = new List<SqlMenuModel>
             {
@@ -109,7 +95,6 @@ namespace MSsqlTool.Model
 
         private static List<SqlMenuModel> GetTableList(string databaseName)
         {
-            var tableList = new List<SqlMenuModel>();
             var getTableConnection = new SqlConnection();
             var tableNames = new DataTable();
             var getTableConnString = GetDifferentConnectionWithName(databaseName);
@@ -131,12 +116,7 @@ namespace MSsqlTool.Model
                 getTableConnection.Close();
             }
             getTableConnection.Dispose();
-            foreach (DataRow row in tableNames.Rows)
-            {
-                var tableFullName = new TableFullNameModel(databaseName,row["name"].ToString());
-                tableList.Add(new SqlMenuModel() { Name = row["name"].ToString(), Level = "tables", TableFullName = tableFullName });
-            }
-            return tableList;
+            return (from DataRow row in tableNames.Rows let tableFullName = new TableFullNameModel(databaseName, row["name"].ToString()) select new SqlMenuModel() {Name = row["name"].ToString(), Level = "tables", TableFullName = tableFullName}).ToList();
         }
 
         public static string GetDifferentConnectionWithName(string name)

@@ -70,7 +70,7 @@ namespace MSsqlTool.Model
             {
                 using (var conn = new SqlConnection(ConnectString))
                 {
-                    var logicName = GetLogicNameFromBak(conn, filePath);
+                    var logicName = GetLogicNameFromBak(filePath);
                     PrepareForImport(conn, logicName);
                     ImportDataBase(conn, logicName,filePath);
                 }
@@ -92,11 +92,11 @@ namespace MSsqlTool.Model
                 connection.Open();
                 var selectAll = $"SELECT * FROM [{tableName}]";
                 dataAdapterForUpdate = new SqlDataAdapter(selectAll, connection);
-                var builder = new SqlCommandBuilder(dataAdapterForUpdate);
+                var dummy = new SqlCommandBuilder(dataAdapterForUpdate);
                 dataAdapterForUpdate.Fill(dataTableForUpdate);
                 connection.Close();
             }
-            catch (Exception e)
+            catch (Exception e) 
             {
                 connection.Close();
                 Logger.Error(e.Message);
@@ -120,6 +120,41 @@ namespace MSsqlTool.Model
             }
         }
 
+        public static string GetLogicNameFromBak(string filePath)
+        {
+            using (var conn = new SqlConnection(ConnectString))
+            {
+                try
+                {
+                    conn.Open();
+                    var getLogicNameScript =
+                        "DECLARE @Table TABLE (LogicalName varchar(128),[PhysicalName] varchar(128), [Type] varchar, " +
+                        "[FileGroupName] varchar(128), [Size] varchar(128), [MaxSize] varchar(128), [FileId] varchar(128)," +
+                        "[CreateLSN] varchar(128), [DropLSN] varchar(128), [UniqueId] varchar(128), [ReadOnlyLSN] varchar(128), " +
+                        "[ReadWriteLSN] varchar(128),[BackupSizeInBytes] varchar(128), [SourceBlockSize] varchar(128), " +
+                        "[FileGroupId] varchar(128), [LogGroupGUID] varchar(128), [DifferentialBaseLSN] varchar(128), " +
+                        "[DifferentialBaseGUID] varchar(128), [IsReadOnly] varchar(128), [IsPresent] varchar(128), [TDEThumbprint] varchar(128))" +
+                        $"DECLARE @Path varchar(1000)='{filePath}'" +
+                        "DECLARE @LogicalNameData varchar(128),@LogicalNameLog varchar(128)" +
+                        "INSERT INTO @table EXEC('RESTORE FILELISTONLY FROM DISK = ''' +@Path+ '''')" +
+                        "SET @LogicalNameData = (SELECT LogicalName FROM @Table WHERE Type= 'D')" +
+                        "SET @LogicalNameLog = (SELECT LogicalName FROM @Table WHERE Type='L')" +
+                        "SELECT @LogicalNameData AS [LogicalName]";
+                    var getLogicNameAdapter = new SqlDataAdapter(getLogicNameScript, conn);
+                    var logicNameTable = new DataTable();
+                    getLogicNameAdapter.Fill(logicNameTable);
+                    var logicName = logicNameTable.Rows[0]["LogicalName"].ToString();
+                    conn.Close();
+                    return logicName;
+                }
+                catch (Exception e)
+                {
+                    conn.Close();
+                    Logger.Error(e.Message);
+                    return null;
+                }
+            }
+        }
 
         private static void PrepareForImport(SqlConnection dropConn, string logicName)
         {
@@ -131,7 +166,8 @@ namespace MSsqlTool.Model
                 var databaseTable = new DataTable();
                 getDataBaseAdapter.Fill(databaseTable);
                 dropConn.Close();
-                foreach (var row in databaseTable.Rows.Cast<DataRow>().Where(row => row["name"].ToString() == logicName))
+                foreach (var row in databaseTable.Rows.Cast<DataRow>()
+                    .Where(row => row["name"].ToString() == logicName))
                 {
                     DropDataBaseHelper(logicName);
                 }
@@ -157,39 +193,6 @@ namespace MSsqlTool.Model
             {
                 MessageBox.Show($"导入数据库出错\n{e.Message}");
                 Logger.Error(e.Message);
-            }
-        }
-
-        private static string GetLogicNameFromBak(SqlConnection conn, string filePath)
-        {
-            try
-            {
-                conn.Open();
-                var getLogicNameScript =
-                    "DECLARE @Table TABLE (LogicalName varchar(128),[PhysicalName] varchar(128), [Type] varchar, " +
-                    "[FileGroupName] varchar(128), [Size] varchar(128), [MaxSize] varchar(128), [FileId] varchar(128)," +
-                    "[CreateLSN] varchar(128), [DropLSN] varchar(128), [UniqueId] varchar(128), [ReadOnlyLSN] varchar(128), " +
-                    "[ReadWriteLSN] varchar(128),[BackupSizeInBytes] varchar(128), [SourceBlockSize] varchar(128), " +
-                    "[FileGroupId] varchar(128), [LogGroupGUID] varchar(128), [DifferentialBaseLSN] varchar(128), " +
-                    "[DifferentialBaseGUID] varchar(128), [IsReadOnly] varchar(128), [IsPresent] varchar(128), [TDEThumbprint] varchar(128))" +
-                    $"DECLARE @Path varchar(1000)='{filePath}'" +
-                    "DECLARE @LogicalNameData varchar(128),@LogicalNameLog varchar(128)" +
-                    "INSERT INTO @table EXEC('RESTORE FILELISTONLY FROM DISK = ''' +@Path+ '''')" +
-                    "SET @LogicalNameData = (SELECT LogicalName FROM @Table WHERE Type= 'D')" +
-                    "SET @LogicalNameLog = (SELECT LogicalName FROM @Table WHERE Type='L')" +
-                    "SELECT @LogicalNameData AS [LogicalName]";
-                var getLogicNameAdapter = new SqlDataAdapter(getLogicNameScript, conn);
-                var logicNameTable = new DataTable();
-                getLogicNameAdapter.Fill(logicNameTable);
-                var logicName = logicNameTable.Rows[0]["LogicalName"].ToString();
-                conn.Close();
-                return logicName;
-            }
-            catch (Exception e)
-            {
-                conn.Close();
-                Logger.Error(e.Message);
-                return null;
             }
         }
     }

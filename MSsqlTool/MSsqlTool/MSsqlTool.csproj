@@ -187,7 +187,6 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <Resource Include="Icons\SQL.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

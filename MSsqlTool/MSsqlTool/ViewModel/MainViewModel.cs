@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections;
-using GalaSoft.MvvmLight;
+﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using MSsqlTool.Model;
+using NLog;
+using System;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
@@ -12,7 +11,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
-using NLog;
 using Cursor = System.Windows.Forms.Cursor;
 using Cursors = System.Windows.Forms.Cursors;
 using DataGrid = System.Windows.Controls.DataGrid;
@@ -41,7 +39,6 @@ namespace MSsqlTool.ViewModel
         public ICommand ChangeWindowStateCommand { get; }
         public ICommand MinimizeWindowCommand { get; }
         public ICommand ResizeWindowCommand { get; }
-        public ICommand LoadingRowCommand { get; }
         public ICommand ExportCommand { get; }
         public ICommand DeleteCommand { get; }
         public ICommand ImportCommand { get; }
@@ -136,7 +133,6 @@ namespace MSsqlTool.ViewModel
             ChangeWindowStateCommand = new RelayCommand(OnChangeWindowStateExecuted);
             MinimizeWindowCommand = new RelayCommand(OnMinimizeWindowExecuted);
             ResizeWindowCommand = new RelayCommand(OnResizeWindowExecuted);
-            //LoadingRowCommand = new RelayCommand<>();
             ExportCommand = new RelayCommand<string>(OnExportCommandExecuted);
             DeleteCommand = new RelayCommand<string>(OnDeleteExecuted);
             ImportCommand = new RelayCommand(OnImportExecuted);
@@ -165,28 +161,35 @@ namespace MSsqlTool.ViewModel
                 return;
             }
             var exportFileLocation = chooseExportFolder.SelectedPath;
-            var allBakFiles = Directory.GetFiles(exportFileLocation, "*.bak");
-            var bakFileName = $"{exportFileLocation}{databaseName}.bak";
-            foreach (var file in allBakFiles)
+            try
             {
-                Logger.Trace(bakFileName);
-                Logger.Trace(file);
-            }
-            if (allBakFiles.Contains(bakFileName))
-            {
-                if (MessageBox.Show("该目录中已有该数据库备份文件，是否覆盖原备份？", "Warning", MessageBoxButton.YesNo,
-                        MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                var allBakFiles = Directory.GetFiles(exportFileLocation, "*.bak");
+                var bakFileName = $"{exportFileLocation}{databaseName}.bak";
+                foreach (var file in allBakFiles)
                 {
-                    var fileLocation = $"{exportFileLocation}{databaseName}.bak";
-                    try
+                    Logger.Trace(bakFileName);
+                    Logger.Trace(file);
+                }
+                if (allBakFiles.Contains(bakFileName))
+                {
+                    if (MessageBox.Show("该目录中已有该数据库备份文件，是否覆盖原备份？", "Warning", MessageBoxButton.YesNo,
+                            MessageBoxImage.Warning) == MessageBoxResult.Yes)
                     {
-                        File.Delete(fileLocation);
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Error(e.Message);
+                        var fileLocation = $"{exportFileLocation}{databaseName}.bak";
+                        try
+                        {
+                            File.Delete(fileLocation);
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.Error(e.Message);
+                        }
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e.Message);
             }
             SqlHelperModel.ExportDataBaseHelper(databaseName, exportFileLocation);
         }
@@ -228,37 +231,13 @@ namespace MSsqlTool.ViewModel
             }
         }
 
-        private static void OnLoadingRowExecuted(DataGridRowEventArgs e)
-        {
-            e.Row.Header = e.Row.GetIndex() + 1;
-        }
-
         private void OnDeleteExecuted(string databaseName)
         {
             Cursor.Current = Cursors.WaitCursor;
             SqlHelperModel.DropDataBaseHelper(databaseName);
             MainDatabaseList = SqlMenuModel.InitializeData();
             Cursor.Current = Cursors.Default;
-            if (OpenedTableList.Count != 0)
-            {
-                OpenedTableList.RemoveAll(tab => tab.TableFullName.DataBaseName == databaseName);
-            }
-
-            if (OpenedTableFoldedList.Count != 0)
-            {
-                OpenedTableFoldedList.RemoveAll(tab => tab.TableFullName.DataBaseName == databaseName);
-            }
-
-            if (OpenedTableList.Count != 0)
-            {
-                OpenedTableList[0].IsChoosed = true;
-            }
-            else
-            {
-                IsDataGridOpened = false;
-            }
-            OpenedTableList = new List<OpenedTablesModel>(OpenedTableList);
-            OpenedTableFoldedList = new List<OpenedTablesModel>(OpenedTableFoldedList);
+            DeleteTabsWithDataBaseName(databaseName);
         }
 
         private void OnImportExecuted()
@@ -278,6 +257,8 @@ namespace MSsqlTool.ViewModel
             SqlHelperModel.ImportDataBaseHelper(filePath);
             MainDatabaseList = SqlMenuModel.InitializeData();
             Cursor.Current = Cursors.Default;
+            var logicName = SqlHelperModel.GetLogicNameFromBak(filePath);
+            DeleteTabsWithDataBaseName(logicName);
         }
 
         private void OnOpenTableExecuted(TableFullNameModel tableFullName)
@@ -403,6 +384,7 @@ namespace MSsqlTool.ViewModel
             OpenedTableList = new List<OpenedTablesModel>();
             OpenedTableFoldedList = new List<OpenedTablesModel>();
             TableData = new TablesDataModel();
+            IsDataGridOpened = false;
         }
 
         private void OnSelectAllExecuted(ItemsControl dataGrid)
@@ -459,11 +441,12 @@ namespace MSsqlTool.ViewModel
         private void SetElseTabsFalse(TableFullNameModel tableFullName)
         {
             OpenedTableList.ForEach(table => table.IsChoosed = false);
-            OpenedTableList.FirstOrDefault(table => table.TableFullName == tableFullName).IsChoosed = true;
+            OpenedTableList.First(table => table.TableFullName == tableFullName).IsChoosed = true;
         }
 
         private void GetTableData(TableFullNameModel tableFullName)
         {
+            Cursor.Current = Cursors.WaitCursor;
             _currentTable = tableFullName;
             TableData = new TablesDataModel
             {
@@ -471,7 +454,37 @@ namespace MSsqlTool.ViewModel
                 TableName = tableFullName.TableName,
                 DataInTable = SqlHelperModel.GetTableDataHelper(tableFullName,ref _dataAdapterForUpdate)
             };
+            Cursor.Current = Cursors.Default;
             IsDataGridOpened = true;
+        }
+
+        private void DeleteTabsWithDataBaseName(string databaseName)
+        {
+            if (OpenedTableList.Count != 0)
+            {
+                OpenedTableList.RemoveAll(tab => tab.TableFullName.DataBaseName == databaseName);
+            }
+
+            if (OpenedTableFoldedList.Count != 0)
+            {
+                OpenedTableFoldedList.RemoveAll(tab => tab.TableFullName.DataBaseName == databaseName);
+            }
+
+            if (OpenedTableList.Count != 0)
+            {
+                OpenedTableList[0].IsChoosed = true;
+            }
+            else
+            {
+                IsDataGridOpened = false;
+            }
+
+            if (OpenedTableFoldedList.Count == 0)
+            {
+                IsTabFoldOpened = false;
+            }
+            OpenedTableList = new List<OpenedTablesModel>(OpenedTableList);
+            OpenedTableFoldedList = new List<OpenedTablesModel>(OpenedTableFoldedList);
         }
         #endregion
     }
