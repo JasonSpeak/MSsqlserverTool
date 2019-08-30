@@ -145,7 +145,7 @@ namespace MSsqlTool.ViewModel
             ClickFoldCommand = new RelayCommand<TableFullNameModel>(OnClickFoldExecuted);
             CloseOtherTabsCommand = new RelayCommand<TableFullNameModel>(OnCloseOtherTabsExecuted);
             CloseAllTabsCommand = new RelayCommand(OnCloseAllTabsExecuted);
-            SelectAllCommand = new RelayCommand<ItemsControl>(OnSelectAllExecuted);
+            SelectAllCommand = new RelayCommand<DataGrid>(OnSelectAllExecuted);
             CheckForSelectAllCommand = new RelayCommand<DataGrid>(OnCheckForSelectAllExecuted);
         }
 
@@ -222,10 +222,10 @@ namespace MSsqlTool.ViewModel
         private void OnDeleteExecuted(string databaseName)
         {
             Cursor.Current = Cursors.WaitCursor;
+            DeleteTabsWithDataBaseName(databaseName);
             SqlHelperModel.DropDataBaseHelper(databaseName);
             MainDatabaseList = SqlMenuModel.InitializeData();
             Cursor.Current = Cursors.Default;
-            DeleteTabsWithDataBaseName(databaseName);
         }
 
         private void OnImportExecuted()
@@ -254,15 +254,18 @@ namespace MSsqlTool.ViewModel
             if (OpenedTableList.Count < 6 && !IsThisTableOpenedInTab(tableFullName))
             {
                 OpenedTableList.Add(new OpenedTablesModel(tableFullName));
+                CheckSelectAllState();
             }
             else if (!IsThisTableOpenedInTab(tableFullName) && !IsThisTableOpenedInFolder(tableFullName))
             {
+                CheckSelectAllState();
                 IsTabFoldOpened = true;
                 OpenedTableFoldedList.Add(OpenedTableList[5]);
                 OpenedTableList[5] = new OpenedTablesModel(tableFullName);
             }
             else if (!IsThisTableOpenedInTab(tableFullName) && IsThisTableOpenedInFolder(tableFullName))
             {
+                CheckSelectAllState();
                 OpenedTableFoldedList.Add(OpenedTableList[5]);
                 OpenedTableList[5] =
                     OpenedTableFoldedList.FirstOrDefault(table => table.TableFullName == tableFullName);
@@ -298,7 +301,9 @@ namespace MSsqlTool.ViewModel
             {
                 if (deleteTab != null && deleteTab.IsChoosed)
                 {
+                    CheckSelectAllState();
                     OpenedTableList[0].IsChoosed = true;
+                    GetTableData(OpenedTableList[0].TableFullName);
                 }
             }
             else
@@ -339,12 +344,14 @@ namespace MSsqlTool.ViewModel
 
         private void OnClickTabExecuted(TableFullNameModel tableFullName)
         {
+            CheckSelectAllState();
             SetElseTabsFalse(tableFullName);
             GetTableData(tableFullName);
         }
 
         private void OnClickFoldExecuted(TableFullNameModel tableFullName)
         {
+            CheckSelectAllState();
             OpenedTableFoldedList.Add(OpenedTableList[5]);
             OpenedTableList[5] = OpenedTableFoldedList.FirstOrDefault(table => table.TableFullName == tableFullName);
             SetElseTabsFalse(tableFullName);
@@ -357,50 +364,47 @@ namespace MSsqlTool.ViewModel
 
         private void OnCloseOtherTabsExecuted(TableFullNameModel tableFullName)
         {
-            OpenedTableList = new List<OpenedTablesModel>()
+            if (OpenedTableList.First(table => table.TableFullName == tableFullName).IsChoosed != true)
             {
-                OpenedTableList.FirstOrDefault(table=>table.TableFullName==tableFullName)
-            };
-            SetElseTabsFalse(tableFullName);
-            GetTableData(tableFullName);
-            OpenedTableFoldedList = new List<OpenedTablesModel>();
-            IsTabFoldOpened = false;
+                OpenedTableList = new List<OpenedTablesModel>()
+                {
+                    OpenedTableList.FirstOrDefault(table => table.TableFullName == tableFullName)
+                };
+                SetElseTabsFalse(tableFullName);
+                GetTableData(tableFullName);
+                OpenedTableFoldedList = new List<OpenedTablesModel>();
+                IsTabFoldOpened = false;
+                CheckSelectAllState();
+            }
+            else
+            {
+                OpenedTableList = new List<OpenedTablesModel>()
+                {
+                    OpenedTableList.FirstOrDefault(table => table.TableFullName == tableFullName)
+                };
+                OpenedTableFoldedList = new List<OpenedTablesModel>();
+                IsTabFoldOpened = false;
+            }
         }
 
         private void OnCloseAllTabsExecuted()
         {
+            CheckSelectAllState();
             OpenedTableList = new List<OpenedTablesModel>();
             OpenedTableFoldedList = new List<OpenedTablesModel>();
             TableData = new TablesDataModel();
             IsDataGridOpened = false;
         }
 
-        private void OnSelectAllExecuted(ItemsControl dataGrid)
+        private void OnSelectAllExecuted(DataGrid dataGrid)
         {
             if (IsAllSelected)
             {
-                for (var i = 0; i < dataGrid.Items.Count; i++)
-                {
-                    var row = (DataGridRow)dataGrid.ItemContainerGenerator.ContainerFromIndex(i);
-                    if (row != null)
-                    {
-                        row.IsSelected = true;
-
-                    }
-                }
-                IsAllSelected = true;
+                dataGrid.SelectAll();
             }
             else
             {
-                for (var i = 0; i < dataGrid.Items.Count; i++)
-                {
-                    var row = (DataGridRow)dataGrid.ItemContainerGenerator.ContainerFromIndex(i);
-                    if (row != null)
-                    {
-                        row.IsSelected = false;
-                    }
-                }
-                IsAllSelected = false;
+                dataGrid.UnselectAll();
             }
         }
 
@@ -473,6 +477,14 @@ namespace MSsqlTool.ViewModel
             }
             OpenedTableList = new List<OpenedTablesModel>(OpenedTableList);
             OpenedTableFoldedList = new List<OpenedTablesModel>(OpenedTableFoldedList);
+        }
+
+        private void CheckSelectAllState()
+        {
+            if (IsAllSelected)  
+            {
+                IsAllSelected = false;
+            }
         }
         #endregion
     }
