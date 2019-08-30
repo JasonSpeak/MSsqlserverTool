@@ -25,7 +25,7 @@ namespace MSsqlTool.Model
                 {
                     exportDbConnection.Open();
                     var exportDbString = string.Format("BACKUP DATABASE [{0}] TO DISK='{1}\\{0}.bak'", dataBaseName, exportFileLocation);
-                    SqlCommand exportCommand = new SqlCommand(exportDbString, exportDbConnection);
+                    var exportCommand = new SqlCommand(exportDbString, exportDbConnection);
                     exportCommand.ExecuteNonQuery();
                     exportDbConnection.Close();
                     MessageBox.Show($"数据库 {dataBaseName} 已成功备份到文件夹 {exportFileLocation} 中", "提示");
@@ -59,7 +59,7 @@ namespace MSsqlTool.Model
             }
             catch (Exception e)
             {
-                MessageBox.Show("删除出现异常，请查看日志");
+                MessageBox.Show("删除错误");
                 Logger.Error(e.Message);
             }
         }
@@ -151,13 +151,14 @@ namespace MSsqlTool.Model
                 {
                     conn.Close();
                     Logger.Error(e.Message);
-                    return null;
+                    throw;
                 }
             }
         }
 
         private static void PrepareForImport(SqlConnection dropConn, string logicName)
         {
+            if(dropConn==null || logicName==null) return;
             try
             {
                 dropConn.Open();
@@ -180,6 +181,7 @@ namespace MSsqlTool.Model
 
         private static void ImportDataBase(SqlConnection importConn,string logicName, string filePath)
         {
+            if(importConn==null || logicName==null || filePath==null) return;
             try
             {
                 importConn.Open();
