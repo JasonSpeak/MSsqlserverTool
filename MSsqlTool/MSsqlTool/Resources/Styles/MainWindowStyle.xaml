@@ -17,7 +17,7 @@
     <converters:PercentageConverter x:Key="PercentageConverter" />
     <converters:BoolToVisibleConverter x:Key="BoolToVisibleConverter" />
 
-    <Style x:Key="WindowTitleStyle" TargetType="{x:Type Window}">
+    <Style x:Key="WindowStyle" TargetType="{x:Type Window}">
         <Setter Property="WindowChrome.WindowChrome">
             <Setter.Value>
                 <WindowChrome

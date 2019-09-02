@@ -10,7 +10,7 @@
     x:Name="CurrentWindow"
     WindowState="{Binding CurrentWindowState}"
     DataContext="{Binding Source={StaticResource Locator}, Path=Main}"
-    Style="{StaticResource WindowTitleStyle}"
+    Style="{StaticResource WindowStyle}"
     WindowStartupLocation="CenterScreen"
     ForceCursor="True"
     Cursor="wait"

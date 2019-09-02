@@ -115,22 +115,22 @@ namespace MSsqlTool.ViewModel
         public MainViewModel()
         {
             CloseWindowCommand = new RelayCommand(OnCloseWindowCommandExecuted);
-            ChangeWindowStateCommand = new RelayCommand(OnChangeWindowStateExecuted);
-            MinimizeWindowCommand = new RelayCommand<string>(OnMinimizeWindowExecuted);
+            ChangeWindowStateCommand = new RelayCommand(OnChangeWindowStateCommandExecuted);
+            MinimizeWindowCommand = new RelayCommand<string>(OnMinimizeWindowCommandExecuted);
             ExportCommand = new RelayCommand<string>(OnExportCommandExecuted);
-            DeleteCommand = new RelayCommand<string>(OnDeleteExecuted);
-            ImportCommand = new RelayCommand(OnImportExecuted);
-            OpenTableCommand = new RelayCommand<TableFullNameModel>(OnOpenTableExecuted);
-            RefreshCommand = new RelayCommand(OnRefreshExecuted);
-            CloseTabCommand = new RelayCommand<TableFullNameModel>(OnCloseTabExecuted);
-            CloseFoldTabCommand = new RelayCommand<TableFullNameModel>(OnCloseFoldTabExecuted);
-            ApplyUpdateCommand = new RelayCommand(OnApplyUpdateExecuted);
-            ClickTabCommand = new RelayCommand<TableFullNameModel>(OnClickTabExecuted);
-            ClickFoldCommand = new RelayCommand<TableFullNameModel>(OnClickFoldExecuted);
-            CloseOtherTabsCommand = new RelayCommand<TableFullNameModel>(OnCloseOtherTabsExecuted);
-            CloseAllTabsCommand = new RelayCommand(OnCloseAllTabsExecuted);
-            SelectAllCommand = new RelayCommand<DataGrid>(OnSelectAllExecuted);
-            CheckForSelectAllCommand = new RelayCommand(OnCheckForSelectAllExecuted);
+            DeleteCommand = new RelayCommand<string>(OnDeleteCommandExecuted);
+            ImportCommand = new RelayCommand(OnImportCommandExecuted);
+            OpenTableCommand = new RelayCommand<TableFullNameModel>(OnOpenTableCommandExecuted);
+            RefreshCommand = new RelayCommand(OnRefreshCommandExecuted);
+            CloseTabCommand = new RelayCommand<TableFullNameModel>(OnCloseTabCommandExecuted);
+            CloseFoldTabCommand = new RelayCommand<TableFullNameModel>(OnCloseFoldTabCommandExecuted);
+            ApplyUpdateCommand = new RelayCommand(OnApplyUpdateCommandExecuted);
+            ClickTabCommand = new RelayCommand<TableFullNameModel>(OnClickTabCommandExecuted);
+            ClickFoldCommand = new RelayCommand<TableFullNameModel>(OnClickFoldCommandExecuted);
+            CloseOtherTabsCommand = new RelayCommand<TableFullNameModel>(OnCloseOtherTabsCommandExecuted);
+            CloseAllTabsCommand = new RelayCommand(OnCloseAllTabsCommandExecuted);
+            SelectAllCommand = new RelayCommand<DataGrid>(OnSelectAllCommandExecuted);
+            CheckForSelectAllCommand = new RelayCommand(OnCheckForSelectAllCommandExecuted);
 
             CurrentWindowState = WindowState.Maximized;
             CurrentCursor = CursorType.Wait;
@@ -147,12 +147,12 @@ namespace MSsqlTool.ViewModel
             _dataAdapterForUpdate.Dispose();
         }
 
-        private void OnChangeWindowStateExecuted()
+        private void OnChangeWindowStateCommandExecuted()
         {
             CurrentWindowState = (CurrentWindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized);
         }
             
-        private void OnMinimizeWindowExecuted(string windowName)
+        private void OnMinimizeWindowCommandExecuted(string windowName)
         {
             CurrentWindowState = WindowState.Minimized;
         }
@@ -172,7 +172,7 @@ namespace MSsqlTool.ViewModel
                     SqlHelperModel.ExportDataBaseHelper(databaseName, exportFileLocation);
                     ShowMessage("Export Success!", "Success");
                 }
-                catch (Exception e)
+                catch (SqlException e)
                 {
                     ShowMessage("Export Failed", "Error");
                     Logger.Error(e.Message);
@@ -182,7 +182,7 @@ namespace MSsqlTool.ViewModel
             }
         }
 
-        private void OnDeleteExecuted(string databaseName)
+        private void OnDeleteCommandExecuted(string databaseName)
         {
             CurrentCursor = CursorType.Wait;
             if (ConfirmDeleteDataBase(databaseName))
@@ -195,7 +195,7 @@ namespace MSsqlTool.ViewModel
                     CurrentCursor = CursorType.Arrow;
                     ShowMessage($"Success Delete Local DataBase {databaseName}", "Success");
                 }
-                catch (Exception e)
+                catch (SqlException e)
                 {
                     ShowMessage("Delete Failed", "Error");
                     Logger.Error(e.Message);
@@ -203,7 +203,7 @@ namespace MSsqlTool.ViewModel
             }
         }
 
-        private void OnImportExecuted()
+        private void OnImportCommandExecuted()
         {
             var chooseFileDialog = new OpenFileDialog
             {
@@ -223,7 +223,7 @@ namespace MSsqlTool.ViewModel
                     DeleteTabsWithDataBaseDeleted(logicName);
                     ShowMessage("Import Success","Success");
                 }
-                catch (Exception e)
+                catch (SqlException e)
                 {
                     ShowMessage("Import Failed","Error");
                     Logger.Error(e.Message);
@@ -233,7 +233,7 @@ namespace MSsqlTool.ViewModel
             }
         }
 
-        private void OnOpenTableExecuted(TableFullNameModel tableFullName)
+        private void OnOpenTableCommandExecuted(TableFullNameModel tableFullName)
         {
             if (CanAddIntoOpenTab(tableFullName))
             {
@@ -261,12 +261,12 @@ namespace MSsqlTool.ViewModel
             GetTableData(tableFullName);
         }
 
-        private void OnRefreshExecuted()
+        private void OnRefreshCommandExecuted()
         {
             MainDatabaseList = SqlMenuModel.InitializeData();
         }
 
-        private void OnCloseTabExecuted(TableFullNameModel tableFullName)
+        private void OnCloseTabCommandExecuted(TableFullNameModel tableFullName)
         {
             var deleteTab = OpenedTables.FirstOrDefault(table => table.TableFullName == tableFullName);
             OpenedTables.Remove(deleteTab);
@@ -296,7 +296,7 @@ namespace MSsqlTool.ViewModel
             }
         }
 
-        private void OnCloseFoldTabExecuted(TableFullNameModel tableFullName)
+        private void OnCloseFoldTabCommandExecuted(TableFullNameModel tableFullName)
         {
             OpenedFoldedTables.Remove(
                 OpenedFoldedTables.First(table => table.TableFullName == tableFullName));
@@ -304,14 +304,14 @@ namespace MSsqlTool.ViewModel
             IsTabFoldOpened = (OpenedFoldedTables.Count != 0);
         }
 
-        private void OnApplyUpdateExecuted()
+        private void OnApplyUpdateCommandExecuted()
         {
             if (TableData.DataInTable.GetChanges() == null)return;
             try
             {
                 SqlHelperModel.ApplyUpdateHelper(_dataAdapterForUpdate, TableData.DataInTable);
             }
-            catch (Exception e)
+            catch (SqlException e)
             {
                 ShowMessage(e.Message,"Error");
                 Logger.Error(e.Message);
@@ -319,14 +319,14 @@ namespace MSsqlTool.ViewModel
             GetTableData(_currentTable);
         }
 
-        private void OnClickTabExecuted(TableFullNameModel tableFullName)
+        private void OnClickTabCommandExecuted(TableFullNameModel tableFullName)
         {
             CheckSelectAllState();
             SetElseTabsFalse(tableFullName);
             GetTableData(tableFullName);
         }
 
-        private void OnClickFoldExecuted(TableFullNameModel tableFullName)
+        private void OnClickFoldCommandExecuted(TableFullNameModel tableFullName)
         {
             CheckSelectAllState();
             MoveThisTabToOpenTabList(tableFullName);
@@ -338,7 +338,7 @@ namespace MSsqlTool.ViewModel
             }
         }
 
-        private void OnCloseOtherTabsExecuted(TableFullNameModel tableFullName)
+        private void OnCloseOtherTabsCommandExecuted(TableFullNameModel tableFullName)
         {
             var targetTab = OpenedTables.First(table => table.TableFullName == tableFullName);
             OpenedTables.Clear();
@@ -353,7 +353,7 @@ namespace MSsqlTool.ViewModel
             }
         }
 
-        private void OnCloseAllTabsExecuted()
+        private void OnCloseAllTabsCommandExecuted()
         {
             CheckSelectAllState();
             OpenedTables.Clear();
@@ -362,7 +362,7 @@ namespace MSsqlTool.ViewModel
             IsDataGridOpened = false;
         }
 
-        private void OnSelectAllExecuted(DataGrid dataGrid)
+        private void OnSelectAllCommandExecuted(DataGrid dataGrid)
         {
             if (IsAllSelected)
             {
@@ -374,7 +374,7 @@ namespace MSsqlTool.ViewModel
             }
         }
 
-        private void OnCheckForSelectAllExecuted()
+        private void OnCheckForSelectAllCommandExecuted()
         {
             if (IsAllSelected)
             {
@@ -413,7 +413,7 @@ namespace MSsqlTool.ViewModel
                     DataInTable = SqlHelperModel.GetTableDataHelper(tableFullName, out _dataAdapterForUpdate)
                 };
             }
-            catch (Exception e)
+            catch (SqlException e)
             {
                 ShowMessage($"Get Data of {tableFullName.GetFormattedName()} Failed","Error");
                 Logger.Error(e.Message);
