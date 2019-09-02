@@ -10,5 +10,10 @@
             DataBaseName = dataBaseName;
             TableName = tableName;
         }
+
+        public string GetFormattedName()
+        {
+            return $"{DataBaseName}.{TableName}";
+        }
     }
 }

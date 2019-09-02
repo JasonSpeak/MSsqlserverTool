@@ -3,23 +3,20 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:dm="clr-namespace:MSsqlTool.Model"
     xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
-    xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+    xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     x:Name="CurrentWindow"
+    WindowState="{Binding CurrentWindowState}"
     DataContext="{Binding Source={StaticResource Locator}, Path=Main}"
     Style="{StaticResource WindowTitleStyle}"
     WindowStartupLocation="CenterScreen"
+    ForceCursor="True"
+    Cursor="wait"
     mc:Ignorable="d">
-    <i:Interaction.Triggers>
-        <i:EventTrigger EventName="SizeChanged">
-            <i:InvokeCommandAction Command="{Binding ResizeWindowCommand}" />
-        </i:EventTrigger>
-    </i:Interaction.Triggers>
     <Window.Resources>
-        <ResourceDictionary Source="../Styles/MainWindowStyle.xaml" />
+        <ResourceDictionary Source="../Resources/Styles/MainWindowStyle.xaml"/>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -33,15 +30,9 @@
                 </i:EventTrigger>
             </i:Interaction.Triggers>
             <Image Style="{StaticResource LogoStyle}" />
-            <Button Command="{Binding MinimizeWindowCommand}" Style="{StaticResource TitleMinimizeButtonStyle}">
-                <Path Style="{StaticResource MiniMizePathStyle}" />
-            </Button>
-            <Button Command="{Binding ChangeWindowStateCommand}" Style="{StaticResource TitleNormalButtonStyle}">
-                <Path Style="{StaticResource RestorePathStyle}" />
-            </Button>
-            <Button Command="{Binding CloseWindowCommand}" Style="{StaticResource TitleCloseButtonStyle}">
-                <Path Style="{StaticResource ClosePathStyle}" />
-            </Button>
+            <Button Command="{Binding MinimizeWindowCommand}"  Style="{StaticResource TitleMinimizeButtonStyle}"/>
+            <Button Command="{Binding ChangeWindowStateCommand}" Style="{StaticResource TitleNormalButtonStyle}" />
+            <Button Command="{Binding CloseWindowCommand}" Style="{StaticResource TitleCloseButtonStyle}" />
         </Grid>
         <Grid Grid.Row="1" Background="#3448a1">
             <Grid.ColumnDefinitions>
@@ -57,21 +48,9 @@
                 Margin="5,0,5,5"
                 Background="White">
                 <TreeView
-                    HorizontalContentAlignment="Left"
                     ItemContainerStyle="{StaticResource TreeViewMainItemStyle}"
-                    ItemsSource="{Binding MainDatabaseList}">
-                    <TreeView.ItemTemplate>
-                        <HierarchicalDataTemplate
-                            DataType="{x:Type dm:SqlMenuModel}"
-                            ItemContainerStyle="{StaticResource TreeViewItemStyle}"
-                            ItemsSource="{Binding MenuTables}">
-                            <StackPanel Orientation="Horizontal">
-                                <Image Source="{Binding Converter={StaticResource IconPathConverter}, Path=Level}" Style="{StaticResource TreeViewIconStyle}" />
-                                <TextBlock Margin="5" Text="{Binding Name}" />
-                            </StackPanel>
-                        </HierarchicalDataTemplate>
-                    </TreeView.ItemTemplate>
-                </TreeView>
+                    ItemsSource="{Binding MainDatabaseList}"
+                    Style="{StaticResource MenuTreeViewStyle}" />
             </Grid>
             <Grid
                 Grid.Column="1"
@@ -83,87 +62,21 @@
                 </Grid.RowDefinitions>
                 <Grid Grid.Row="0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="95*" />
-                        <ColumnDefinition Width="5*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="50px" />
                     </Grid.ColumnDefinitions>
-                    <StackPanel x:Name="TableStackPanel">
-                        <ListView ItemContainerStyle="{StaticResource TabsListViewItemStyle}" ItemsSource="{Binding OpenedTableList}">
-                            <ListView.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <WrapPanel IsItemsHost="True" Orientation="Horizontal" />
-                                </ItemsPanelTemplate>
-                            </ListView.ItemsPanel>
-                            <ListView.ItemTemplate>
-                                <DataTemplate>
-                                    <Viewbox>
-                                        <Grid>
-                                            <materialDesign:Chip
-                                                x:Name="Chip"
-                                                Width="{Binding Converter={StaticResource PercentageConverter}, ElementName=TableStackPanel, Path=ActualWidth, ConverterParameter=0.167}"
-                                                Margin="-2,0,0,0"
-                                                Command="{Binding Source={StaticResource Locator}, Path=Main.ClickTabCommand}"
-                                                CommandParameter="{Binding TableFullName}"
-                                                Content="{Binding TableName}"
-                                                DeleteCommand="{Binding Source={StaticResource Locator}, Path=Main.CloseTabCommand}"
-                                                DeleteCommandParameter="{Binding TableFullName}"
-                                                IsTabStop="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListViewItem}, Path=IsSelected}"
-                                                Style="{StaticResource TabChip}"
-                                                ToolTip="{Binding TableName}">
-                                                <materialDesign:Chip.ContextMenu>
-                                                    <ContextMenu Style="{StaticResource LonwinContextMenu}">
-                                                        <MenuItem
-                                                            Command="{Binding Source={StaticResource Locator}, Path=Main.CloseTabCommand}"
-                                                            CommandParameter="{Binding TableFullName}"
-                                                            Header="关闭" />
-                                                        <MenuItem
-                                                            Command="{Binding Source={StaticResource Locator}, Path=Main.CloseOtherTabsCommand}"
-                                                            CommandParameter="{Binding TableFullName}"
-                                                            Header="关闭其他文档" />
-                                                        <MenuItem Command="{Binding Source={StaticResource Locator}, Path=Main.CloseAllTabsCommand}" Header="关闭所有文档" />
-                                                    </ContextMenu>
-                                                </materialDesign:Chip.ContextMenu>
-                                            </materialDesign:Chip>
-                                        </Grid>
-                                    </Viewbox>
-                                    <DataTemplate.Triggers>
-                                        <DataTrigger Binding="{Binding IsChoosed}" Value="true">
-                                            <Setter TargetName="Chip" Property="Background" Value="#283a89" />
-                                            <Setter TargetName="Chip" Property="Foreground" Value="White" />
-                                        </DataTrigger>
-                                    </DataTemplate.Triggers>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
+                    <StackPanel>
+                        <ListView
+                            ItemContainerStyle="{StaticResource TabsListViewItemStyle}"
+                            ItemsSource="{Binding OpenedTables}"
+                            Style="{StaticResource OpenTabListViewStyle}" />
                     </StackPanel>
                     <Grid Grid.Column="1">
                         <materialDesign:PopupBox Style="{StaticResource LonwinPopupBox}" Visibility="{Binding Converter={StaticResource BoolToVisibleConverter}, Source={StaticResource Locator}, Path=Main.IsTabFoldOpened}">
-                            <materialDesign:PopupBox.ToggleContent>
-                                <Grid Width="40" Height="40">
-                                    <Path Style="{StaticResource PopBoxPathStyle}" />
-                                </Grid>
-                            </materialDesign:PopupBox.ToggleContent>
                             <ListView
                                 ItemContainerStyle="{StaticResource FoldTabsListViewItemStyle}"
-                                ItemsSource="{Binding OpenedTableFoldedList}"
-                                Style="{StaticResource FoldTabsListViewStyle}">
-                                <ListView.ItemTemplate>
-                                    <DataTemplate>
-                                        <StackPanel>
-                                            <Viewbox>
-                                                <materialDesign:Chip
-                                                    x:Name="Chip"
-                                                    Command="{Binding Source={StaticResource Locator}, Path=Main.ClickFoldCommand}"
-                                                    CommandParameter="{Binding TableFullName}"
-                                                    Content="{Binding TableName}"
-                                                    DeleteCommand="{Binding Source={StaticResource Locator}, Path=Main.CloseFoldTabCommand}"
-                                                    DeleteCommandParameter="{Binding TableFullName}"
-                                                    Style="{StaticResource FoldTabChipStyle}"
-                                                    ToolTip="{Binding TableName}" />
-                                            </Viewbox>
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </ListView.ItemTemplate>
-                            </ListView>
+                                ItemsSource="{Binding OpenedFoldedTables}"
+                                Style="{StaticResource FoldTabsListViewStyle}" />
                         </materialDesign:PopupBox>
                     </Grid>
                 </Grid>
@@ -179,18 +92,8 @@
                                 Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type DataGridRow}}, Path=IsSelected}"
                                 CanUserResize="False"
                                 CellStyle="{StaticResource DataGridCheckBoxCellStyle}"
-                                ElementStyle="{StaticResource MaterialDesignDataGridCheckBoxColumnStyle}">
-                                <DataGridCheckBoxColumn.HeaderTemplate>
-                                    <DataTemplate>
-                                        <CheckBox
-                                            x:Name="CheckBoxAll"
-                                            Command="{Binding Source={StaticResource Locator}, Path=Main.SelectAllCommand}"
-                                            CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type DataGrid}}}"
-                                            IsChecked="{Binding Source={StaticResource Locator}, Path=Main.IsAllSelected, Mode=TwoWay}"
-                                            ToolTip="全选/全不选" />
-                                    </DataTemplate>
-                                </DataGridCheckBoxColumn.HeaderTemplate>
-                            </DataGridCheckBoxColumn>
+                                ElementStyle="{StaticResource MaterialDesignDataGridCheckBoxColumnStyle}"
+                                HeaderTemplate="{StaticResource SelectAllHeaderTemplate}" />
                         </DataGrid.Columns>
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="CurrentCellChanged">

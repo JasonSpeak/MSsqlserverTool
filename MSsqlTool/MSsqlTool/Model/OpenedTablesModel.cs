@@ -43,7 +43,7 @@ namespace MSsqlTool.Model
         public OpenedTablesModel(TableFullNameModel tableFullName)
         {
             TableFullName = tableFullName;
-            TableName = tableFullName.DataBaseName + "." + tableFullName.TableName;
+            TableName = tableFullName.GetFormattedName();
             _isChoosed = false;
         }
 
