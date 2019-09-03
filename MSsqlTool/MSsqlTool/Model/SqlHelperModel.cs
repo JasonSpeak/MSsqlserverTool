@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using System;
+using NLog;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
@@ -7,48 +8,55 @@ namespace MSsqlTool.Model
 {
     public static class SqlHelperModel
     {
-        private static readonly string ConnectString =
-            ConfigurationManager.ConnectionStrings["ConnectString"].ToString();
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        public static void ExportDataBaseHelper(string dataBaseName,string exportFileLocation)
+        public static void ExportDataBaseHelper(string dataBaseName,string exportFileLocation,SqlConnection masterConn)
         {
-            if(string.IsNullOrEmpty(dataBaseName) || string.IsNullOrEmpty(exportFileLocation)) return;
-
-            var exportDbConnectionString = SqlMenuModel.GetDifferentConnectionWithName(dataBaseName);
-            SqlConnection exportDbConnection;
-            using (exportDbConnection = new SqlConnection(exportDbConnectionString))
+            if(string.IsNullOrEmpty(dataBaseName) || string.IsNullOrEmpty(exportFileLocation))
+                throw new NullReferenceException();
+            try
             {
-                exportDbConnection.Open();
+                masterConn.Open();
                 var exportDbString = string.Format("BACKUP DATABASE [{0}] TO DISK='{1}\\{0}.bak'", dataBaseName, exportFileLocation);
-                var exportCommand = new SqlCommand(exportDbString, exportDbConnection);
+                var exportCommand = new SqlCommand(exportDbString, masterConn);
                 exportCommand.ExecuteNonQuery();
                 exportCommand.Dispose();
-                exportDbConnection.Close();
+                masterConn.Close();
+            }
+            catch (SqlException e)
+            {
+                Logger.Error(e.Message);
+                throw ;
             }
         }
 
-        public static void DropDataBaseHelper(string dataBaseName)
+        public static void DropDataBaseHelper(string dataBaseName,SqlConnection masterConn)
         {
-            if(string.IsNullOrEmpty(dataBaseName)) return;
-            using (var dropConn = new SqlConnection(ConnectString))
+            if(string.IsNullOrEmpty(dataBaseName))
+                throw new NullReferenceException();
+            try
             {
-                dropConn.Open();
-                var dropCommand =
-                    new SqlCommand(
-                        $"USE MASTER;ALTER DATABASE [{dataBaseName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;DROP DATABASE [{dataBaseName}];",
-                        dropConn);
+                masterConn.Open();
+                var dropCommand = new SqlCommand(
+                    $"USE MASTER;ALTER DATABASE [{dataBaseName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;DROP DATABASE [{dataBaseName}];", masterConn);
                 dropCommand.ExecuteNonQuery();
                 dropCommand.Dispose();
-                dropConn.Close();
+                masterConn.Close();
+            }
+            catch (SqlException e)
+            {
+                Logger.Error(e.Message);
+                throw;
             }
         }
 
-        public static void ImportDataBaseHelper(string filePath)
+        public static void ImportDataBaseHelper(string filePath,SqlConnection masterConn)
         {
-            if(string.IsNullOrEmpty(filePath)) return;
-            var logicName = GetLogicNameFromBak(filePath);
-            PrepareForImport(logicName);
-            ImportDataBase( logicName,filePath);
+            if(string.IsNullOrEmpty(filePath))
+                throw new NullReferenceException();
+            var logicName = GetLogicNameFromBak(filePath,masterConn);
+            PrepareForImport(logicName,masterConn);
+            ImportDataBase( logicName,filePath,masterConn);
         }
 
         public static DataTable GetTableDataHelper(TableFullNameModel tableFullName,out SqlDataAdapter dataAdapterForUpdate)
@@ -56,33 +64,52 @@ namespace MSsqlTool.Model
             if (string.IsNullOrEmpty(tableFullName.DataBaseName) || string.IsNullOrEmpty(tableFullName.TableName))
             {
                 dataAdapterForUpdate = null;
-                return null;
+                throw new NullReferenceException();
             }
             var databaseName = tableFullName.DataBaseName;
             var tableName = tableFullName.TableName;
             var dataTableForUpdate = new DataTable();
-            var connection = new SqlConnection(SqlMenuModel.GetDifferentConnectionWithName(databaseName));
-            connection.Open();
-            var selectAll = $"SELECT * FROM [{tableName}]";
-            dataAdapterForUpdate = new SqlDataAdapter(selectAll, connection);
-            var dummy = new SqlCommandBuilder(dataAdapterForUpdate);
-            dataAdapterForUpdate.Fill(dataTableForUpdate);
-            connection.Close();
+            try
+            {
+                var connection = new SqlConnection(GetDifferentConnectionWithName(databaseName));
+                connection.Open();
+                var selectAll = $"SELECT * FROM [{tableName}]";
+                dataAdapterForUpdate = new SqlDataAdapter(selectAll, connection);
+                var dummy = new SqlCommandBuilder(dataAdapterForUpdate);
+                dataAdapterForUpdate.Fill(dataTableForUpdate);
+                connection.Close();
+            }
+            catch (SqlException e)
+            {
+                Logger.Error(e.Message);
+                throw;
+            }
             return dataTableForUpdate;
         }
 
         public static void ApplyUpdateHelper(SqlDataAdapter dataAdapterForUpdate,DataTable dataTableForUpdate)
         {
-            if(dataAdapterForUpdate == null || dataTableForUpdate == null) return;
-            dataAdapterForUpdate.Update(dataTableForUpdate);
+            if(dataAdapterForUpdate == null || dataTableForUpdate == null)
+                throw new NullReferenceException();
+            try
+            {
+                dataAdapterForUpdate.Update(dataTableForUpdate);
+            }
+            catch (SqlException e)
+            {
+                Logger.Error(e.Message);
+                throw;
+            }
         }
 
-        public static string GetLogicNameFromBak(string filePath)
+        public static string GetLogicNameFromBak(string filePath,SqlConnection masterConn)
         {
-            if (string.IsNullOrEmpty(filePath)) return null;
-            using (var conn = new SqlConnection(ConnectString))
+            if (string.IsNullOrEmpty(filePath))
+                throw new NullReferenceException();
+            var logicName = "";
+            try
             {
-                conn.Open();
+                masterConn.Open();
                 var getLogicNameScript =
                     "DECLARE @Table TABLE (LogicalName varchar(128),[PhysicalName] varchar(128), [Type] varchar, " +
                     "[FileGroupName] varchar(128), [Size] varchar(128), [MaxSize] varchar(128), [FileId] varchar(128)," +
@@ -96,71 +123,96 @@ namespace MSsqlTool.Model
                     "SET @LogicalNameData = (SELECT LogicalName FROM @Table WHERE Type= 'D')" +
                     "SET @LogicalNameLog = (SELECT LogicalName FROM @Table WHERE Type='L')" +
                     "SELECT @LogicalNameData AS [LogicalName]";
-                var getLogicNameAdapter = new SqlDataAdapter(getLogicNameScript, conn);
+                var getLogicNameAdapter = new SqlDataAdapter(getLogicNameScript, masterConn);
                 var logicNameTable = new DataTable();
                 getLogicNameAdapter.Fill(logicNameTable);
-                var logicName = logicNameTable.Rows[0]["LogicalName"].ToString();
-                conn.Close();
+                logicName = logicNameTable.Rows[0]["LogicalName"].ToString();
+                masterConn.Close();
                 getLogicNameAdapter.Dispose();
-                return logicName;
             }
+            catch (SqlException e)
+            {
+                Logger.Error(e.Message);
+                throw;
+            }
+            return logicName;
         }
 
-        public static bool IsLocalExistThisDataBase(string logicName)
+        public static bool IsLocalExistThisDataBase(string logicName,SqlConnection masterConn)
         {
             if (string.IsNullOrEmpty(logicName))
-                return false;
-            using (var dropConn = new SqlConnection(ConnectString))
+                throw new NullReferenceException();
+            var databaseTable = new DataTable();
+            try
             {
-                dropConn.Open();
+                masterConn.Open();
                 const string getDataBaseScript = "SELECT NAME FROM SYSDATABASES";
-                var getDataBaseAdapter = new SqlDataAdapter(getDataBaseScript, dropConn);
-                var databaseTable = new DataTable();
+                var getDataBaseAdapter = new SqlDataAdapter(getDataBaseScript, masterConn);
                 getDataBaseAdapter.Fill(databaseTable);
                 getDataBaseAdapter.Dispose();
-                dropConn.Close();
-                if (databaseTable.Rows
-                    .Cast<DataRow>().Any(row => row["name"].ToString() == logicName))
-                {
-                    return true;
-                }
+                masterConn.Close();
             }
-
+            catch (SqlException e)
+            {
+                Logger.Error(e.Message);
+                throw;
+            }
+            if (databaseTable.Rows
+                .Cast<DataRow>().Any(row => row["name"].ToString() == logicName))
+            {
+                return true;
+            }
             return false;
         }
 
-        private static void PrepareForImport(string logicName)
+        public static string GetDifferentConnectionWithName(string name)
         {
-            if(string.IsNullOrEmpty(logicName)) return;
-            using (var dropConn = new SqlConnection(ConnectString))
-            {
-                dropConn.Open();
-                const string getDataBaseString = "SELECT NAME FROM SYSDATABASES";
-                var getDataBaseAdapter = new SqlDataAdapter(getDataBaseString, dropConn);
-                var databaseTable = new DataTable();
-                getDataBaseAdapter.Fill(databaseTable);
-                dropConn.Close();
-                getDataBaseAdapter.Dispose();
+            if (string.IsNullOrEmpty(name)) return null;
+            return $"data source=.\\SQLEXPRESS;initial catalog={name};integrated security=True;App=EntityFramework";
+        }
 
-                if (IsLogicDatabaseNameExisted(databaseTable,logicName))
-                {
-                    DropDataBaseHelper(logicName);
-                }
+        private static void PrepareForImport(string logicName,SqlConnection masterConn)
+        {
+            if(string.IsNullOrEmpty(logicName))
+                throw new NullReferenceException();
+            var databaseTable = new DataTable();
+            try
+            {
+                masterConn.Open();
+                const string getDataBaseString = "SELECT NAME FROM SYSDATABASES";
+                var getDataBaseAdapter = new SqlDataAdapter(getDataBaseString, masterConn);
+                getDataBaseAdapter.Fill(databaseTable);
+                masterConn.Close();
+                getDataBaseAdapter.Dispose();
+            }
+            catch (SqlException e)
+            {
+                Logger.Error(e.Message);
+                throw;
+            }
+            if (IsLogicDatabaseNameExisted(databaseTable,logicName))
+            {
+                DropDataBaseHelper(logicName,masterConn);
             }
         }
 
-        private static void ImportDataBase(string logicName, string filePath)
+        private static void ImportDataBase(string logicName, string filePath,SqlConnection masterConn)
         {
-            if(string.IsNullOrEmpty(logicName) || string.IsNullOrEmpty(filePath)) return;
-
-            using (var importConn = new SqlConnection(ConnectString))
+            if(string.IsNullOrEmpty(logicName) || string.IsNullOrEmpty(filePath))
+                throw new NullReferenceException();
+            try
             {
-                importConn.Open();
+                masterConn.Open();
                 var importScript = $"RESTORE DATABASE [{logicName}] FROM DISK='{filePath}';";
-                var importCommand = new SqlCommand(importScript, importConn);
+                var importCommand = new SqlCommand(importScript, masterConn);
                 importCommand.ExecuteNonQuery();
                 importCommand.Dispose();
-                importConn.Close();
+                masterConn.Close();
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e.Message);
+                throw;
             }
         }
 

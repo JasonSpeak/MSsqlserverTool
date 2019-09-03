@@ -5,15 +5,16 @@ using NLog;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Configuration;
+using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
+using System.Windows.Threading;
 using Application = System.Windows.Application;
-using Cursor = System.Windows.Forms.Cursor;
-using Cursors = System.Windows.Forms.Cursors;
 using DataGrid = System.Windows.Controls.DataGrid;
 using MessageBox = System.Windows.MessageBox;
 
@@ -22,13 +23,18 @@ namespace MSsqlTool.ViewModel
 {
     public class MainViewModel : ViewModelBase
     {
+        private static readonly string ConnectString =
+            ConfigurationManager.ConnectionStrings["ConnectString"].ToString();
         private const int MaxTabCount = 6;
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
+        private readonly SqlConnection _masterConn;
         private WindowState _currentWindowState;
-        private CursorType _currentCursor;
-        private TablesDataModel _tableData;
+        private string _currentCursor;
+        private List<SqlMenuModel> _mainDatabaseList;
         private SqlDataAdapter _dataAdapterForUpdate;
         private TableFullNameModel _currentTable;
+        private DataTable _currentData;
+        private readonly Dispatcher _currentDispatcher;
         private bool _isDataGridOpened;
         private bool _isAllSelected;
         private bool _isTabFoldOpened;
@@ -60,7 +66,7 @@ namespace MSsqlTool.ViewModel
                 RaisePropertyChanged(()=>CurrentWindowState);
             }
         }
-        public CursorType CurrentCursor
+        public string CurrentCursor
         {
             get => _currentCursor;
             set
@@ -69,16 +75,24 @@ namespace MSsqlTool.ViewModel
                 RaisePropertyChanged(()=>CurrentCursor);
             }
         }
-        public ObservableCollection<SqlMenuModel> MainDatabaseList { get; set; }
-        public ObservableCollection<OpenedTablesModel> OpenedTables { get; }
-        public ObservableCollection<OpenedTablesModel> OpenedFoldedTables { get; }
-        public TablesDataModel TableData
+        public List<SqlMenuModel> MainDatabaseList
         {
-            get => _tableData;
+            get => _mainDatabaseList;
             set
             {
-                _tableData = value;
-                RaisePropertyChanged(() => TableData);
+                _mainDatabaseList = value;
+                RaisePropertyChanged(()=>MainDatabaseList);
+            }
+        }
+        public ObservableCollection<OpenedTablesModel> OpenedTabs { get; }
+        public ObservableCollection<OpenedTablesModel> OpenedTabsFolder { get; }
+        public DataTable CurrentData
+        {
+            get => _currentData;
+            set
+            {
+                _currentData = value;
+                RaisePropertyChanged(()=>CurrentData);
             }
         }
         public bool IsAllSelected
@@ -132,19 +146,22 @@ namespace MSsqlTool.ViewModel
             SelectAllCommand = new RelayCommand<DataGrid>(OnSelectAllCommandExecuted);
             CheckForSelectAllCommand = new RelayCommand(OnCheckForSelectAllCommandExecuted);
 
-            CurrentWindowState = WindowState.Maximized;
-            CurrentCursor = CursorType.Wait;
-            OpenedTables = new ObservableCollection<OpenedTablesModel>();
-            OpenedFoldedTables = new ObservableCollection<OpenedTablesModel>();
+            CurrentWindowState = WindowState.Normal;
+            CurrentCursor = "Arrow";
+            OpenedTabs = new ObservableCollection<OpenedTablesModel>();
+            OpenedTabsFolder = new ObservableCollection<OpenedTablesModel>();
             _dataAdapterForUpdate = new SqlDataAdapter();
+            _masterConn = new SqlConnection(ConnectString);
+            _currentDispatcher = Application.Current.MainWindow?.Dispatcher;
 
-            MainDatabaseList = SqlMenuModel.InitializeData();
+            MainDatabaseList = SqlMenuModel.InitializeData(_masterConn);
         }
 
         private void OnCloseWindowCommandExecuted()
         {
             Application.Current.Shutdown();
             _dataAdapterForUpdate.Dispose();
+            _masterConn.Dispose();
         }
 
         private void OnChangeWindowStateCommandExecuted()
@@ -163,43 +180,25 @@ namespace MSsqlTool.ViewModel
             if (chooseExportFolder.ShowDialog() == DialogResult.OK)
             {
                 var exportFileLocation = chooseExportFolder.SelectedPath;
-                try
-                {
-                    var allBakFiles = Directory.GetFiles(exportFileLocation, "*.bak");
-                    var bakFileName = $"{exportFileLocation}\\{databaseName}.bak";
-                    bakFileName = bakFileName.Replace("\\\\", "\\");
-                    DeleteLocalBakFile(allBakFiles, bakFileName);
-                    SqlHelperModel.ExportDataBaseHelper(databaseName, exportFileLocation);
-                    ShowMessage("Export Success!", "Success");
-                }
-                catch (SqlException e)
-                {
-                    ShowMessage("Export Failed", "Error");
-                    Logger.Error(e.Message);
-                    throw;
-                }
-
+                var allBakFiles = Directory.GetFiles(exportFileLocation, "*.bak");
+                var bakFileName = $"{exportFileLocation}\\{databaseName}.bak";
+                bakFileName = bakFileName.Replace("\\\\", "\\");
+                DeleteLocalBakFile(allBakFiles, bakFileName);
+                SqlHelperModel.ExportDataBaseHelper(databaseName, exportFileLocation,_masterConn);
+                ShowMessage("Export Success!", "Success");
             }
         }
 
         private void OnDeleteCommandExecuted(string databaseName)
         {
-            CurrentCursor = CursorType.Wait;
+            CurrentCursor = "Wait";
             if (ConfirmDeleteDataBase(databaseName))
             {
-                try
-                {
-                    SqlHelperModel.DropDataBaseHelper(databaseName);
-                    DeleteTabsWithDataBaseDeleted(databaseName);
-                    MainDatabaseList = SqlMenuModel.InitializeData();
-                    CurrentCursor = CursorType.Arrow;
-                    ShowMessage($"Success Delete Local DataBase {databaseName}", "Success");
-                }
-                catch (SqlException e)
-                {
-                    ShowMessage("Delete Failed", "Error");
-                    Logger.Error(e.Message);
-                }
+                SqlHelperModel.DropDataBaseHelper(databaseName,_masterConn);
+                DeleteTabsWithDataBaseDeleted(databaseName);
+                MainDatabaseList = SqlMenuModel.InitializeData(_masterConn);
+                CurrentCursor = "Arrow";
+                ShowMessage($"Success Delete Local DataBase {databaseName}", "Success");
             }
         }
 
@@ -211,25 +210,20 @@ namespace MSsqlTool.ViewModel
             };
             if (chooseFileDialog.ShowDialog() == DialogResult.OK)
             {
-                try
-                {
-                    var filePath = chooseFileDialog.FileName;
-                    var logicName = SqlHelperModel.GetLogicNameFromBak(filePath);
-                    if (!IsOverWriteLocalDataBase(logicName)) return;
-                    CurrentCursor = CursorType.Wait;
-                    SqlHelperModel.ImportDataBaseHelper(filePath);
-                    MainDatabaseList = SqlMenuModel.InitializeData();
-                    CurrentCursor = CursorType.Arrow;
-                    DeleteTabsWithDataBaseDeleted(logicName);
-                    ShowMessage("Import Success","Success");
-                }
-                catch (SqlException e)
-                {
-                    ShowMessage("Import Failed","Error");
-                    Logger.Error(e.Message);
-                    throw;
-                }
                 
+                _currentDispatcher?.BeginInvoke(DispatcherPriority.Background,
+                    (Action) (() =>
+                    {
+                        CurrentCursor = "Wait";
+                        var filePath = chooseFileDialog.FileName;
+                        var logicName = SqlHelperModel.GetLogicNameFromBak(filePath, _masterConn);
+                        if (!IsOverWriteLocalDataBase(logicName)) return;
+                        SqlHelperModel.ImportDataBaseHelper(filePath, _masterConn);
+                        MainDatabaseList = SqlMenuModel.InitializeData(_masterConn);
+                        CurrentCursor = "Arrow";
+                        DeleteTabsWithDataBaseDeleted(logicName);
+                        ShowMessage("Import Success", "Success");
+                    }));
             }
         }
 
@@ -237,128 +231,118 @@ namespace MSsqlTool.ViewModel
         {
             if (CanAddIntoOpenTab(tableFullName))
             {
-                OpenedTables.Add(new OpenedTablesModel(tableFullName));
-                CheckSelectAllState();
+                IsAllSelected = false;
+                OpenedTabs.Add(new OpenedTablesModel(tableFullName));
             }
             else if (CanAddIntoOpenTabFolder(tableFullName))
             {
-                CheckSelectAllState();
+                IsAllSelected = false;
                 IsTabFoldOpened = true;
-                OpenedFoldedTables.Add(OpenedTables[5]);
-                OpenedTables[MaxTabCount-1] = new OpenedTablesModel(tableFullName);
+                OpenedTabsFolder.Add(OpenedTabs[MaxTabCount-1]);
+                OpenedTabs[MaxTabCount-1] = new OpenedTablesModel(tableFullName);
             }
             else if (IsThisTableOpenedInFolder(tableFullName))
             {
-                CheckSelectAllState();
+                IsAllSelected = false;
                 MoveThisTabToOpenTabList(tableFullName);
             }
-
-            foreach (var tab in OpenedFoldedTables)
-            {
-                tab.IsChoosed = false;
-            }
-            SetElseTabsFalse(tableFullName);
+            OpenedTablesModel.SetAllTabsFalse(OpenedTabsFolder);
+            OpenedTablesModel.SetElseTabsFalse(OpenedTabs,tableFullName);
             GetTableData(tableFullName);
         }
 
         private void OnRefreshCommandExecuted()
         {
-            MainDatabaseList = SqlMenuModel.InitializeData();
+            MainDatabaseList = SqlMenuModel.InitializeData(_masterConn);
         }
 
         private void OnCloseTabCommandExecuted(TableFullNameModel tableFullName)
         {
-            var deleteTab = OpenedTables.FirstOrDefault(table => table.TableFullName == tableFullName);
-            OpenedTables.Remove(deleteTab);
-            if (OpenedFoldedTables.Count != 0)
+            var deleteTab = OpenedTabs.First(table => table.TableFullName == tableFullName);
+            OpenedTabs.Remove(deleteTab);
+            if (OpenedTabsFolder.Count != 0)
             {
-                OpenedTables.Add(OpenedFoldedTables[0]);
-                OpenedFoldedTables.RemoveAt(0);
+                OpenedTabs.Add(OpenedTabsFolder[0]);
+                OpenedTabsFolder.RemoveAt(0);
+                IsTabFoldOpened = (OpenedTabsFolder.Count != 0);
             }
-            else
+            if (OpenedTabs.Count != 0)
             {
-                IsTabFoldOpened = false;
-            }
-            if (OpenedTables.Count != 0)
-            {
-                if (deleteTab != null && deleteTab.IsChoosed)
+                if (deleteTab.IsChoosed)
                 {
-                    CheckSelectAllState();
-                    OpenedTables[0].IsChoosed = true;
-                    GetTableData(OpenedTables[0].TableFullName);
+                    IsAllSelected = false;
+                    OpenedTabs[0].IsChoosed = true;
+                    GetTableData(OpenedTabs[0].TableFullName);
                 }
             }
-            else
-            {
-                IsDataGridOpened = false;
-                IsAllSelected = false;
-                TableData = null;
-            }
+            
+            IsDataGridOpened = false;
+            IsAllSelected = false;
+            
         }
 
         private void OnCloseFoldTabCommandExecuted(TableFullNameModel tableFullName)
         {
-            OpenedFoldedTables.Remove(
-                OpenedFoldedTables.First(table => table.TableFullName == tableFullName));
-
-            IsTabFoldOpened = (OpenedFoldedTables.Count != 0);
+            OpenedTabsFolder.Remove(
+                OpenedTabsFolder.First(table => table.TableFullName == tableFullName));
+            IsTabFoldOpened = (OpenedTabsFolder.Count != 0);
         }
 
         private void OnApplyUpdateCommandExecuted()
         {
-            if (TableData.DataInTable.GetChanges() == null)return;
-            try
+            if (CurrentData.GetChanges() != null)
             {
-                SqlHelperModel.ApplyUpdateHelper(_dataAdapterForUpdate, TableData.DataInTable);
+                try
+                {
+                    SqlHelperModel.ApplyUpdateHelper(_dataAdapterForUpdate, CurrentData);
+                }
+                catch (SqlException e)
+                {
+                    ShowMessage(e.Message,"Error");
+                }
+                GetTableData(_currentTable);
             }
-            catch (SqlException e)
-            {
-                ShowMessage(e.Message,"Error");
-                Logger.Error(e.Message);
-            }
-            GetTableData(_currentTable);
         }
 
         private void OnClickTabCommandExecuted(TableFullNameModel tableFullName)
         {
-            CheckSelectAllState();
-            SetElseTabsFalse(tableFullName);
-            GetTableData(tableFullName);
+            if (!OpenedTabs.First(tab => tab.TableFullName == tableFullName).IsChoosed)
+            {
+                IsAllSelected = false;
+                OpenedTablesModel.SetElseTabsFalse(OpenedTabs, tableFullName);
+                GetTableData(tableFullName);
+            }
         }
 
         private void OnClickFoldCommandExecuted(TableFullNameModel tableFullName)
         {
-            CheckSelectAllState();
+            IsAllSelected = false;
             MoveThisTabToOpenTabList(tableFullName);
-            SetElseTabsFalse(tableFullName);
+            OpenedTablesModel.SetElseTabsFalse(OpenedTabs, tableFullName);
             GetTableData(tableFullName);
-            foreach (var tab in OpenedFoldedTables)
-            {
-                tab.IsChoosed = false;
-            }
+            OpenedTablesModel.SetAllTabsFalse(OpenedTabsFolder);
         }
 
         private void OnCloseOtherTabsCommandExecuted(TableFullNameModel tableFullName)
         {
-            var targetTab = OpenedTables.First(table => table.TableFullName == tableFullName);
-            OpenedTables.Clear();
-            OpenedFoldedTables.Clear();
-            OpenedTables.Add(targetTab);
+            var lastTab = OpenedTabs.First(table => table.TableFullName == tableFullName);
+            OpenedTabs.Clear();
+            OpenedTabsFolder.Clear();
+            OpenedTabs.Add(lastTab);
             IsTabFoldOpened = false;
-            if (!targetTab.IsChoosed)
+            if (!lastTab.IsChoosed)
             {
-                SetElseTabsFalse(tableFullName);
+                OpenedTablesModel.SetElseTabsFalse(OpenedTabs, tableFullName);
                 GetTableData(tableFullName);
-                CheckSelectAllState();
+                IsAllSelected = false;
             }
         }
 
         private void OnCloseAllTabsCommandExecuted()
         {
-            CheckSelectAllState();
-            OpenedTables.Clear();
-            OpenedFoldedTables.Clear();
-            TableData = new TablesDataModel();
+            IsAllSelected = false;
+            OpenedTabs.Clear();
+            OpenedTabsFolder.Clear();
             IsDataGridOpened = false;
         }
 
@@ -376,100 +360,49 @@ namespace MSsqlTool.ViewModel
 
         private void OnCheckForSelectAllCommandExecuted()
         {
-            if (IsAllSelected)
-            {
-                IsAllSelected = false;
-            }
+            IsAllSelected = false;
         }
 
         private bool IsThisTableOpenedInTab(TableFullNameModel tableFullName)
         {
-            return OpenedTables.Any(table => table.TableFullName == tableFullName);
+            return OpenedTabs.Any(table => table.TableFullName == tableFullName);
         }
 
         private bool IsThisTableOpenedInFolder(TableFullNameModel tableFullName)
         {
-            return OpenedFoldedTables.Any(table => table.TableFullName == tableFullName);
-        }
-
-        private void SetElseTabsFalse(TableFullNameModel tableFullName)
-        {
-            foreach (var openedTable in OpenedTables)
-            {
-                openedTable.IsChoosed = openedTable.TableFullName == tableFullName;
-            }
+            return OpenedTabsFolder.Any(table => table.TableFullName == tableFullName);
         }
 
         private void GetTableData(TableFullNameModel tableFullName)
         {
-            Cursor.Current = Cursors.WaitCursor;
+            CurrentCursor = "Wait";
             _currentTable = tableFullName;
-            try
-            {
-                TableData = new TablesDataModel
-                {
-                    DataBaseName = tableFullName.DataBaseName,
-                    TableName = tableFullName.TableName,
-                    DataInTable = SqlHelperModel.GetTableDataHelper(tableFullName, out _dataAdapterForUpdate)
-                };
-            }
-            catch (SqlException e)
-            {
-                ShowMessage($"Get Data of {tableFullName.GetFormattedName()} Failed","Error");
-                Logger.Error(e.Message);
-                throw;
-            }
-            Cursor.Current = Cursors.Default;
+            CurrentData = SqlHelperModel.GetTableDataHelper(tableFullName, out _dataAdapterForUpdate);
+            CurrentCursor = "Arrow";
             IsDataGridOpened = true;
         }
             
         private void DeleteTabsWithDataBaseDeleted(string databaseName)
         {
-            if (OpenedTables.Count != 0)
+            OpenedTablesModel.DeleteTabWithDataBaseName(OpenedTabs,databaseName);
+            OpenedTablesModel.DeleteTabWithDataBaseName(OpenedTabsFolder,databaseName);
+            if (OpenedTabs.Count != 0)
             {
-                var deleteTables = OpenedTables.Where(tab => tab.TableFullName.DataBaseName == databaseName).ToList();
-                foreach (var t in deleteTables)
-                {
-                    OpenedTables.Remove(t);
-                }
-            }
-
-            if (OpenedFoldedTables.Count != 0)
-            {
-                var deleteTables = OpenedFoldedTables.Where(tab => tab.TableFullName.DataBaseName == databaseName).ToList();
-                foreach (var t in deleteTables)
-                {
-                    OpenedFoldedTables.Remove(t);
-                }
-            }
-
-            if (OpenedTables.Count != 0)
-            {
-                OpenedTables[0].IsChoosed = true;
+                OpenedTabs[0].IsChoosed = true;
             }
             else
             {
                 IsDataGridOpened = false;
             }
-
-            if (OpenedFoldedTables.Count == 0)
+            if (OpenedTabsFolder.Count == 0)
             {
                 IsTabFoldOpened = false;
             }
         }
 
-        private void CheckSelectAllState()
-        {
-            if (IsAllSelected)  
-            {
-                IsAllSelected = false;
-            }
-        }
-
-        
         private bool CanAddIntoOpenTab(TableFullNameModel tableFullName)
         {
-            return OpenedTables.Count < MaxTabCount && !IsThisTableOpenedInTab(tableFullName);
+            return OpenedTabs.Count < MaxTabCount && !IsThisTableOpenedInTab(tableFullName);
         }
 
         private bool CanAddIntoOpenTabFolder(TableFullNameModel tableFullName)
@@ -479,32 +412,32 @@ namespace MSsqlTool.ViewModel
 
         private void MoveThisTabToOpenTabList(TableFullNameModel tableFullName)
         {
-            OpenedFoldedTables.Add(OpenedTables[MaxTabCount-1]);
-            OpenedTables[MaxTabCount-1] =
-                OpenedFoldedTables.First(table => table.TableFullName == tableFullName);
-            OpenedFoldedTables.Remove(
-                OpenedFoldedTables.First(tab => tab.TableFullName == tableFullName));
+            OpenedTabsFolder.Add(OpenedTabs[MaxTabCount-1]);
+            OpenedTabs[MaxTabCount-1] =
+                OpenedTabsFolder.First(table => table.TableFullName == tableFullName);
+            OpenedTabsFolder.Remove(
+                OpenedTabsFolder.First(tab => tab.TableFullName == tableFullName));
         }
 
-        private static bool IsOverWriteLocalDataBase(string logicName)
+        private bool IsOverWriteLocalDataBase(string logicName)
         {
-            if (SqlHelperModel.IsLocalExistThisDataBase(logicName))
+            if (SqlHelperModel.IsLocalExistThisDataBase(logicName,_masterConn))
             {
                 return (MessageBox.Show($"是否覆盖本地数据库{logicName}", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning) ==
                         MessageBoxResult.Yes);
 
             }
-            return false;
+            return true;
         }
 
-        private static bool ConfirmDeleteDataBase(string databaseName)
+        private bool ConfirmDeleteDataBase(string databaseName)
         {
             return MessageBox.Show($"是否删除本地数据库 {databaseName}？", "提醒", MessageBoxButton.YesNo,
                        MessageBoxImage.Warning) ==
                    MessageBoxResult.Yes;
         }
 
-        private static void DeleteLocalBakFile(string[] allBakFiles, string bakFileName)
+        private void DeleteLocalBakFile(string[] allBakFiles, string bakFileName)
         {
             if (allBakFiles.Contains(bakFileName))
             {
@@ -520,5 +453,6 @@ namespace MSsqlTool.ViewModel
         {
             MessageBox.Show(message, title);
         }
+
     }
 }

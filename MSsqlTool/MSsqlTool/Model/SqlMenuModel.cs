@@ -1,7 +1,7 @@
-﻿using GalaSoft.MvvmLight;
+﻿using System;
+using GalaSoft.MvvmLight;
+using NLog;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
@@ -10,13 +10,11 @@ namespace MSsqlTool.Model
 {
     public class SqlMenuModel:ObservableObject
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private string _name;
         private string _level;
         private TableFullNameModel _tableFullName;
         private List<SqlMenuModel> _menuTables;
-
-        private static readonly string ConnectString =
-            ConfigurationManager.ConnectionStrings["ConnectString"].ToString();
 
         public string Name
         {
@@ -58,39 +56,43 @@ namespace MSsqlTool.Model
             }
         }
 
-        public static ObservableCollection<SqlMenuModel> InitializeData()
+        public static List<SqlMenuModel> InitializeData(SqlConnection masterConn)
         {
-            DataTable dataBaseTable;
-            using (var initializeConn = new SqlConnection(ConnectString))
+            var dataBaseTable = new DataTable();
+            try
             {
-                initializeConn.Open();
+                masterConn.Open();
                 const string selectDataBasesString = "SELECT NAME FROM SYSDATABASES WHERE SID != 0x01";
-                var dataBaseAdapter = new SqlDataAdapter(selectDataBasesString, initializeConn);
-                dataBaseTable = new DataTable();
+                var dataBaseAdapter = new SqlDataAdapter(selectDataBasesString, masterConn);
                 dataBaseAdapter.Fill(dataBaseTable);
                 dataBaseAdapter.Dispose();
-                initializeConn.Close();
+                masterConn.Close();
+            }
+            catch (SqlException e)
+            {
+                Logger.Error(e.Message);
+                throw;
             }
             var tempDataBaseList = (from DataRow row in dataBaseTable.Rows select row["name"].ToString()).ToList();
-            var dataBaseList = (from name in tempDataBaseList let tablesList = GetTableList(name) select new SqlMenuModel() { Name = name, MenuTables = tablesList, Level = "databases" }).ToList();
-            var mainDatabaseList = new ObservableCollection<SqlMenuModel>
+            var dataBaseList = new List<SqlMenuModel>();
+            foreach (var name in tempDataBaseList)
+            {
+                List<SqlMenuModel> tablesList = GetTableList(name);
+                dataBaseList.Add(new SqlMenuModel() {Name = name, MenuTables = tablesList, Level = "databases"});
+            }
+            var mainDatabaseList = new List<SqlMenuModel>
             {
                 new SqlMenuModel() { Name = "数据库", MenuTables = dataBaseList, Level = "main" }
             };
             return mainDatabaseList;
         }
 
-        public static string GetDifferentConnectionWithName(string name)
-        {
-            if (string.IsNullOrEmpty(name)) return null;
-            return $"data source=.\\SQLEXPRESS;initial catalog={name};integrated security=True;App=EntityFramework";
-        }
-
         private static List<SqlMenuModel> GetTableList(string databaseName)
         {
-            if (string.IsNullOrEmpty(databaseName)) return null;
+            if (string.IsNullOrEmpty(databaseName))
+                throw new NullReferenceException();
             DataTable tableNames;
-            var getTableConnString = GetDifferentConnectionWithName(databaseName);
+            var getTableConnString = SqlHelperModel.GetDifferentConnectionWithName(databaseName);
             using (var getTableConnection = new SqlConnection(getTableConnString))
             {
                 getTableConnection.Open();

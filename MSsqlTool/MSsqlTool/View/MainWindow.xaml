@@ -8,12 +8,12 @@
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     x:Name="CurrentWindow"
+    ForceCursor="True"
     WindowState="{Binding CurrentWindowState}"
+    Cursor="{Binding CurrentCursor}"
     DataContext="{Binding Source={StaticResource Locator}, Path=Main}"
     Style="{StaticResource WindowStyle}"
     WindowStartupLocation="CenterScreen"
-    ForceCursor="True"
-    Cursor="wait"
     mc:Ignorable="d">
     <Window.Resources>
         <ResourceDictionary Source="../Resources/Styles/MainWindowStyle.xaml"/>
@@ -37,12 +37,10 @@
         <Grid Grid.Row="1" Background="#3448a1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition
-                    Width="3*"
-                    MinWidth="150px"
-                    MaxWidth="350px" />
+                    Width="3*"/>
                 <ColumnDefinition Width="17*" />
             </Grid.ColumnDefinitions>
-            <GridSplitter Grid.Column="0" Style="{StaticResource GridSplitterStyle}" />
+            <GridSplitter Grid.Column="0" Style="{StaticResource GridSplitterStyle}" IsHitTestVisible="True" Cursor="Wait" ForceCursor="True"/>
             <Grid
                 Grid.Column="0"
                 Margin="5,0,5,5"
@@ -68,14 +66,14 @@
                     <StackPanel>
                         <ListView
                             ItemContainerStyle="{StaticResource TabsListViewItemStyle}"
-                            ItemsSource="{Binding OpenedTables}"
+                            ItemsSource="{Binding OpenedTabs}"
                             Style="{StaticResource OpenTabListViewStyle}" />
                     </StackPanel>
                     <Grid Grid.Column="1">
                         <materialDesign:PopupBox Style="{StaticResource LonwinPopupBox}" Visibility="{Binding Converter={StaticResource BoolToVisibleConverter}, Source={StaticResource Locator}, Path=Main.IsTabFoldOpened}">
                             <ListView
                                 ItemContainerStyle="{StaticResource FoldTabsListViewItemStyle}"
-                                ItemsSource="{Binding OpenedFoldedTables}"
+                                ItemsSource="{Binding OpenedTabsFolder}"
                                 Style="{StaticResource FoldTabsListViewStyle}" />
                         </materialDesign:PopupBox>
                     </Grid>
@@ -84,7 +82,7 @@
                     <DataGrid
                         CellStyle="{StaticResource DataGridCellStyle}"
                         ColumnHeaderStyle="{StaticResource DataGridColumnHeaderStyle}"
-                        ItemsSource="{Binding TableData.DataInTable, Mode=TwoWay}"
+                        ItemsSource="{Binding CurrentData, Mode=TwoWay}"
                         Style="{StaticResource LonwinDataGrid}"
                         Visibility="{Binding Converter={StaticResource BoolToVisibleConverter}, Source={StaticResource Locator}, Path=Main.IsDataGridOpened}">
                         <DataGrid.Columns>
