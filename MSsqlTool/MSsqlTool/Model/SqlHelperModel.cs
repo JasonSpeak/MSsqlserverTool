@@ -1,5 +1,5 @@
-﻿using System;
-using NLog;
+﻿using NLog;
+using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
@@ -17,8 +17,8 @@ namespace MSsqlTool.Model
             try
             {
                 masterConn.Open();
-                var exportDbString = string.Format("BACKUP DATABASE [{0}] TO DISK='{1}\\{0}.bak'", dataBaseName, exportFileLocation);
-                var exportCommand = new SqlCommand(exportDbString, masterConn);
+                var exportScript = string.Format("BACKUP DATABASE [{0}] TO DISK='{1}\\{0}.bak'", dataBaseName, exportFileLocation);
+                var exportCommand = new SqlCommand(exportScript, masterConn);
                 exportCommand.ExecuteNonQuery();
                 exportCommand.Dispose();
                 masterConn.Close();
@@ -73,8 +73,8 @@ namespace MSsqlTool.Model
             {
                 var connection = new SqlConnection(GetDifferentConnectionWithName(databaseName));
                 connection.Open();
-                var selectAll = $"SELECT * FROM [{tableName}]";
-                dataAdapterForUpdate = new SqlDataAdapter(selectAll, connection);
+                var selectAllScript = $"SELECT * FROM [{tableName}]";
+                dataAdapterForUpdate = new SqlDataAdapter(selectAllScript, connection);
                 var dummy = new SqlCommandBuilder(dataAdapterForUpdate);
                 dataAdapterForUpdate.Fill(dataTableForUpdate);
                 connection.Close();
@@ -146,7 +146,7 @@ namespace MSsqlTool.Model
             try
             {
                 masterConn.Open();
-                const string getDataBaseScript = "SELECT NAME FROM SYSDATABASES";
+                var getDataBaseScript = "SELECT NAME FROM SYSDATABASES";
                 var getDataBaseAdapter = new SqlDataAdapter(getDataBaseScript, masterConn);
                 getDataBaseAdapter.Fill(databaseTable);
                 getDataBaseAdapter.Dispose();
@@ -167,7 +167,8 @@ namespace MSsqlTool.Model
 
         public static string GetDifferentConnectionWithName(string name)
         {
-            if (string.IsNullOrEmpty(name)) return null;
+            if (string.IsNullOrEmpty(name))
+                throw new NullReferenceException();
             return $"data source=.\\SQLEXPRESS;initial catalog={name};integrated security=True;App=EntityFramework";
         }
 
@@ -179,8 +180,8 @@ namespace MSsqlTool.Model
             try
             {
                 masterConn.Open();
-                const string getDataBaseString = "SELECT NAME FROM SYSDATABASES";
-                var getDataBaseAdapter = new SqlDataAdapter(getDataBaseString, masterConn);
+                var getDataBaseScript = "SELECT NAME FROM SYSDATABASES";
+                var getDataBaseAdapter = new SqlDataAdapter(getDataBaseScript, masterConn);
                 getDataBaseAdapter.Fill(databaseTable);
                 masterConn.Close();
                 getDataBaseAdapter.Dispose();
@@ -203,13 +204,13 @@ namespace MSsqlTool.Model
             try
             {
                 masterConn.Open();
-                var importScript = $"RESTORE DATABASE [{logicName}] FROM DISK='{filePath}';";
+                var importScript = $"RESTORE DATABASE [{logicName}] FROM DISK='{filePath}'";
                 var importCommand = new SqlCommand(importScript, masterConn);
                 importCommand.ExecuteNonQuery();
                 importCommand.Dispose();
                 masterConn.Close();
             }
-            catch (Exception e)
+            catch (SqlException e)
             {
                 Logger.Error(e.Message);
                 throw;

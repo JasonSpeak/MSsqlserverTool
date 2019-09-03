@@ -62,8 +62,8 @@ namespace MSsqlTool.Model
             try
             {
                 masterConn.Open();
-                const string selectDataBasesString = "SELECT NAME FROM SYSDATABASES WHERE SID != 0x01";
-                var dataBaseAdapter = new SqlDataAdapter(selectDataBasesString, masterConn);
+                var selectDataBasesScript = "SELECT NAME FROM SYSDATABASES WHERE SID != 0x01";
+                var dataBaseAdapter = new SqlDataAdapter(selectDataBasesScript, masterConn);
                 dataBaseAdapter.Fill(dataBaseTable);
                 dataBaseAdapter.Dispose();
                 masterConn.Close();
@@ -95,13 +95,21 @@ namespace MSsqlTool.Model
             var getTableConnString = SqlHelperModel.GetDifferentConnectionWithName(databaseName);
             using (var getTableConnection = new SqlConnection(getTableConnString))
             {
-                getTableConnection.Open();
-                const string selectTableString = "SELECT NAME FROM SYS.TABLES";
-                var tablesNameAdapter = new SqlDataAdapter(selectTableString, getTableConnection);
-                tableNames = new DataTable();
-                tablesNameAdapter.Fill(tableNames);
-                tablesNameAdapter.Dispose();
-                getTableConnection.Close();
+                try
+                {
+                    getTableConnection.Open();
+                    var selectTableScript = "SELECT NAME FROM SYS.TABLES";
+                    var tablesNameAdapter = new SqlDataAdapter(selectTableScript, getTableConnection);
+                    tableNames = new DataTable();
+                    tablesNameAdapter.Fill(tableNames);
+                    tablesNameAdapter.Dispose();
+                    getTableConnection.Close();
+                }
+                catch (SqlException e)
+                {
+                    Logger.Error(e.Message);
+                    throw;
+                }
             }
             var tableList = new List<SqlMenuModel>();
             foreach (DataRow row in tableNames.Rows)

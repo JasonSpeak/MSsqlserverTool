@@ -1,7 +1,6 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using MSsqlTool.Model;
-using NLog;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -28,13 +27,13 @@ namespace MSsqlTool.ViewModel
         private const int MaxTabCount = 6;
 
         private readonly SqlConnection _masterConn;
+        private readonly Dispatcher _currentDispatcher;
         private WindowState _currentWindowState;
         private string _currentCursor;
         private List<SqlMenuModel> _mainDatabaseList;
         private SqlDataAdapter _dataAdapterForUpdate;
         private TableFullNameModel _currentTable;
         private DataTable _currentData;
-        private readonly Dispatcher _currentDispatcher;
         private bool _isDataGridOpened;
         private bool _isAllSelected;
         private bool _isTabFoldOpened;
@@ -176,7 +175,7 @@ namespace MSsqlTool.ViewModel
 
         private void OnExportCommandExecuted(string databaseName)
         {
-            var chooseExportFolder = new FolderBrowserDialog {Description = @"选择导出路径"};
+            var chooseExportFolder = new FolderBrowserDialog {Description = @"Choose Export Location"};
             if (chooseExportFolder.ShowDialog() == DialogResult.OK)
             {
                 var exportFileLocation = chooseExportFolder.SelectedPath;
@@ -206,7 +205,7 @@ namespace MSsqlTool.ViewModel
         {
             var chooseFileDialog = new OpenFileDialog
             {
-                Title = @"选择导入文件", Multiselect = false, Filter = @"数据库备份文件(*.bak)|*.bak"
+                Title = @"Choose Import bak file", Multiselect = false, Filter = @"Database Back File(*.bak)|*.bak"
             };
             if (chooseFileDialog.ShowDialog() == DialogResult.OK)
             {
@@ -244,7 +243,7 @@ namespace MSsqlTool.ViewModel
             else if (IsThisTableOpenedInFolder(tableFullName))
             {
                 IsAllSelected = false;
-                MoveThisTabToOpenTabList(tableFullName);
+                MoveThisTabToOpenTabs(tableFullName);
             }
             OpenedTablesModel.SetAllTabsFalse(OpenedTabsFolder);
             OpenedTablesModel.SetElseTabsFalse(OpenedTabs,tableFullName);
@@ -275,9 +274,8 @@ namespace MSsqlTool.ViewModel
                     GetTableData(OpenedTabs[0].TableFullName);
                 }
             }
-            
-            IsDataGridOpened = false;
-            IsAllSelected = false;
+            IsDataGridOpened = OpenedTabs.Count != 0;
+            IsAllSelected = OpenedTabs.Count != 0;
             
         }
 
@@ -317,7 +315,7 @@ namespace MSsqlTool.ViewModel
         private void OnClickFoldCommandExecuted(TableFullNameModel tableFullName)
         {
             IsAllSelected = false;
-            MoveThisTabToOpenTabList(tableFullName);
+            MoveThisTabToOpenTabs(tableFullName);
             OpenedTablesModel.SetElseTabsFalse(OpenedTabs, tableFullName);
             GetTableData(tableFullName);
             OpenedTablesModel.SetAllTabsFalse(OpenedTabsFolder);
@@ -332,7 +330,7 @@ namespace MSsqlTool.ViewModel
             IsTabFoldOpened = false;
             if (!lastTab.IsChoosed)
             {
-                OpenedTablesModel.SetElseTabsFalse(OpenedTabs, tableFullName);
+                OpenedTabs[0].IsChoosed = true;
                 GetTableData(tableFullName);
                 IsAllSelected = false;
             }
@@ -410,7 +408,7 @@ namespace MSsqlTool.ViewModel
             return !IsThisTableOpenedInTab(tableFullName) && !IsThisTableOpenedInFolder(tableFullName);
         }
 
-        private void MoveThisTabToOpenTabList(TableFullNameModel tableFullName)
+        private void MoveThisTabToOpenTabs(TableFullNameModel tableFullName)
         {
             OpenedTabsFolder.Add(OpenedTabs[MaxTabCount-1]);
             OpenedTabs[MaxTabCount-1] =
@@ -423,7 +421,7 @@ namespace MSsqlTool.ViewModel
         {
             if (SqlHelperModel.IsLocalExistThisDataBase(logicName,_masterConn))
             {
-                return (MessageBox.Show($"是否覆盖本地数据库{logicName}", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning) ==
+                return (MessageBox.Show($"Do you want to OVERWRITE local database:\n{logicName}", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning) ==
                         MessageBoxResult.Yes);
 
             }
@@ -432,7 +430,7 @@ namespace MSsqlTool.ViewModel
 
         private bool ConfirmDeleteDataBase(string databaseName)
         {
-            return MessageBox.Show($"是否删除本地数据库 {databaseName}？", "提醒", MessageBoxButton.YesNo,
+            return MessageBox.Show($"Do you want to DELETE local database:\n{databaseName}？", "Warning", MessageBoxButton.YesNo,
                        MessageBoxImage.Warning) ==
                    MessageBoxResult.Yes;
         }
@@ -441,7 +439,7 @@ namespace MSsqlTool.ViewModel
         {
             if (allBakFiles.Contains(bakFileName))
             {
-                if (MessageBox.Show("该目录中已有该数据库备份文件，是否覆盖原备份？", "Warning", MessageBoxButton.YesNo,
+                if (MessageBox.Show("Do you want to OVERWRITE Old backup file of this database？", "Warning", MessageBoxButton.YesNo,
                         MessageBoxImage.Warning) == MessageBoxResult.Yes)
                 {
                     File.Delete(bakFileName);

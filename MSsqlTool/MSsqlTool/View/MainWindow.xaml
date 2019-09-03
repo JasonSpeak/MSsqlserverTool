@@ -40,7 +40,7 @@
                     Width="3*"/>
                 <ColumnDefinition Width="17*" />
             </Grid.ColumnDefinitions>
-            <GridSplitter Grid.Column="0" Style="{StaticResource GridSplitterStyle}" IsHitTestVisible="True" Cursor="Wait" ForceCursor="True"/>
+            <GridSplitter Grid.Column="0" Style="{StaticResource GridSplitterStyle}"/>
             <Grid
                 Grid.Column="0"
                 Margin="5,0,5,5"

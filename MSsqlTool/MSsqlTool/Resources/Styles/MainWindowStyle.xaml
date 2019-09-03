@@ -233,6 +233,9 @@
             <Trigger Property="Tag" Value="databases">
                 <Setter Property="Source" Value="../Images/database.png" />
             </Trigger>
+            <Trigger Property="Tag" Value="main">
+                <Setter Property="Source" Value="../Images/database.png" />
+            </Trigger>
         </Style.Triggers>
     </Style>
 
@@ -261,7 +264,7 @@
                         <wpf:ScaleHost x:Name="ScaleHost" />
                         <ToggleButton
                             x:Name="Expander"
-                            Margin="8,0,8,0"
+                            Margin="8,0,2,0"
                             VerticalAlignment="Center"
                             ClickMode="Press"
                             Foreground="Black"
@@ -500,7 +503,7 @@
                         <ControlTemplate TargetType="{x:Type TreeViewItem}">
                             <Border
                                 x:Name="MyBackgroundElement"
-                                Margin="20,0,0,0"
+                                Margin="10,0,0,0"
                                 BorderThickness="0"
                                 IsHitTestVisible="True">
                                 <Button Style="{StaticResource ButtonInTreeView}">
@@ -509,10 +512,11 @@
                                             <i:InvokeCommandAction Command="{Binding Source={StaticResource Locator}, Path=Main.OpenTableCommand}" CommandParameter="{Binding TableFullName}" />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
-                                    <StackPanel Margin="10,0,0,0" Orientation="Horizontal">
+                                    <StackPanel Margin="5,0,0,0" Orientation="Horizontal">
                                         <Image Style="{StaticResource TreeViewIconStyle}" Tag="{Binding Level}" />
                                         <TextBlock
                                             x:Name="NameTextBlock"
+                                            HorizontalAlignment="Left"
                                             Margin="5"
                                             Text="{Binding Name}" />
                                     </StackPanel>
@@ -1063,6 +1067,12 @@
         <Setter Property="HorizontalAlignment" Value="Right" />
         <Setter Property="VerticalAlignment" Value="Stretch" />
         <Setter Property="Background" Value="#3448a1" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="ForceCursor" Value="True"/>
+                <Setter Property="Cursor" Value="Wait"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <Style x:Key="MaterialDesignDataGridCell" TargetType="{x:Type DataGridCell}">
