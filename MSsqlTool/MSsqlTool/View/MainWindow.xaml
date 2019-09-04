@@ -8,7 +8,6 @@
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     x:Name="CurrentWindow"
-    ForceCursor="True"
     WindowStartupLocation="CenterScreen"
     WindowState="{Binding CurrentWindowState}"
     Cursor="{Binding CurrentCursor}"
@@ -41,7 +40,7 @@
                 <ColumnDefinition Width="17*" />
             </Grid.ColumnDefinitions>
             <GridSplitter Grid.Column="0" Style="{StaticResource GridSplitterStyle}"/>
-            <Grid
+                <Grid
                 Grid.Column="0"
                 Margin="5,0,5,5"
                 Background="White">

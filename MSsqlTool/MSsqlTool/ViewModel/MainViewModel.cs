@@ -22,9 +22,9 @@ namespace MSsqlTool.ViewModel
 {
     public class MainViewModel : ViewModelBase
     {
+        private const int MaxTabCount = 6;
         private static readonly string ConnectString =
             ConfigurationManager.ConnectionStrings["ConnectString"].ToString();
-        private const int MaxTabCount = 6;
 
         private readonly SqlConnection _masterConn;
         private readonly Dispatcher _currentDispatcher;
@@ -99,8 +99,11 @@ namespace MSsqlTool.ViewModel
             get => _isAllSelected;
             set
             {
-                _isAllSelected = value;
-                RaisePropertyChanged(()=>IsAllSelected);
+                if (_isAllSelected != value)
+                {
+                    _isAllSelected = value;
+                    RaisePropertyChanged(() => IsAllSelected);
+                }
             }
         }
         public bool IsDataGridOpened
@@ -108,8 +111,11 @@ namespace MSsqlTool.ViewModel
             get => _isDataGridOpened;
             set
             {
-                _isDataGridOpened = value;
-                RaisePropertyChanged(()=>IsDataGridOpened);
+                if (_isDataGridOpened != value)
+                {
+                    _isDataGridOpened = value;
+                    RaisePropertyChanged(() => IsDataGridOpened);
+                }
             }
         }
         public bool IsTabFoldOpened
@@ -371,7 +377,6 @@ namespace MSsqlTool.ViewModel
         private void GetTableData(TableFullNameModel tableFullName)
         {
             IsDataGridOpened = true;
-            _currentTable = tableFullName;
             _currentDispatcher?.BeginInvoke(DispatcherPriority.Background,
                 (Action)(() =>
                 {
@@ -379,7 +384,7 @@ namespace MSsqlTool.ViewModel
                     CurrentData = SqlHelperModel.GetTableDataHelper(tableFullName, out _dataAdapterForUpdate);
                     CurrentCursor = "Arrow";
                 }));
-            
+            _currentTable = tableFullName;
         }
             
         private void DeleteTabsWithDataBaseDeleted(string databaseName)

@@ -58,6 +58,10 @@ namespace MSsqlTool.Model
 
         public static List<SqlMenuModel> InitializeData(SqlConnection masterConn)
         {
+            if (masterConn == null)
+            {
+                throw new ArgumentException(@"masterConn should not be empty",nameof(masterConn));
+            }
             var dataBaseTable = new DataTable();
             try
             {
@@ -89,8 +93,6 @@ namespace MSsqlTool.Model
 
         private static List<SqlMenuModel> GetTableList(string databaseName)
         {
-            if (string.IsNullOrEmpty(databaseName))
-                throw new ArgumentException(@"databaseName should not be empty",nameof(databaseName));
             DataTable tableNames;
             var getTableConnString = SqlHelperModel.GetDifferentConnectionWithName(databaseName);
             using (var getTableConnection = new SqlConnection(getTableConnString))
