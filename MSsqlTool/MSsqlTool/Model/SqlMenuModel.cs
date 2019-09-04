@@ -90,7 +90,7 @@ namespace MSsqlTool.Model
         private static List<SqlMenuModel> GetTableList(string databaseName)
         {
             if (string.IsNullOrEmpty(databaseName))
-                throw new NullReferenceException();
+                throw new ArgumentException(@"databaseName should not be empty",nameof(databaseName));
             DataTable tableNames;
             var getTableConnString = SqlHelperModel.GetDifferentConnectionWithName(databaseName);
             using (var getTableConnection = new SqlConnection(getTableConnString))

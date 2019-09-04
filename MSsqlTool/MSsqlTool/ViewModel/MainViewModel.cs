@@ -190,14 +190,18 @@ namespace MSsqlTool.ViewModel
 
         private void OnDeleteCommandExecuted(string databaseName)
         {
-            CurrentCursor = "Wait";
             if (ConfirmDeleteDataBase(databaseName))
             {
-                SqlHelperModel.DropDataBaseHelper(databaseName,_masterConn);
-                DeleteTabsWithDataBaseDeleted(databaseName);
-                MainDatabaseList = SqlMenuModel.InitializeData(_masterConn);
-                CurrentCursor = "Arrow";
-                ShowMessage($"Success Delete Local DataBase {databaseName}", "Success");
+                _currentDispatcher?.BeginInvoke(DispatcherPriority.Background,
+                    (Action) (() =>
+                    {
+                        CurrentCursor = "Wait";
+                        SqlHelperModel.DropDataBaseHelper(databaseName, _masterConn);
+                        DeleteTabsWithDataBaseDeleted(databaseName);
+                        MainDatabaseList = SqlMenuModel.InitializeData(_masterConn);
+                        CurrentCursor = "Arrow";
+                        ShowMessage($"Success Delete Local DataBase {databaseName}", "Success");
+                    }));
             }
         }
 
@@ -209,14 +213,14 @@ namespace MSsqlTool.ViewModel
             };
             if (chooseFileDialog.ShowDialog() == DialogResult.OK)
             {
-                
                 _currentDispatcher?.BeginInvoke(DispatcherPriority.Background,
                     (Action) (() =>
                     {
                         CurrentCursor = "Wait";
                         var filePath = chooseFileDialog.FileName;
                         var logicName = SqlHelperModel.GetLogicNameFromBak(filePath, _masterConn);
-                        if (!IsOverWriteLocalDataBase(logicName)) return;
+                        if (!IsOverWriteLocalDataBase(logicName))
+                            return;
                         SqlHelperModel.ImportDataBaseHelper(filePath, _masterConn);
                         MainDatabaseList = SqlMenuModel.InitializeData(_masterConn);
                         CurrentCursor = "Arrow";
@@ -274,9 +278,11 @@ namespace MSsqlTool.ViewModel
                     GetTableData(OpenedTabs[0].TableFullName);
                 }
             }
+            else
+            {
+                IsAllSelected = false;
+            }
             IsDataGridOpened = OpenedTabs.Count != 0;
-            IsAllSelected = OpenedTabs.Count != 0;
-            
         }
 
         private void OnCloseFoldTabCommandExecuted(TableFullNameModel tableFullName)
@@ -324,24 +330,25 @@ namespace MSsqlTool.ViewModel
         private void OnCloseOtherTabsCommandExecuted(TableFullNameModel tableFullName)
         {
             var lastTab = OpenedTabs.First(table => table.TableFullName == tableFullName);
+            IsTabFoldOpened = false;
             OpenedTabs.Clear();
             OpenedTabsFolder.Clear();
             OpenedTabs.Add(lastTab);
-            IsTabFoldOpened = false;
             if (!lastTab.IsChoosed)
             {
+                IsAllSelected = false;
                 OpenedTabs[0].IsChoosed = true;
                 GetTableData(tableFullName);
-                IsAllSelected = false;
             }
         }
 
         private void OnCloseAllTabsCommandExecuted()
         {
+            IsDataGridOpened = false;
             IsAllSelected = false;
+            IsTabFoldOpened = false;
             OpenedTabs.Clear();
             OpenedTabsFolder.Clear();
-            IsDataGridOpened = false;
         }
 
         private void OnSelectAllCommandExecuted(DataGrid dataGrid)
@@ -361,23 +368,18 @@ namespace MSsqlTool.ViewModel
             IsAllSelected = false;
         }
 
-        private bool IsThisTableOpenedInTab(TableFullNameModel tableFullName)
-        {
-            return OpenedTabs.Any(table => table.TableFullName == tableFullName);
-        }
-
-        private bool IsThisTableOpenedInFolder(TableFullNameModel tableFullName)
-        {
-            return OpenedTabsFolder.Any(table => table.TableFullName == tableFullName);
-        }
-
         private void GetTableData(TableFullNameModel tableFullName)
         {
-            CurrentCursor = "Wait";
-            _currentTable = tableFullName;
-            CurrentData = SqlHelperModel.GetTableDataHelper(tableFullName, out _dataAdapterForUpdate);
-            CurrentCursor = "Arrow";
             IsDataGridOpened = true;
+            _currentTable = tableFullName;
+            _currentDispatcher?.BeginInvoke(DispatcherPriority.Background,
+                (Action)(() =>
+                {
+                    CurrentCursor = "Wait";
+                    CurrentData = SqlHelperModel.GetTableDataHelper(tableFullName, out _dataAdapterForUpdate);
+                    CurrentCursor = "Arrow";
+                }));
+            
         }
             
         private void DeleteTabsWithDataBaseDeleted(string databaseName)
@@ -388,14 +390,27 @@ namespace MSsqlTool.ViewModel
             {
                 OpenedTabs[0].IsChoosed = true;
             }
-            else
-            {
-                IsDataGridOpened = false;
-            }
-            if (OpenedTabsFolder.Count == 0)
-            {
-                IsTabFoldOpened = false;
-            }
+            IsDataGridOpened = OpenedTabs.Count != 0;
+            IsTabFoldOpened = OpenedTabsFolder.Count != 0;
+        }
+
+        private void MoveThisTabToOpenTabs(TableFullNameModel tableFullName)
+        {
+            OpenedTabsFolder.Add(OpenedTabs[MaxTabCount - 1]);
+            OpenedTabs[MaxTabCount - 1] =
+                OpenedTabsFolder.First(table => table.TableFullName == tableFullName);
+            OpenedTabsFolder.Remove(
+                OpenedTabsFolder.First(tab => tab.TableFullName == tableFullName));
+        }
+
+        private bool IsThisTableOpenedInTab(TableFullNameModel tableFullName)
+        {
+            return OpenedTabs.Any(table => table.TableFullName == tableFullName);
+        }
+
+        private bool IsThisTableOpenedInFolder(TableFullNameModel tableFullName)
+        {
+            return OpenedTabsFolder.Any(table => table.TableFullName == tableFullName);
         }
 
         private bool CanAddIntoOpenTab(TableFullNameModel tableFullName)
@@ -408,30 +423,26 @@ namespace MSsqlTool.ViewModel
             return !IsThisTableOpenedInTab(tableFullName) && !IsThisTableOpenedInFolder(tableFullName);
         }
 
-        private void MoveThisTabToOpenTabs(TableFullNameModel tableFullName)
+        private static void ShowMessage(string message, string title)
         {
-            OpenedTabsFolder.Add(OpenedTabs[MaxTabCount-1]);
-            OpenedTabs[MaxTabCount-1] =
-                OpenedTabsFolder.First(table => table.TableFullName == tableFullName);
-            OpenedTabsFolder.Remove(
-                OpenedTabsFolder.First(tab => tab.TableFullName == tableFullName));
+            MessageBox.Show(message, title);
         }
 
         private bool IsOverWriteLocalDataBase(string logicName)
         {
             if (SqlHelperModel.IsLocalExistThisDataBase(logicName,_masterConn))
             {
-                return (MessageBox.Show($"Do you want to OVERWRITE local database:\n{logicName}", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning) ==
+                return (MessageBox.Show($"Do you want to OVERWRITE local database:\n{logicName}", "Warning",
+                            MessageBoxButton.YesNo, MessageBoxImage.Warning) ==
                         MessageBoxResult.Yes);
-
             }
             return true;
         }
 
         private bool ConfirmDeleteDataBase(string databaseName)
         {
-            return MessageBox.Show($"Do you want to DELETE local database:\n{databaseName}？", "Warning", MessageBoxButton.YesNo,
-                       MessageBoxImage.Warning) ==
+            return MessageBox.Show($"Do you want to DELETE local database:\n{databaseName}？", "Warning",
+                       MessageBoxButton.YesNo, MessageBoxImage.Warning) ==
                    MessageBoxResult.Yes;
         }
 
@@ -439,18 +450,12 @@ namespace MSsqlTool.ViewModel
         {
             if (allBakFiles.Contains(bakFileName))
             {
-                if (MessageBox.Show("Do you want to OVERWRITE Old backup file of this database？", "Warning", MessageBoxButton.YesNo,
+                if (MessageBox.Show("Do you want to OVERWRITE old backup file of this database？", "Warning", MessageBoxButton.YesNo,
                         MessageBoxImage.Warning) == MessageBoxResult.Yes)
                 {
                     File.Delete(bakFileName);
                 }
             }
         }
-
-        private static void ShowMessage(string message, string title)
-        {
-            MessageBox.Show(message, title);
-        }
-
     }
 }

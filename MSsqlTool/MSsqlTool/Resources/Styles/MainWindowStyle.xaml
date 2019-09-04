@@ -12,11 +12,17 @@
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Menu.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ToolTip.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/themes/materialdesigntheme.popupbox.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/themes/materialdesigntheme.treeview.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <converters:PercentageConverter x:Key="PercentageConverter" />
     <converters:BoolToVisibleConverter x:Key="BoolToVisibleConverter" />
-
+    <wpf:NullableToVisibilityConverter x:Key="NullableToVisibilityConverter"/>
+    <wpf:MathMultipleConverter x:Key="MathMlpMultipleConverter" Operation="Multiply"/>
+    <wpf:BrushRoundConverter x:Key="BrushRoundConverter"/>
+    <wpf:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    <wpf:NotZeroToVisibilityConverter x:Key="NotZeroToVisibilityConverter"/>    
+    
     <Style x:Key="WindowStyle" TargetType="{x:Type Window}">
         <Setter Property="WindowChrome.WindowChrome">
             <Setter.Value>

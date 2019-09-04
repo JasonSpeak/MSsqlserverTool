@@ -12,12 +12,15 @@ namespace MSsqlTool.Model
 
         public static void ExportDataBaseHelper(string dataBaseName,string exportFileLocation,SqlConnection masterConn)
         {
-            if(string.IsNullOrEmpty(dataBaseName) || string.IsNullOrEmpty(exportFileLocation))
-                throw new NullReferenceException();
+            if(string.IsNullOrEmpty(dataBaseName))
+                throw new ArgumentException(@"dataBaseName should not be empty",nameof(dataBaseName));
+            if(string.IsNullOrEmpty(exportFileLocation))
+                throw new ArgumentException(@"exportFileLocation should not be empty",nameof(exportFileLocation));
             try
             {
                 masterConn.Open();
-                var exportScript = string.Format("BACKUP DATABASE [{0}] TO DISK='{1}\\{0}.bak'", dataBaseName, exportFileLocation);
+                var exportScript =
+                    $"BACKUP DATABASE [{dataBaseName}] TO DISK='{exportFileLocation}\\{dataBaseName}.bak'";
                 var exportCommand = new SqlCommand(exportScript, masterConn);
                 exportCommand.ExecuteNonQuery();
                 exportCommand.Dispose();
@@ -33,12 +36,13 @@ namespace MSsqlTool.Model
         public static void DropDataBaseHelper(string dataBaseName,SqlConnection masterConn)
         {
             if(string.IsNullOrEmpty(dataBaseName))
-                throw new NullReferenceException();
+                throw new ArgumentException(@"databaseName should not be empty",nameof(dataBaseName));
             try
             {
                 masterConn.Open();
-                var dropCommand = new SqlCommand(
-                    $"USE MASTER;ALTER DATABASE [{dataBaseName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;DROP DATABASE [{dataBaseName}];", masterConn);
+                var dropScript =
+                    $"USE MASTER;ALTER DATABASE [{dataBaseName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;DROP DATABASE [{dataBaseName}];";
+                var dropCommand = new SqlCommand(dropScript, masterConn);
                 dropCommand.ExecuteNonQuery();
                 dropCommand.Dispose();
                 masterConn.Close();
@@ -53,7 +57,7 @@ namespace MSsqlTool.Model
         public static void ImportDataBaseHelper(string filePath,SqlConnection masterConn)
         {
             if(string.IsNullOrEmpty(filePath))
-                throw new NullReferenceException();
+                throw new ArgumentException(@"filePath should not be empty",nameof(filePath));
             var logicName = GetLogicNameFromBak(filePath,masterConn);
             PrepareForImport(logicName,masterConn);
             ImportDataBase( logicName,filePath,masterConn);
@@ -64,7 +68,7 @@ namespace MSsqlTool.Model
             if (string.IsNullOrEmpty(tableFullName.DataBaseName) || string.IsNullOrEmpty(tableFullName.TableName))
             {
                 dataAdapterForUpdate = null;
-                throw new NullReferenceException();
+                throw new ArgumentException(@"tableFullName should not be empty",nameof(tableFullName));
             }
             var databaseName = tableFullName.DataBaseName;
             var tableName = tableFullName.TableName;
@@ -89,8 +93,10 @@ namespace MSsqlTool.Model
 
         public static void ApplyUpdateHelper(SqlDataAdapter dataAdapterForUpdate,DataTable dataTableForUpdate)
         {
-            if(dataAdapterForUpdate == null || dataTableForUpdate == null)
-                throw new NullReferenceException();
+            if(dataAdapterForUpdate == null)
+                throw new ArgumentException(@"dataAdapterForUpdate should not be empty",nameof(dataAdapterForUpdate));
+            if(dataTableForUpdate == null)
+                throw new ArgumentException(@"dataTableForUpdate should not be empty",nameof(dataTableForUpdate));
             try
             {
                 dataAdapterForUpdate.Update(dataTableForUpdate);
@@ -105,7 +111,7 @@ namespace MSsqlTool.Model
         public static string GetLogicNameFromBak(string filePath,SqlConnection masterConn)
         {
             if (string.IsNullOrEmpty(filePath))
-                throw new NullReferenceException();
+                throw new ArgumentException(@"filePath should not be empty",nameof(filePath));
             var logicName = "";
             try
             {
@@ -141,7 +147,7 @@ namespace MSsqlTool.Model
         public static bool IsLocalExistThisDataBase(string logicName,SqlConnection masterConn)
         {
             if (string.IsNullOrEmpty(logicName))
-                throw new NullReferenceException();
+                throw new ArgumentException(@"logicName should not be empty",nameof(logicName));
             var databaseTable = new DataTable();
             try
             {
@@ -157,25 +163,18 @@ namespace MSsqlTool.Model
                 Logger.Error(e.Message);
                 throw;
             }
-            if (databaseTable.Rows
-                .Cast<DataRow>().Any(row => row["name"].ToString() == logicName))
-            {
-                return true;
-            }
-            return false;
+            return databaseTable.Rows.Cast<DataRow>().Any(row => row["name"].ToString() == logicName);
         }
 
         public static string GetDifferentConnectionWithName(string name)
         {
             if (string.IsNullOrEmpty(name))
-                throw new NullReferenceException();
+                throw new ArgumentException(@"name should not be empty",nameof(name));
             return $"data source=.\\SQLEXPRESS;initial catalog={name};integrated security=True;App=EntityFramework";
         }
 
         private static void PrepareForImport(string logicName,SqlConnection masterConn)
         {
-            if(string.IsNullOrEmpty(logicName))
-                throw new NullReferenceException();
             var databaseTable = new DataTable();
             try
             {
@@ -199,8 +198,6 @@ namespace MSsqlTool.Model
 
         private static void ImportDataBase(string logicName, string filePath,SqlConnection masterConn)
         {
-            if(string.IsNullOrEmpty(logicName) || string.IsNullOrEmpty(filePath))
-                throw new NullReferenceException();
             try
             {
                 masterConn.Open();

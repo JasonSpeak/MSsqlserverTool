@@ -9,11 +9,11 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     x:Name="CurrentWindow"
     ForceCursor="True"
+    WindowStartupLocation="CenterScreen"
     WindowState="{Binding CurrentWindowState}"
     Cursor="{Binding CurrentCursor}"
     DataContext="{Binding Source={StaticResource Locator}, Path=Main}"
     Style="{StaticResource WindowStyle}"
-    WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
     <Window.Resources>
         <ResourceDictionary Source="../Resources/Styles/MainWindowStyle.xaml"/>
