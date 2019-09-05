@@ -3,6 +3,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controlzEx="clr-namespace:ControlzEx;assembly=MaterialDesignThemes.Wpf"
     xmlns:dm="clr-namespace:MSsqlTool.Model"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:d1p1="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d1p1:Ignorable="d"
     xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
     xmlns:wpf="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:converters="clr-namespace:MSsqlTool.Converters">
@@ -10,19 +13,27 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Button.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Menu.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/themes/materialdesigntheme.textbox.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ToolTip.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/themes/materialdesigntheme.popupbox.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/themes/materialdesigntheme.treeview.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/themes/materialdesigntheme.listview.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/themes/materialdesigntheme.datagrid.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/themes/materialdesigntheme.shadows.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <converters:PercentageConverter x:Key="PercentageConverter" />
-    <converters:BoolToVisibleConverter x:Key="BoolToVisibleConverter" />
+    <converters:BoolToVisibilityConverter x:Key="BoolToVisibleConverter" />
     <wpf:NullableToVisibilityConverter x:Key="NullableToVisibilityConverter"/>
     <wpf:MathMultipleConverter x:Key="MathMlpMultipleConverter" Operation="Multiply"/>
     <wpf:BrushRoundConverter x:Key="BrushRoundConverter"/>
     <wpf:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-    <wpf:NotZeroToVisibilityConverter x:Key="NotZeroToVisibilityConverter"/>    
-    
+    <wpf:NotZeroToVisibilityConverter x:Key="NotZeroToVisibilityConverter"/>
+    <vm:ViewModelLocator
+        xmlns:vm="clr-namespace:MSsqlTool.ViewModel"
+        x:Key="StyleLocator"
+        d:IsDataSource="True" />
+
     <Style x:Key="WindowStyle" TargetType="{x:Type Window}">
         <Setter Property="WindowChrome.WindowChrome">
             <Setter.Value>
@@ -47,6 +58,36 @@
                 <Setter Property="BorderThickness" Value="8"/>
             </DataTrigger>
         </Style.Triggers>
+    </Style>
+
+    <Style
+        x:Key="LonwinContextMenu"
+        BasedOn="{StaticResource MaterialDesignMenu}"
+        TargetType="{x:Type ContextMenu}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type MenuBase}">
+                    <AdornerDecorator CacheMode="{Binding RelativeSource={RelativeSource Self}, Path=(wpf:ShadowAssist.CacheMode)}">
+                        <Border
+                            Margin="2"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="0"
+                            Effect="{StaticResource MaterialDesignShadowDepth1}">
+                            <Border Background="Transparent">
+                                <Grid Margin="0,0" RenderOptions.ClearTypeHint="Enabled">
+                                        <ItemsPresenter
+                                            x:Name="ItemsPresenter"
+                                            Grid.IsSharedSizeScope="True"
+                                            KeyboardNavigation.DirectionalNavigation="Cycle"
+                                            KeyboardNavigation.TabNavigation="Cycle"
+                                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                </Grid>
+                            </Border>
+                        </Border>
+                    </AdornerDecorator>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style x:Key="LogoStyle" TargetType="{x:Type Image}">
@@ -186,8 +227,6 @@
         </Style.Triggers>
     </Style>
 
-
-
     <Style x:Key="TitleNormalButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignFlatButton}">
         <Setter Property="Width" Value="20px" />
         <Setter Property="Height" Value="20px" />
@@ -245,14 +284,8 @@
         </Style.Triggers>
     </Style>
 
-    <Style x:Key="LonwinTreeViewItem" TargetType="{x:Type TreeViewItem}">
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="HorizontalContentAlignment" Value="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" />
-        <Setter Property="VerticalContentAlignment" Value="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" />
+    <Style x:Key="LonwinTreeViewItem" TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource MaterialDesignTreeViewItem}">
         <Setter Property="Padding" Value="4" />
-        <Setter Property="FocusVisualStyle" Value="{StaticResource MaterialDesignTreeViewItemFocusVisual}" />
-        <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type TreeView}}}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TreeViewItem}">
@@ -310,7 +343,6 @@
                                 <ContentPresenter x:Name="PART_Header" ContentSource="Header" />
                             </wpf:Ripple>
                         </Grid>
-
                         <ContentControl
                             x:Name="AdditionalContentControl"
                             Grid.Row="1"
@@ -320,7 +352,6 @@
                             ContentTemplate="{Binding RelativeSource={RelativeSource Self}, Path=(wpf:TreeViewAssist.AdditionalTemplate)}"
                             ContentTemplateSelector="{Binding RelativeSource={RelativeSource Self}, Path=(wpf:TreeViewAssist.AdditionalTemplateSelector)}"
                             Visibility="Collapsed" />
-
                         <StackPanel
                             x:Name="ItemsPanel"
                             Grid.Row="2"
@@ -493,6 +524,23 @@
         </Style.Triggers>
     </Style>
 
+    <ContextMenu x:Key="DatabaseMenu" Style="{StaticResource LonwinContextMenu}">
+        <MenuItem
+            Command="{Binding Source={StaticResource StyleLocator}, Path=Main.ExportCommand}"
+            CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}, Path=PlacementTarget.Header.Name}"
+            Header="导出" />
+        <MenuItem
+            Command="{Binding Source={StaticResource StyleLocator}, Path=Main.DeleteCommand}"
+            CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}, Path=PlacementTarget.Header.Name}"
+            Header="删除" />
+    </ContextMenu>
+
+    <ContextMenu x:Key="OpenTables" Style="{StaticResource LonwinContextMenu}">
+        <MenuItem
+            Command="{Binding Source={StaticResource StyleLocator}, Path=Main.OpenTableCommand}"
+            CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}, Path=PlacementTarget.Header.TableFullName}"
+            Header="打开" />
+    </ContextMenu>
 
     <Style
         x:Key="TreeViewItemStyle"
@@ -500,10 +548,10 @@
         TargetType="TreeViewItem">
         <Style.Triggers>
             <DataTrigger Binding="{Binding Level}" Value="databases">
-                <Setter Property="ContextMenu" Value="{DynamicResource DatabaseMenu}" />
+                <Setter Property="ContextMenu" Value="{StaticResource DatabaseMenu}" />
             </DataTrigger>
             <DataTrigger Binding="{Binding Level}" Value="tables">
-                <Setter Property="ContextMenu" Value="{DynamicResource OpenTables}" />
+                <Setter Property="ContextMenu" Value="{StaticResource OpenTables}" />
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type TreeViewItem}">
@@ -515,7 +563,7 @@
                                 <Button Style="{StaticResource ButtonInTreeView}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="MouseDoubleClick">
-                                            <i:InvokeCommandAction Command="{Binding Source={StaticResource Locator}, Path=Main.OpenTableCommand}" CommandParameter="{Binding TableFullName}" />
+                                            <i:InvokeCommandAction Command="{Binding Source={StaticResource StyleLocator}, Path=Main.OpenTableCommand}" CommandParameter="{Binding TableFullName}" />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                     <StackPanel Margin="5,0,0,0" Orientation="Horizontal">
@@ -544,7 +592,6 @@
             </Trigger>
         </Style.Triggers>
         <Setter Property="IsExpanded" Value="True" />
-
     </Style>
 
     <Style x:Key="MenuTreeViewStyle" TargetType="{x:Type TreeView}">
@@ -562,6 +609,113 @@
                 </HierarchicalDataTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <Style x:Key="TabChip" TargetType="{x:Type wpf:Chip}">
+        <Setter Property="Height" Value="50px" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type wpf:Chip}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Border
+                            Grid.ColumnSpan="3"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="0" />
+                        <ContentControl
+                            x:Name="IconControl"
+                            Grid.Column="0"
+                            Width="32"
+                            Height="32"
+                            VerticalAlignment="Center"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            Background="{TemplateBinding IconBackground}"
+                            Content="{TemplateBinding Icon}"
+                            FontSize="17"
+                            FontWeight="Regular"
+                            Foreground="{TemplateBinding IconForeground}"
+                            IsTabStop="False"
+                            Visibility="{TemplateBinding Icon,
+                                                         Converter={StaticResource NullableToVisibilityConverter}}">
+                            <ContentControl.Clip>
+                                <EllipseGeometry
+                                    Center="16,16"
+                                    RadiusX="16"
+                                    RadiusY="16" />
+                            </ContentControl.Clip>
+                            <ContentControl.Template>
+                                <ControlTemplate TargetType="ContentControl">
+                                    <Border Background="{TemplateBinding Background}">
+                                        <ContentPresenter
+                                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                            Content="{TemplateBinding Content}" />
+                                    </Border>
+                                </ControlTemplate>
+                            </ContentControl.Template>
+                        </ContentControl>
+                        <ContentControl
+                            x:Name="TextBlock"
+                            Grid.Column="1"
+                            Margin="8,0,12,0"
+                            VerticalAlignment="Center"
+                            Content="{TemplateBinding Content}"
+                            ContentStringFormat="{TemplateBinding ContentTemplateSelector}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
+                            IsTabStop="False" />
+                        <Button
+                            x:Name="PART_DeleteButton"
+                            Grid.Column="2"
+                            Width="16"
+                            Height="16"
+                            Margin="-6,0,8,0"
+                            VerticalAlignment="Center"
+                            ToolTip="{TemplateBinding DeleteToolTip}"
+                            Visibility="{TemplateBinding IsDeletable,
+                                                         Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <Button.Template>
+                                <ControlTemplate>
+                                    <Grid>
+                                        <Ellipse
+                                            x:Name="Bg"
+                                            Fill="#FFA6A6A6"
+                                            Stroke="#FF009587"
+                                            StrokeThickness="0" />
+                                        <wpf:PackIcon
+                                            Width="12"
+                                            Height="12"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Kind="Close" />
+                                    </Grid>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="Bg" Property="StrokeThickness" Value="1" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger SourceName="IconControl" Property="Visibility" Value="Collapsed">
+                            <Setter TargetName="TextBlock" Property="Margin" Value="12,0,12,0" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="IsDeletable" Value="True" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <Style
@@ -584,10 +738,10 @@
                                 x:Name="Chip"
                                 Width="{Binding Converter={StaticResource PercentageConverter}, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type StackPanel}}, Path=ActualWidth, ConverterParameter=0.166}"
                                 Margin="-2,0,0,0"
-                                Command="{Binding Source={StaticResource Locator}, Path=Main.ClickTabCommand}"
+                                Command="{Binding Source={StaticResource StyleLocator}, Path=Main.ClickTabCommand}"
                                 CommandParameter="{Binding TableFullName}"
                                 Content="{Binding TableName}"
-                                DeleteCommand="{Binding Source={StaticResource Locator}, Path=Main.CloseTabCommand}"
+                                DeleteCommand="{Binding Source={StaticResource StyleLocator}, Path=Main.CloseTabCommand}"
                                 DeleteCommandParameter="{Binding TableFullName}"
                                 IsTabStop="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListViewItem}, Path=IsSelected}"
                                 Style="{StaticResource TabChip}"
@@ -595,14 +749,14 @@
                                 <wpf:Chip.ContextMenu>
                                     <ContextMenu Style="{StaticResource LonwinContextMenu}">
                                         <MenuItem
-                                            Command="{Binding Source={StaticResource Locator}, Path=Main.CloseTabCommand}"
+                                            Command="{Binding Source={StaticResource StyleLocator}, Path=Main.CloseTabCommand}"
                                             CommandParameter="{Binding TableFullName}"
                                             Header="关闭" />
                                         <MenuItem
-                                            Command="{Binding Source={StaticResource Locator}, Path=Main.CloseOtherTabsCommand}"
+                                            Command="{Binding Source={StaticResource StyleLocator}, Path=Main.CloseOtherTabsCommand}"
                                             CommandParameter="{Binding TableFullName}"
                                             Header="关闭其他文档" />
-                                        <MenuItem Command="{Binding Source={StaticResource Locator}, Path=Main.CloseAllTabsCommand}" Header="关闭所有文档" />
+                                        <MenuItem Command="{Binding Source={StaticResource StyleLocator}, Path=Main.CloseAllTabsCommand}" Header="关闭所有文档" />
                                     </ContextMenu>
                                 </wpf:Chip.ContextMenu>
                             </wpf:Chip>
@@ -623,7 +777,6 @@
         <Setter Property="VerticalContentAlignment" Value="Bottom" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
         <Setter Property="Padding" Value="16,0,16,16" />
-        <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
@@ -688,12 +841,8 @@
     </Style>
 
     <Style x:Key="LonwinPopupBox" TargetType="{x:Type wpf:PopupBox}">
-        <Setter Property="ToggleContent" Value="{StaticResource MaterialDesignPopupBoxToggleContent}" />
-        <Setter Property="wpf:RippleAssist.Feedback" Value="{DynamicResource MaterialDesignFlatButtonRipple}" />
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="wpf:ShadowAssist.ShadowDepth" Value="Depth3" />
-        <Setter Property="TextElement.FontWeight" Value="Normal" />
         <Setter Property="Padding" Value="0,0,0,0" />
         <Setter Property="PlacementMode" Value="BottomAndAlignRightEdges" />
         <Setter Property="Focusable" Value="True" />
@@ -756,7 +905,6 @@
                                 ContentTemplate="{TemplateBinding PopupContentTemplate}"
                                 FontSize="15"
                                 FontWeight="Regular"
-                                Foreground="{DynamicResource MaterialDesignBody}"
                                 RenderOptions.ClearTypeHint="Enabled">
                                 <wpf:Card.Resources>
                                     <Style BasedOn="{StaticResource MaterialDesignPopupBoxButton}" TargetType="Button" />
@@ -777,15 +925,127 @@
     <DataTemplate x:Key="SelectAllHeaderTemplate">
         <CheckBox
             x:Name="CheckBoxAll"
-            Command="{Binding Source={StaticResource Locator}, Path=Main.SelectAllCommand}"
+            Command="{Binding Source={StaticResource StyleLocator}, Path=Main.SelectAllCommand}"
             CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type DataGrid}}}"
-            IsChecked="{Binding Source={StaticResource Locator}, Path=Main.IsAllSelected, Mode=TwoWay}"
+            IsChecked="{Binding Source={StaticResource StyleLocator}, Path=Main.IsAllSelected, Mode=TwoWay}"
             ToolTip="全选/全不选" />
     </DataTemplate>
 
     <Style x:Key="TabsListViewItemStyle" TargetType="{x:Type ListViewItem}">
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="BorderBrush" Value="Black" />
+    </Style>
+
+    <Style x:Key="FoldTabChipStyle" TargetType="{x:Type wpf:Chip}">
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Width" Value="196" />
+        <Setter Property="Height" Value="30px" />
+        <Setter Property="Margin" Value="-1,0,0,0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type wpf:Chip}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Border
+                            Grid.ColumnSpan="3"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="0" />
+                        <ContentControl
+                            x:Name="IconControl"
+                            Grid.Column="0"
+                            Width="32"
+                            Height="32"
+                            VerticalAlignment="Center"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            Background="{TemplateBinding IconBackground}"
+                            Content="{TemplateBinding Icon}"
+                            FontSize="17"
+                            FontWeight="Regular"
+                            Foreground="{TemplateBinding IconForeground}"
+                            IsTabStop="False"
+                            Visibility="{TemplateBinding Icon,
+                                                         Converter={StaticResource NullableToVisibilityConverter}}">
+                            <ContentControl.Clip>
+                                <EllipseGeometry
+                                    Center="16,16"
+                                    RadiusX="16"
+                                    RadiusY="16" />
+                            </ContentControl.Clip>
+                            <ContentControl.Template>
+                                <ControlTemplate TargetType="ContentControl">
+                                    <Border Background="{TemplateBinding Background}">
+                                        <ContentPresenter
+                                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                            Content="{TemplateBinding Content}" />
+                                    </Border>
+                                </ControlTemplate>
+                            </ContentControl.Template>
+                        </ContentControl>
+                        <ContentControl
+                            x:Name="TextBlock"
+                            Grid.Column="1"
+                            Margin="8,0,12,0"
+                            VerticalAlignment="Center"
+                            Content="{TemplateBinding Content}"
+                            ContentStringFormat="{TemplateBinding ContentTemplateSelector}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
+                            IsTabStop="False" />
+                        <Button
+                            x:Name="PART_DeleteButton"
+                            Grid.Column="2"
+                            Width="16"
+                            Height="16"
+                            Margin="-6,0,8,0"
+                            VerticalAlignment="Center"
+                            ToolTip="{TemplateBinding DeleteToolTip}"
+                            Visibility="{TemplateBinding IsDeletable,
+                                                         Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <Button.Template>
+                                <ControlTemplate>
+                                    <Grid>
+                                        <Ellipse
+                                            x:Name="Bg"
+                                            Fill="#FFA6A6A6"
+                                            Stroke="#FF009587"
+                                            StrokeThickness="0" />
+                                        <wpf:PackIcon
+                                            Width="12"
+                                            Height="12"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Kind="Close" />
+                                    </Grid>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="Bg" Property="StrokeThickness" Value="1" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger SourceName="IconControl" Property="Visibility" Value="Collapsed">
+                            <Setter TargetName="TextBlock" Property="Margin" Value="12,0,12,0" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="IsDeletable" Value="True" />
+                <Setter Property="Background" Value="#b7dbff" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <Style x:Key="FoldTabsListViewStyle" TargetType="{x:Type ListView}">
@@ -798,10 +1058,10 @@
                         <Viewbox>
                             <wpf:Chip
                                 x:Name="Chip"
-                                Command="{Binding Source={StaticResource Locator}, Path=Main.ClickFoldCommand}"
+                                Command="{Binding Source={StaticResource StyleLocator}, Path=Main.ClickFoldCommand}"
                                 CommandParameter="{Binding TableFullName}"
                                 Content="{Binding TableName}"
-                                DeleteCommand="{Binding Source={StaticResource Locator}, Path=Main.CloseFoldTabCommand}"
+                                DeleteCommand="{Binding Source={StaticResource StyleLocator}, Path=Main.CloseFoldTabCommand}"
                                 DeleteCommandParameter="{Binding TableFullName}"
                                 Style="{StaticResource FoldTabChipStyle}"
                                 ToolTip="{Binding TableName}" />
@@ -821,242 +1081,17 @@
         </Style.Triggers>
     </Style>
 
-    <Style x:Key="TabChip" TargetType="{x:Type wpf:Chip}">
-        <Setter Property="Height" Value="50px" />
-        <Setter Property="HorizontalAlignment" Value="Stretch" />
-        <Setter Property="VerticalAlignment" Value="Stretch" />
-        <Setter Property="FontSize" Value="13" />
-        <Setter Property="Background" Value="#d0d0d0" />
-        <Setter Property="IconBackground" Value="{DynamicResource PrimaryHueMidBrush}" />
-        <Setter Property="IconForeground" Value="{DynamicResource PrimaryHueMidForegroundBrush}" />
-        <Setter Property="Cursor" Value="Hand" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type wpf:Chip}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <Border
-                            Grid.ColumnSpan="3"
-                            Background="{TemplateBinding Background}"
-                            CornerRadius="0" />
-                        <ContentControl
-                            x:Name="IconControl"
-                            Grid.Column="0"
-                            Width="32"
-                            Height="32"
-                            VerticalAlignment="Center"
-                            HorizontalContentAlignment="Center"
-                            VerticalContentAlignment="Center"
-                            Background="{TemplateBinding IconBackground}"
-                            Content="{TemplateBinding Icon}"
-                            FontSize="17"
-                            FontWeight="Regular"
-                            Foreground="{TemplateBinding IconForeground}"
-                            IsTabStop="False"
-                            Visibility="{TemplateBinding Icon,
-                                                         Converter={StaticResource NullableToVisibilityConverter}}">
-                            <ContentControl.Clip>
-                                <EllipseGeometry
-                                    Center="16,16"
-                                    RadiusX="16"
-                                    RadiusY="16" />
-                            </ContentControl.Clip>
-                            <ContentControl.Template>
-                                <ControlTemplate TargetType="ContentControl">
-                                    <Border Background="{TemplateBinding Background}">
-                                        <ContentPresenter
-                                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                            Content="{TemplateBinding Content}" />
-                                    </Border>
-                                </ControlTemplate>
-                            </ContentControl.Template>
-                        </ContentControl>
-                        <ContentControl
-                            x:Name="TextBlock"
-                            Grid.Column="1"
-                            Margin="8,0,12,0"
-                            VerticalAlignment="Center"
-                            Content="{TemplateBinding Content}"
-                            ContentStringFormat="{TemplateBinding ContentTemplateSelector}"
-                            ContentTemplate="{TemplateBinding ContentTemplate}"
-                            ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
-                            IsTabStop="False" />
-                        <Button
-                            x:Name="PART_DeleteButton"
-                            Grid.Column="2"
-                            Width="16"
-                            Height="16"
-                            Margin="-6,0,8,0"
-                            VerticalAlignment="Center"
-                            ToolTip="{TemplateBinding DeleteToolTip}"
-                            Visibility="{TemplateBinding IsDeletable,
-                                                         Converter={StaticResource BooleanToVisibilityConverter}}">
-                            <Button.Template>
-                                <ControlTemplate>
-                                    <Grid>
-                                        <Ellipse
-                                            x:Name="Bg"
-                                            Fill="#FFA6A6A6"
-                                            Stroke="#FF009587"
-                                            StrokeThickness="0" />
-                                        <wpf:PackIcon
-                                            Width="12"
-                                            Height="12"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            Kind="Close" />
-                                    </Grid>
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter TargetName="Bg" Property="StrokeThickness" Value="1" />
-                                        </Trigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </Button.Template>
-                        </Button>
-                    </Grid>
-                    <ControlTemplate.Triggers>
-                        <Trigger SourceName="IconControl" Property="Visibility" Value="Collapsed">
-                            <Setter TargetName="TextBlock" Property="Margin" Value="12,0,12,0" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="IsDeletable" Value="True" />
-            </Trigger>
-        </Style.Triggers>
-    </Style>
-
-    <Style x:Key="FoldTabChipStyle" TargetType="{x:Type wpf:Chip}">
-        <Setter Property="HorizontalAlignment" Value="Left" />
-        <Setter Property="FontSize" Value="13" />
-        <Setter Property="Width" Value="196" />
-        <Setter Property="Height" Value="30px" />
-        <Setter Property="Margin" Value="-1,0,0,0" />
-        <Setter Property="Background" Value="#eaf0ff" />
-        <Setter Property="IconBackground" Value="{DynamicResource PrimaryHueMidBrush}" />
-        <Setter Property="IconForeground" Value="{DynamicResource PrimaryHueMidForegroundBrush}" />
-        <Setter Property="Cursor" Value="Hand" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type wpf:Chip}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <Border
-                            Grid.ColumnSpan="3"
-                            Background="{TemplateBinding Background}"
-                            CornerRadius="0" />
-                        <ContentControl
-                            x:Name="IconControl"
-                            Grid.Column="0"
-                            Width="32"
-                            Height="32"
-                            VerticalAlignment="Center"
-                            HorizontalContentAlignment="Center"
-                            VerticalContentAlignment="Center"
-                            Background="{TemplateBinding IconBackground}"
-                            Content="{TemplateBinding Icon}"
-                            FontSize="17"
-                            FontWeight="Regular"
-                            Foreground="{TemplateBinding IconForeground}"
-                            IsTabStop="False"
-                            Visibility="{TemplateBinding Icon,
-                                                         Converter={StaticResource NullableToVisibilityConverter}}">
-                            <ContentControl.Clip>
-                                <EllipseGeometry
-                                    Center="16,16"
-                                    RadiusX="16"
-                                    RadiusY="16" />
-                            </ContentControl.Clip>
-                            <ContentControl.Template>
-                                <ControlTemplate TargetType="ContentControl">
-                                    <Border Background="{TemplateBinding Background}">
-                                        <ContentPresenter
-                                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                            Content="{TemplateBinding Content}" />
-                                    </Border>
-                                </ControlTemplate>
-                            </ContentControl.Template>
-                        </ContentControl>
-                        <ContentControl
-                            x:Name="TextBlock"
-                            Grid.Column="1"
-                            Margin="8,0,12,0"
-                            VerticalAlignment="Center"
-                            Content="{TemplateBinding Content}"
-                            ContentStringFormat="{TemplateBinding ContentTemplateSelector}"
-                            ContentTemplate="{TemplateBinding ContentTemplate}"
-                            ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
-                            IsTabStop="False" />
-                        <Button
-                            x:Name="PART_DeleteButton"
-                            Grid.Column="2"
-                            Width="16"
-                            Height="16"
-                            Margin="-6,0,8,0"
-                            VerticalAlignment="Center"
-                            ToolTip="{TemplateBinding DeleteToolTip}"
-                            Visibility="{TemplateBinding IsDeletable,
-                                                         Converter={StaticResource BooleanToVisibilityConverter}}">
-                            <Button.Template>
-                                <ControlTemplate>
-                                    <Grid>
-                                        <Ellipse
-                                            x:Name="Bg"
-                                            Fill="#FFA6A6A6"
-                                            Stroke="#FF009587"
-                                            StrokeThickness="0" />
-                                        <wpf:PackIcon
-                                            Width="12"
-                                            Height="12"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            Kind="Close" />
-                                    </Grid>
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter TargetName="Bg" Property="StrokeThickness" Value="1" />
-                                        </Trigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </Button.Template>
-                        </Button>
-                    </Grid>
-                    <ControlTemplate.Triggers>
-                        <Trigger SourceName="IconControl" Property="Visibility" Value="Collapsed">
-                            <Setter TargetName="TextBlock" Property="Margin" Value="12,0,12,0" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="IsDeletable" Value="True" />
-                <Setter Property="Background" Value="#b7dbff" />
-            </Trigger>
-        </Style.Triggers>
-    </Style>
+    <ContextMenu x:Key="TreeViewMainItemContextMenu" Style="{StaticResource LonwinContextMenu}">
+        <MenuItem Command="{Binding Source={StaticResource StyleLocator}, Path=Main.ImportCommand}" Header="导入" />
+        <MenuItem Command="{Binding Source={StaticResource StyleLocator}, Path=Main.RefreshCommand}" Header="刷新" />
+    </ContextMenu>
 
     <Style
         x:Key="TreeViewMainItemStyle"
         BasedOn="{StaticResource LonwinTreeViewItem}"
         TargetType="TreeViewItem">
         <Setter Property="IsExpanded" Value="True" />
-        <Setter Property="ContextMenu" Value="{DynamicResource TreeViewMainItemContextMenu}" />
+        <Setter Property="ContextMenu" Value="{StaticResource TreeViewMainItemContextMenu}" />
     </Style>
 
     <Style x:Key="DataGridColumnHeaderStyle" TargetType="{x:Type DataGridColumnHeader}">
@@ -1075,7 +1110,7 @@
         <Setter Property="Background" Value="#3448a1" />
     </Style>
 
-    <Style x:Key="MaterialDesignDataGridCell" TargetType="{x:Type DataGridCell}">
+    <Style x:Key="LonwinDataGridCell" TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource MaterialDesignDataGridCell}">
         <Setter Property="Padding" Value="2,2,2,2" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderBrush" Value="Transparent" />
@@ -1094,41 +1129,18 @@
                             SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="MouseLeftButtonUp">
-                                <i:InvokeCommandAction Command="{Binding Source={StaticResource Locator}, Path=Main.CheckForSelectAllCommand}" />
+                                <i:InvokeCommandAction Command="{Binding Source={StaticResource StyleLocator}, Path=Main.CheckForSelectAllCommand}" />
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                     </Border>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Style.Triggers>
-            <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignTextBoxBorder}" />
-            </Trigger>
-            <MultiTrigger>
-                <MultiTrigger.Conditions>
-                    <Condition Property="IsSelected" Value="True" />
-                    <Condition Property="Selector.IsSelectionActive" Value="False" />
-                </MultiTrigger.Conditions>
-                <Setter Property="Background" Value="{DynamicResource MaterialDesignSelection}" />
-            </MultiTrigger>
-            <MultiTrigger>
-                <MultiTrigger.Conditions>
-                    <Condition Property="IsSelected" Value="True" />
-                    <Condition Property="Selector.IsSelectionActive" Value="True" />
-                </MultiTrigger.Conditions>
-                <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
-                <Setter Property="Background" Value="{DynamicResource MaterialDesignSelection}" />
-            </MultiTrigger>
-            <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Opacity" Value=".56" />
-            </Trigger>
-        </Style.Triggers>
     </Style>
 
     <Style
         x:Key="DataGridCellStyle"
-        BasedOn="{StaticResource MaterialDesignDataGridCell}"
+        BasedOn="{StaticResource LonwinDataGridCell}"
         TargetType="DataGridCell">
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Center" />
@@ -1144,7 +1156,7 @@
 
     <Style
         x:Key="DataGridCheckBoxCellStyle"
-        BasedOn="{StaticResource MaterialDesignDataGridCell}"
+        BasedOn="{StaticResource LonwinDataGridCell}"
         TargetType="DataGridCell">
         <Setter Property="Background" Value="#e8e8ec" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
@@ -1245,15 +1257,6 @@
                                             Background="#e8e8ec"
                                             BorderBrush="Black"
                                             BorderThickness="0,0.5,0,0.5" />
-                                        <Button
-                                            Grid.Row="0"
-                                            Grid.Column="0"
-                                            Width="{Binding CellsPanelHorizontalOffset, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}"
-                                            Command="{x:Static DataGrid.SelectAllCommand}"
-                                            Focusable="false"
-                                            Style="{DynamicResource {ComponentResourceKey ResourceId=DataGridSelectAllButtonStyle,
-                                                                                          TypeInTargetAssembly={x:Type DataGrid}}}"
-                                            Visibility="{Binding HeadersVisibility, ConverterParameter={x:Static DataGridHeadersVisibility.All}, Converter={x:Static DataGrid.HeadersVisibilityConverter}, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
                                         <Border
                                             Grid.Row="0"
                                             Grid.Column="1"
@@ -1301,64 +1304,9 @@
         </Setter>
     </Style>
 
-    <Style
-        x:Key="LonwinContextMenu"
-        BasedOn="{StaticResource MaterialDesignMenu}"
-        TargetType="{x:Type ContextMenu}">
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type MenuBase}">
-                    <AdornerDecorator CacheMode="{Binding RelativeSource={RelativeSource Self}, Path=(wpf:ShadowAssist.CacheMode)}">
-                        <Border
-                            Margin="2"
-                            Background="{TemplateBinding Background}"
-                            CornerRadius="0"
-                            Effect="{DynamicResource MaterialDesignShadowDepth1}">
-                            <Border Background="Transparent">
-                                <ScrollViewer x:Name="SubMenuScrollViewer" Style="{DynamicResource {ComponentResourceKey ResourceId=MenuScrollViewer, TypeInTargetAssembly={x:Type FrameworkElement}}}">
-                                    <Grid Margin="0,0" RenderOptions.ClearTypeHint="Enabled">
-                                        <ItemsPresenter
-                                            x:Name="ItemsPresenter"
-                                            Grid.IsSharedSizeScope="True"
-                                            KeyboardNavigation.DirectionalNavigation="Cycle"
-                                            KeyboardNavigation.TabNavigation="Cycle"
-                                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-                                    </Grid>
-                                </ScrollViewer>
-                            </Border>
-                        </Border>
-                    </AdornerDecorator>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
     <Style x:Key="CheckAllBox" TargetType="{x:Type CheckBox}">
         <Setter Property="Height" Value="40" />
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
-
-    <ContextMenu x:Key="TreeViewMainItemContextMenu" Style="{StaticResource LonwinContextMenu}">
-        <MenuItem Command="{Binding Source={StaticResource Locator}, Path=Main.ImportCommand}" Header="导入" />
-        <MenuItem Command="{Binding Source={StaticResource Locator}, Path=Main.RefreshCommand}" Header="刷新" />
-    </ContextMenu>
-
-    <ContextMenu x:Key="DatabaseMenu" Style="{StaticResource LonwinContextMenu}">
-        <MenuItem
-            Command="{Binding Source={StaticResource Locator}, Path=Main.ExportCommand}"
-            CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}, Path=PlacementTarget.Header.Name}"
-            Header="导出" />
-        <MenuItem
-            Command="{Binding Source={StaticResource Locator}, Path=Main.DeleteCommand}"
-            CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}, Path=PlacementTarget.Header.Name}"
-            Header="删除" />
-    </ContextMenu>
-
-    <ContextMenu x:Key="OpenTables" Style="{StaticResource LonwinContextMenu}">
-        <MenuItem
-            Command="{Binding Source={StaticResource Locator}, Path=Main.OpenTableCommand}"
-            CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}, Path=PlacementTarget.Header.TableFullName}"
-            Header="打开" />
-    </ContextMenu>
 </ResourceDictionary>

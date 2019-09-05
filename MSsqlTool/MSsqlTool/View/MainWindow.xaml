@@ -9,14 +9,11 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     x:Name="CurrentWindow"
     WindowStartupLocation="CenterScreen"
+    DataContext="{Binding Source={StaticResource Locator}, Path=Main}"
     WindowState="{Binding CurrentWindowState}"
     Cursor="{Binding CurrentCursor}"
-    DataContext="{Binding Source={StaticResource Locator}, Path=Main}"
     Style="{StaticResource WindowStyle}"
     mc:Ignorable="d">
-    <Window.Resources>
-        <ResourceDictionary Source="../Resources/Styles/MainWindowStyle.xaml"/>
-    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="50" />
@@ -30,7 +27,7 @@
             </i:Interaction.Triggers>
             <Image Style="{StaticResource LogoStyle}" />
             <Button Command="{Binding MinimizeWindowCommand}"  Style="{StaticResource TitleMinimizeButtonStyle}"/>
-            <Button Command="{Binding ChangeWindowStateCommand}" Style="{StaticResource TitleNormalButtonStyle}" />
+            <Button Command="{Binding MaximizeOrRestoreCommand}" Style="{StaticResource TitleNormalButtonStyle}" />
             <Button Command="{Binding CloseWindowCommand}" Style="{StaticResource TitleCloseButtonStyle}" />
         </Grid>
         <Grid Grid.Row="1" Background="#3448a1">
@@ -94,7 +91,7 @@
                         </DataGrid.Columns>
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="CurrentCellChanged">
-                                <i:InvokeCommandAction Command="{Binding Source={StaticResource Locator}, Path=Main.ApplyUpdateCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type DataGrid}}}" />
+                                <i:InvokeCommandAction Command="{Binding ApplyUpdateCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type DataGrid}}}" />
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                     </DataGrid>

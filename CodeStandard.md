@@ -19,4 +19,4 @@
 > - image、style、icon等资源文件放入Resources文件夹。
 > - Converters辅助类单独放入一个文件夹
 ### 编码要求
-> - public方法必须校验参数，并且不可以与其他public方法有调用关联
+> - public方法必须校验参数，并且不可以与其他public方法有关联

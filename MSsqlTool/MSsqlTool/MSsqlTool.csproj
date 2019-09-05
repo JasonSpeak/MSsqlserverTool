@@ -127,10 +127,11 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Model\OpenedTablesModel.cs" />
+    <Compile Include="Model\OpenTabsHelperModel.cs" />
     <Compile Include="Model\SqlHelperModel.cs" />
     <Compile Include="Model\SqlMenuModel.cs" />
     <Compile Include="Model\TableFullNameModel.cs" />
-    <Compile Include="Converters\BoolToVisibleConverter.cs" />
+    <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="Converters\PercentageConverter.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />

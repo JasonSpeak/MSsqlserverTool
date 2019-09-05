@@ -48,31 +48,5 @@ namespace MSsqlTool.Model
             TableName = tableFullName.GetFormattedName();
             _isChoosed = false;
         }
-
-        public static void SetElseTabsFalse(ObservableCollection<OpenedTablesModel> openedTabs,TableFullNameModel tableFullName)
-        {
-            foreach (var tab in openedTabs)
-            {
-                tab.IsChoosed = (tab.TableFullName == tableFullName);
-            }
-        }
-
-        public static void DeleteTabWithDataBaseName(ObservableCollection<OpenedTablesModel> tabs, string dataBaseName)
-        {
-            var deleteTabs = tabs.Where(tab => tab.TableFullName.DataBaseName == dataBaseName).ToList();
-            foreach (var tab in deleteTabs)
-            {
-                tabs.Remove(tab);
-            }
-        }
-
-        public static void SetAllTabsFalse(ObservableCollection<OpenedTablesModel> tabs)
-        {
-            foreach (var tab in tabs)
-            {
-                tab.IsChoosed = false;
-            }
-        }
-
     }
 }

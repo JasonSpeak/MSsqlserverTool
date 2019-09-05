@@ -14,7 +14,7 @@ namespace MSsqlTool
         {
             base.OnStartup(e);
 
-            AppDomain.CurrentDomain.UnhandledException += OnUnhandledExceptionOccured; ;
+            AppDomain.CurrentDomain.UnhandledException += OnUnhandledExceptionOccured;
         }
 
         private void OnUnhandledExceptionOccured(object sender, UnhandledExceptionEventArgs e)

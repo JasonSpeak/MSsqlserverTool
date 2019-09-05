@@ -4,7 +4,7 @@ using System.Windows.Data;
 
 namespace MSsqlTool.Converters
 {
-    internal class BoolToVisibleConverter:IValueConverter 
+    internal class BoolToVisibilityConverter:IValueConverter 
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
