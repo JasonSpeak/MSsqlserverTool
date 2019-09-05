@@ -57,6 +57,9 @@
             <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self},Path=WindowState}" Value="{x:Static WindowState.Maximized}">
                 <Setter Property="BorderThickness" Value="8"/>
             </DataTrigger>
+            <DataTrigger Binding="{Binding CurrentCursorState}" Value="True">
+                <Setter Property="Cursor" Value="Wait"/>
+            </DataTrigger>
         </Style.Triggers>
     </Style>
 

@@ -11,7 +11,6 @@
     WindowStartupLocation="CenterScreen"
     DataContext="{Binding Source={StaticResource Locator}, Path=Main}"
     WindowState="{Binding CurrentWindowState}"
-    Cursor="{Binding CurrentCursor}"
     Style="{StaticResource WindowStyle}"
     mc:Ignorable="d">
     <Grid>
@@ -30,7 +29,7 @@
             <Button Command="{Binding MaximizeOrRestoreCommand}" Style="{StaticResource TitleNormalButtonStyle}" />
             <Button Command="{Binding CloseWindowCommand}" Style="{StaticResource TitleCloseButtonStyle}" />
         </Grid>
-        <Grid Grid.Row="1" Background="#3448a1">
+        <Grid Grid.Row="1" Background="{StaticResource ThemeColor}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition
                     Width="3*"/>

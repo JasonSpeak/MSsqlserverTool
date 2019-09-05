@@ -12,6 +12,7 @@
                 xmlns:vm="clr-namespace:MSsqlTool.ViewModel"
                 x:Key="Locator"
                 d:IsDataSource="True" />
+            <SolidColorBrush x:Key="ThemeColor" Color="#3448a1"></SolidColorBrush>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Resources/Styles/MainWindowStyle.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />

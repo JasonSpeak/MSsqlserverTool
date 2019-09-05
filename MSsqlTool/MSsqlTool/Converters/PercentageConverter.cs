@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 using System.Windows.Data;
 
 namespace MSsqlTool.Converters
@@ -14,7 +15,7 @@ namespace MSsqlTool.Converters
                 return convertValue * convertParameter;
             }
 
-            return null;
+            return DependencyProperty.UnsetValue;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter,

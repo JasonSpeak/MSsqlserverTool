@@ -4,7 +4,6 @@ using MSsqlTool.Model;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
@@ -23,15 +22,12 @@ namespace MSsqlTool.ViewModel
     public class MainViewModel : ViewModelBase
     {   
         private const int MaxTabsCount = 6;
-        private static readonly string ConnectString =
-            ConfigurationManager.ConnectionStrings["ConnectString"].ToString();
-        private readonly SqlConnection _masterConn;
         private readonly Dispatcher _currentDispatcher;
 
         private bool _isDataGridOpened;
         private bool _isAllSelected;
         private bool _isTabFoldOpened;
-        private string _currentCursor;
+        private bool _currentCursorState;
         private WindowState _currentWindowState;
         private List<SqlMenuModel> _mainDatabaseList;
         private SqlDataAdapter _dataAdapterForUpdate;
@@ -74,13 +70,13 @@ namespace MSsqlTool.ViewModel
                 }
             }
         }
-        public string CurrentCursor
+        public bool CurrentCursorState
         {
-            get => _currentCursor;
+            get => _currentCursorState;
             set
             {
-                _currentCursor = value;
-                RaisePropertyChanged(() => CurrentCursor);
+                _currentCursorState = value;
+                RaisePropertyChanged(() => CurrentCursorState);
             }
         }
         public WindowState CurrentWindowState
@@ -133,8 +129,7 @@ namespace MSsqlTool.ViewModel
 
         public MainViewModel()
         {
-            _masterConn = new SqlConnection(ConnectString);
-            SqlHelperModel.TestSqlConnection(_masterConn);
+            CheckSqlServerAvailability();
 
             CloseWindowCommand = new RelayCommand(OnCloseWindowCommandExecuted);
             MaximizeOrRestoreCommand = new RelayCommand(OnMaximizeOrRestoreCommandExecuted);
@@ -155,21 +150,21 @@ namespace MSsqlTool.ViewModel
             SelectAllCommand = new RelayCommand<DataGrid>(OnSelectAllCommandExecuted);
             CheckForSelectAllCommand = new RelayCommand(OnCheckForSelectAllCommandExecuted);
 
-            CurrentCursor = "Arrow";
             CurrentWindowState = WindowState.Normal;
             _dataAdapterForUpdate = new SqlDataAdapter();
             _currentDispatcher = Application.Current.MainWindow?.Dispatcher;
             OpenedTabs = new ObservableCollection<OpenedTablesModel>();
             OpenedTabsFolder = new ObservableCollection<OpenedTablesModel>();
 
-            MainDatabaseList = SqlMenuModel.InitializeData(_masterConn);
+            MainDatabaseList = SqlMenuModel.InitializeData();
         }
 
         private void OnCloseWindowCommandExecuted()
         {
             Application.Current.Shutdown();
             _dataAdapterForUpdate.Dispose();
-            _masterConn.Dispose();
+            SqlMenuModel.Close();
+            SqlHelperModel.Close();
         }
 
         private void OnMaximizeOrRestoreCommandExecuted()
@@ -189,7 +184,7 @@ namespace MSsqlTool.ViewModel
             var bakFileName = $"{exportFileLocation}\\{databaseName}.bak";
             bakFileName = bakFileName.Replace("\\\\", "\\");
             DeleteLocalBakFile(allBakFiles, bakFileName);
-            SqlHelperModel.ExportDataBaseHelper(databaseName, exportFileLocation,_masterConn);
+            SqlHelperModel.ExportDataBaseHelper(databaseName, exportFileLocation);
             ShowMessage("Export Success!", "Success");
         }
 
@@ -200,11 +195,11 @@ namespace MSsqlTool.ViewModel
                 _currentDispatcher?.BeginInvoke(DispatcherPriority.Background,
                     (Action) (() =>
                     {
-                        CurrentCursor = "Wait";
-                        SqlHelperModel.DropDataBaseHelper(databaseName, _masterConn);
+                        CurrentCursorState = true;
+                        SqlHelperModel.DropDataBaseHelper(databaseName);
                         DeleteTabsWithDataBaseDeleted(databaseName);
-                        MainDatabaseList = SqlMenuModel.InitializeData(_masterConn);
-                        CurrentCursor = "Arrow";
+                        MainDatabaseList = SqlMenuModel.InitializeData();
+                        CurrentCursorState = false;
                         ShowMessage($"Success Delete Local DataBase {databaseName}", "Success");
                     }));
             }
@@ -213,16 +208,16 @@ namespace MSsqlTool.ViewModel
         private void OnImportCommandExecuted()
         {
             var filePath = GetImportFileLocation();
-            var logicName = SqlHelperModel.GetLogicNameFromBak(filePath, _masterConn);
+            var logicName = SqlHelperModel.GetLogicNameFromBak(filePath);
             if (IsOverWriteLocalDataBase(logicName))
             {
                 _currentDispatcher?.BeginInvoke(DispatcherPriority.Background,
                     (Action)(() =>
                     {
-                        CurrentCursor = "Wait";
-                        SqlHelperModel.ImportDataBaseHelper(filePath, _masterConn);
-                        MainDatabaseList = SqlMenuModel.InitializeData(_masterConn);
-                        CurrentCursor = "Arrow";
+                        CurrentCursorState = true;
+                        SqlHelperModel.ImportDataBaseHelper(filePath);
+                        MainDatabaseList = SqlMenuModel.InitializeData();
+                        CurrentCursorState = false;
                         DeleteTabsWithDataBaseDeleted(logicName);
                         ShowMessage("Import Success", "Success");
                     }));
@@ -255,7 +250,7 @@ namespace MSsqlTool.ViewModel
 
         private void OnRefreshCommandExecuted()
         {
-            MainDatabaseList = SqlMenuModel.InitializeData(_masterConn);
+            MainDatabaseList = SqlMenuModel.InitializeData();
         }
 
         private void OnCloseTabCommandExecuted(TableFullNameModel tableFullName)
@@ -294,14 +289,8 @@ namespace MSsqlTool.ViewModel
         {
             if (CurrentData.GetChanges() != null)
             {
-                try
-                {
-                    SqlHelperModel.ApplyUpdateHelper(_dataAdapterForUpdate, CurrentData);
-                }
-                catch (SqlException e)
-                {
-                    ShowMessage(e.Message,"Error");
-                }
+                if(!SqlHelperModel.ApplyUpdateHelper(_dataAdapterForUpdate, CurrentData))
+                    ShowMessage("Update table's data failed\nRead Log file for more Information","Error");
                 GetTableData(_currentTable);
             }
         }
@@ -366,15 +355,23 @@ namespace MSsqlTool.ViewModel
             IsAllSelected = false;
         }
 
+        private void CheckSqlServerAvailability()
+        {
+            if (!SqlHelperModel.CanMasterConnAvailable())
+            {
+                ShowMessage("Unable to connect SqlServer\nRead Log file for more Information","Error");
+            }
+        }
+
         private void GetTableData(TableFullNameModel tableFullName)
         {
             IsDataGridOpened = true;
-            _currentDispatcher?.BeginInvoke(DispatcherPriority.Background,
+            _currentDispatcher?.BeginInvoke(DispatcherPriority.Normal,
                 (Action)(() =>
                 {
-                    CurrentCursor = "Wait";
+                    CurrentCursorState = true;
                     CurrentData = SqlHelperModel.GetTableDataHelper(tableFullName, out _dataAdapterForUpdate);
-                    CurrentCursor = "Arrow";
+                    CurrentCursorState = false;
                 }));
             _currentTable = tableFullName;
         }
@@ -417,7 +414,7 @@ namespace MSsqlTool.ViewModel
 
         private bool IsOverWriteLocalDataBase(string logicName)
         {
-            if (SqlHelperModel.IsLocalExistThisDataBase(logicName,_masterConn))
+            if (SqlHelperModel.IsLocalExistThisDataBase(logicName))
             {
                 return (MessageBox.Show($"Do you want to OVERWRITE local database:\n{logicName}", "Warning",
                             MessageBoxButton.YesNo, MessageBoxImage.Warning) ==

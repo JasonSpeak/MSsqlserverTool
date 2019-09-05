@@ -1,25 +1,14 @@
-﻿using System.Collections.ObjectModel;
-using System.Linq;
-using GalaSoft.MvvmLight;
+﻿using GalaSoft.MvvmLight;
 
 namespace MSsqlTool.Model
 {
     public class OpenedTablesModel:ObservableObject
     {
-        private string _tableName;
-        private TableFullNameModel _tableFullName;
         private bool _isChoosed;
 
-        public string TableName
-        {
-            get => _tableName;
-            set
-            {
-                _tableName = value;
-                RaisePropertyChanged(()=>TableName);
-            }
-        }
+        public string TableName { get; }
 
+        public TableFullNameModel TableFullName { get; }
 
         public bool IsChoosed
         {
@@ -28,17 +17,6 @@ namespace MSsqlTool.Model
             {
                 _isChoosed = value;
                 RaisePropertyChanged(()=>IsChoosed);
-            }
-        }
-
-
-        public TableFullNameModel TableFullName
-        {
-            get => _tableFullName;
-            set
-            {
-                _tableFullName = value;
-                RaisePropertyChanged(()=>TableFullName);
             }
         }
 

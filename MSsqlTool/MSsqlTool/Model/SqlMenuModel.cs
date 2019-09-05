@@ -1,7 +1,6 @@
-﻿using System;
-using GalaSoft.MvvmLight;
-using NLog;
+﻿using GalaSoft.MvvmLight;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
@@ -10,7 +9,10 @@ namespace MSsqlTool.Model
 {
     public class SqlMenuModel:ObservableObject
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private static readonly string ConnectString =
+            ConfigurationManager.ConnectionStrings["ConnectString"].ToString();
+        private static readonly SqlConnection MasterConn = new SqlConnection(ConnectString);
+
         private string _name;
         private string _level;
         private TableFullNameModel _tableFullName;
@@ -56,27 +58,15 @@ namespace MSsqlTool.Model
             }
         }
 
-        public static List<SqlMenuModel> InitializeData(SqlConnection masterConn)
+        public static List<SqlMenuModel> InitializeData()
         {
-            if (masterConn == null)
-            {
-                throw new ArgumentException(@"masterConn should not be empty",nameof(masterConn));
-            }
+            MasterConn.Open();
+            var selectDataBasesScript = "SELECT NAME FROM SYSDATABASES WHERE SID != 0x01";
+            var dataBaseAdapter = new SqlDataAdapter(selectDataBasesScript, MasterConn);
             var dataBaseTable = new DataTable();
-            try
-            {
-                masterConn.Open();
-                var selectDataBasesScript = "SELECT NAME FROM SYSDATABASES WHERE SID != 0x01";
-                var dataBaseAdapter = new SqlDataAdapter(selectDataBasesScript, masterConn);
-                dataBaseAdapter.Fill(dataBaseTable);
-                dataBaseAdapter.Dispose();
-                masterConn.Close();
-            }
-            catch (SqlException e)
-            {
-                Logger.Error(e.Message);
-                throw;
-            }
+            dataBaseAdapter.Fill(dataBaseTable);
+            dataBaseAdapter.Dispose();
+            MasterConn.Close();
             var tempDataBaseList = (from DataRow row in dataBaseTable.Rows select row["name"].ToString()).ToList();
             var dataBaseList = new List<SqlMenuModel>();
             foreach (var name in tempDataBaseList)
@@ -88,31 +78,32 @@ namespace MSsqlTool.Model
             {
                 new SqlMenuModel() { Name = "数据库", MenuTables = dataBaseList, Level = "main" }
             };
+
             return mainDatabaseList;
         }
+
+        public static void Close()
+        {
+            MasterConn.Dispose();
+        }
+        
 
         private static List<SqlMenuModel> GetTableList(string databaseName)
         {
             DataTable tableNames;
+
             var getTableConnString = SqlHelperModel.GetDifferentConnectionWithName(databaseName);
             using (var getTableConnection = new SqlConnection(getTableConnString))
             {
-                try
-                {
-                    getTableConnection.Open();
-                    var selectTableScript = "SELECT NAME FROM SYS.TABLES";
-                    var tablesNameAdapter = new SqlDataAdapter(selectTableScript, getTableConnection);
-                    tableNames = new DataTable();
-                    tablesNameAdapter.Fill(tableNames);
-                    tablesNameAdapter.Dispose();
-                    getTableConnection.Close();
-                }
-                catch (SqlException e)
-                {
-                    Logger.Error(e.Message);
-                    throw;
-                }
+                getTableConnection.Open();
+                var selectTableScript = "SELECT NAME FROM SYS.TABLES";
+                var tablesNameAdapter = new SqlDataAdapter(selectTableScript, getTableConnection);
+                tableNames = new DataTable();
+                tablesNameAdapter.Fill(tableNames);
+                tablesNameAdapter.Dispose();
+                getTableConnection.Close();
             }
+
             var tableList = new List<SqlMenuModel>();
             foreach (DataRow row in tableNames.Rows)
             {
