@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace MSsqlTool.Model
 {
-    internal static class OpenTabsHelper
+    internal static class OpenTabsHelperModel
     {
         public static void SetElseTabsFalse(this ObservableCollection<OpenedTablesModel> openedTabs, TableFullNameModel tableFullName)
         {

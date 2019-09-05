@@ -21,7 +21,7 @@ using MessageBox = System.Windows.MessageBox;
 namespace MSsqlTool.ViewModel
 {
     public class MainViewModel : ViewModelBase
-    {
+    {   
         private const int MaxTabsCount = 6;
         private static readonly string ConnectString =
             ConfigurationManager.ConnectionStrings["ConnectString"].ToString();
