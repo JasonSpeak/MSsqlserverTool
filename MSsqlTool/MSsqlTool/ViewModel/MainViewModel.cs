@@ -180,6 +180,13 @@ namespace MSsqlTool.ViewModel
         private void OnExportCommandExecuted(string databaseName)
         {
             var exportFileLocation = GetExportFolder();
+            if(string.IsNullOrEmpty(exportFileLocation))
+                return;
+            if (Path.GetPathRoot(exportFileLocation) == "C:\\")
+            {
+                ShowMessage("Can't Create files in C:\\", "Warning");
+                return;
+            }
             var allBakFiles = Directory.GetFiles(exportFileLocation, "*.bak");
             var bakFileName = $"{exportFileLocation}\\{databaseName}.bak";
             bakFileName = bakFileName.Replace("\\\\", "\\");
@@ -208,6 +215,8 @@ namespace MSsqlTool.ViewModel
         private void OnImportCommandExecuted()
         {
             var filePath = GetImportFileLocation();
+            if(string.IsNullOrEmpty(filePath))
+                return;
             var logicName = SqlHelperModel.GetLogicNameFromBak(filePath);
             if (IsOverWriteLocalDataBase(logicName))
             {
@@ -445,8 +454,11 @@ namespace MSsqlTool.ViewModel
         private static string GetExportFolder()
         {
             var chooseExportFolder = new FolderBrowserDialog { Description = @"Choose Export Location" };
-            chooseExportFolder.ShowDialog();
-            return chooseExportFolder.SelectedPath;
+            if (chooseExportFolder.ShowDialog() == DialogResult.OK)
+            {
+                return chooseExportFolder.SelectedPath;
+            }
+            return null;
         }
 
         private static string GetImportFileLocation()
@@ -457,8 +469,12 @@ namespace MSsqlTool.ViewModel
                 Multiselect = false,
                 Filter = @"Database Back File(*.bak)|*.bak"
             };
-            chooseFileDialog.ShowDialog();
-            return chooseFileDialog.FileName;
+            if (chooseFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                return chooseFileDialog.FileName;
+            }
+
+            return null;
         }
     }
 }

@@ -3,6 +3,7 @@ using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 
 namespace MSsqlTool.Model
@@ -118,23 +119,11 @@ namespace MSsqlTool.Model
                 throw new ArgumentException(@"filePath should not be empty",nameof(filePath));
 
             MasterConn.Open();
-            var getLogicNameScript =
-                "DECLARE @Table TABLE (LogicalName varchar(128),[PhysicalName] varchar(128), [Type] varchar, " +
-                "[FileGroupName] varchar(128), [Size] varchar(128), [MaxSize] varchar(128), [FileId] varchar(128)," +
-                "[CreateLSN] varchar(128), [DropLSN] varchar(128), [UniqueId] varchar(128), [ReadOnlyLSN] varchar(128), " +
-                "[ReadWriteLSN] varchar(128),[BackupSizeInBytes] varchar(128), [SourceBlockSize] varchar(128), " +
-                "[FileGroupId] varchar(128), [LogGroupGUID] varchar(128), [DifferentialBaseLSN] varchar(128), " +
-                "[DifferentialBaseGUID] varchar(128), [IsReadOnly] varchar(128), [IsPresent] varchar(128), [TDEThumbprint] varchar(128))" +
-                $"DECLARE @Path varchar(1000)='{filePath}'" +
-                "DECLARE @LogicalNameData varchar(128),@LogicalNameLog varchar(128)" +
-                "INSERT INTO @table EXEC('RESTORE FILELISTONLY FROM DISK = ''' +@Path+ '''')" +
-                "SET @LogicalNameData = (SELECT LogicalName FROM @Table WHERE Type= 'D')" +
-                "SET @LogicalNameLog = (SELECT LogicalName FROM @Table WHERE Type='L')" +
-                "SELECT @LogicalNameData AS [LogicalName]";
+            var getLogicNameScript = $"RESTORE HEADERONLY  FROM DISK='{filePath}'";
             var getLogicNameAdapter = new SqlDataAdapter(getLogicNameScript, MasterConn);
             var logicNameTable = new DataTable();
             getLogicNameAdapter.Fill(logicNameTable);
-            var logicName = logicNameTable.Rows[0]["LogicalName"].ToString();
+            var logicName = logicNameTable.Rows[0]["DatabaseName"].ToString();
             MasterConn.Close();
             getLogicNameAdapter.Dispose();
             
@@ -187,6 +176,7 @@ namespace MSsqlTool.Model
 
         private static void ImportDataBase(string logicName, string filePath,SqlConnection MasterConn)
         {
+            Debug.WriteLine(logicName);
             MasterConn.Open();
             var importScript = $"RESTORE DATABASE [{logicName}] FROM DISK='{filePath}'";
             var importCommand = new SqlCommand(importScript, MasterConn);
