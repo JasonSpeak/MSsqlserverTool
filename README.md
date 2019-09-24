@@ -5,7 +5,7 @@
 - [WorkList](#worklist)
 
 ## Usage
-> **MSsqlTool for Lonwin** 
+> **MSsqlTool for Lonwin**  
 > **A light sql workbench of MSsqlserver**  
 > - With this tool ,you can:  
 >   - get local databases without sysdatabases  
